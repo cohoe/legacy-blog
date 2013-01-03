@@ -3,19 +3,20 @@ layout: post
 title: "System Technology Accounting and Resource Registration Solution (STARRS)"
 date: 2013-01-01 20:10
 comments: true
+sharing: true
 categories: Projects
 ---
 # Background
-Like most of my projects, it all started with CSH. RIT allocates us two /24 public-facing networks to distribute out to our users. These resources need to have some degree of accounting in the event a user does something stupid (piracy, kiddie-pr0n, etc). RIT handles this with their own internal application, referred to as "start.rit.edu". Fun aside, Start.RIT was coded by an old CSHer, now RIT employee and CSH advisor. He still maintains portions of it today. When the CSH network got to the point of needing our own internal application, Joe Sunday created "start.csh.rit.edu". Similar to it's RIT counterpart, Start.CSH allowed administrators to register machines and distribute resources on the network. Start.CSH also allowed for users to manage firewall rules for their hosts at the border firewall systems. On the backend, it had a script that would automatically generate an ISC-DHCPD config file and load it into the server.
+Like most of my projects, it all started with CSH. RIT allocates us two /24 public-facing networks to distribute out to our users. These resources need to have some degree of accounting in the event a user does something stupid (piracy, kiddie-pr0n, etc). RIT handles this with their own internal application, referred to as "start.rit.edu". _Fun aside, Start.RIT was coded by an old CSHer, now RIT employee and CSH advisor. He still maintains portions of it today._ When the CSH network got to the point of needing our own internal application, a member (<a href="http://www.csh.rit.edu/~sunday/">Joe Sunday</a>) created "start.csh.rit.edu". Similar to it's RIT counterpart, start.csh allowed administrators to register machines and distribute resources on the network. Start.csh also allowed for users to manage firewall rules for their hosts at the border firewall systems. On the backend, it had a script that would automatically generate an ISC-DHCPD config file and load it into the server.
 
 Unfortunately over time, bits of Start began to break. The fact that users could not register their own machines was a major source of irritation for the RTPs (Root-Type-Persons, or Sysadmins). When the network topology was shifted to accomodate some reorganization within RIT, the firewall rule system broke completely. There was no way to clear out old hosts that havent been on the network in years. And after the house DHCP server was compromised (then obliterated by the RTPs for security), the automatic DHCP generation was completely gone. We needed something new.
 
-Starting in the Spring of 2011 I starting to architect a new application to encoumpase the previous functionality and add a lot of new features and enhancements that would benefit us for years to come. Going into the projects, I knew one thing: It had to be based in PostgreSQL. Pg has native datatypes for IP addresses, subnets, and MAC addresses. I know that this would be invaluable to have later on in the project. I also knew that I didnt want to write a daemon that ran on some server.
+Starting in the Spring of 2011 I starting to architect a new application to encoumpase the previous functionality and add a lot of new features and enhancements that would benefit us for years to come. Going into the projects, I knew one thing: It had to be based in PostgreSQL. Pg has native datatypes for IP addresses, subnets, and MAC addresses. I know that this would be invaluable to have later on in the project. I also knew that I didnt want to write a daemon that ran on some server imposing application logic.
 
 # Development
-At this point in my career, I didn't have a whole lot of database architecting experience. I began to search for a schema creation application to help me architect what I knew was going to be a complex schema. I ran across a service called SchemaBank. (SB is now defunct) It was a schema design webapp that supported Postgres. It also introduced me to two things that would change the course of the application forever: Triggers and Functions. I realized that I could use Pg as the backend daemon to the entire application. For client interaction with the application, I started to develop a set of wrapper API functions that would help impose the application logic on the stored data. While most of this was taken care of in the relations between entities, there were some that could not be expressed as a relation. Fast forward two months, and I had a first revision of the database and the API to start writing an interface for.
+At this point in my career, I didn't have a whole lot of database architecting experience. I began to search for a schema creation application to help me architect what I knew was going to be a complex schema. I ran across a service called <a href="http://www.schemabank.com">SchemaBank</a>. (SB is now defunct) It was a schema design webapp that supported Postgres. It also introduced me to two things that would change the course of the application forever: Triggers and Functions. I realized that I could use Pg as the backend daemon to the entire application. For client interaction with the application, I started to develop a set of wrapper API functions that would help impose the application logic on the stored data. While most of this was taken care of in the relations between entities, there were some that could not be expressed as a relation. Fast forward two months, and I had a first revision of the database and the API to start writing an interface for.
 
-At this point I didn't know any sort of web languages other than HTML and CSS. So using a book I won at BarCampRoc on PHP, MySQL, and Javascript (a very good book by the way), I started to learn PHP. Originally I was going to go with a purely non-OOP model for the webapp, however after consulting one of my web-dev friends (Ben Russell), he suggested that I go with an OOP model and to use some sort of framework to avoid having to write a ton of extra code. At this point I went with one that another one of my web-dev friends had used, Codeigniter. So I set to work and started writing classes. During this time, I knew that I needed a new a new dhcpd.conf generation function. One of my friends (Anthony Gargiulo) expressed an interest in helping out with the project, so I tasked him with writing a generation function in Perl. Four months later, I had a working PHP web interface (and he had a working dhcpd.conf generator). At this point, I had everything except a name. I dont really remember a lot about how it came about, but I think I took the first cool-sounding word that came to my head. I was in a Quake 3 Arena mood that day and remembered an old console command (impulse). I took that word and backronymed it to the IP Management Program for Use in Local Server Environments.
+At this point I didn't know any sort of web languages other than HTML and CSS either. So using a book I won at BarCampRoc on <a href="http://shop.oreilly.com/product/9780596157142.do">PHP, MySQL, and Javascript</a> (a very good book by the way), I started to learn PHP. Originally I was going to go with a purely non-OOP model for the webapp, however after consulting one of my web-dev friends (<a href="http://iota.csh.rit.edu/">Ben Russell</a>), he suggested that I go with an OOP model and to use some sort of framework to avoid having to write a ton of extra code. At this point I went with one that another one of my web-dev friends had used, <a href="http://ellislab.com/codeigniter">Codeigniter</a>. So I set to work and started writing classes. During this time, I knew that I needed a new a new dhcpd.conf generation function. One of my friends (<a href="http://blog.agargiulo.com/">Anthony Gargiulo</a>) expressed an interest in helping out with the project, so I tasked him with writing a generation function in Perl. Four months later, I had a working PHP web interface (and he had a working dhcpd.conf generator). At this point, I had everything except a name. I dont really remember a lot about how it came about, but I think I took the first cool-sounding word that came to my head. I was in a Quake 3 Arena mood that day and remembered an old console command (impulse). I took that word and backronymed it to the IP Management Program for Use in Local Server Environments.
 
 # Initial Implementation
 When we returned to RIT in the Fall, I set to work deploying IMPULSE. After a few hickups here and there, everything was in place and in use. Users were fairly receptive to it, mainly that they could register their devices themselves. However after some time, a few problems emerged. The web interface became terribly slow with all of the data that people had entered. It wasnt very efficient at allowing users to complete basic tasks and had a few bugs. Clearly some changes needed to occur, but during the course of the year I didn't want to touch it. I spent 6 months writing code on this project, and I really didnt want to work on it again.
@@ -40,27 +41,27 @@ STARRS also has the ability to automatically generate a configuration file for t
 
 Use cases have STARRS working with the following web authentication services:
 
-* Stanford Webauth
-* Basic Auth w/ mod_ldap
+* <a href="http://webauth.stanford.edu/">Stanford Webauth</a>
+* <a href="http://httpd.apache.org/docs/2.2/mod/mod_ldap.html">Basic Auth w/ mod_ldap</a>
 
 # Deployment
 All of the code is available on Github in two repositories:
 
-* Core/Database
-* Web
+* <a href="https://github.com/cohoe/starrs">Core/Database</a>
+* <a href="https://github.com/cohoe/starrs-web">Web</a>
 
-There is an unofficial and unsupported command-line interface written by a friend of mine (Ryan Brown) located Here.
+There is an unofficial and unsupported command-line interface written by a friend of mine (<a href="http://ryansb.com/">Ryan Brown</a>) located <a href="https://github.com/ryansb/ish">Here</a>.
 
 STARRS is licensed under the MIT license.
 
 # Demo
-You can access the demo at STARRS Demo. Username is 'root' and password is 'admin'. The database resets itself every 24 hours at midnight, so don't expect long-term persistence of data.
+You can access <a href="http://starrsdemo.grantcohoe.com">the demo by clicking here.</a> Username is 'root' and password is 'admin'. The database resets itself every 24 hours at midnight, so don't expect long-term persistence of data.
 
 # Who Should Use This
 If you are a service provider to a group of users who consume network resources that you control. You want some way of accounting for what resources are in use and where they are in your network. The use cases of it so far are:
 
 * Computer Science House - Dorm of college students (about 350 systems)
-* Engineering Lab Services - Product developers in 4 sites across 3 countries (1000+ systems)
+* Work - Product developers in 4 sites across 3 countries (1000+ systems)
 * Enterprise - My personal VM server (30 systems)
 
 # Future

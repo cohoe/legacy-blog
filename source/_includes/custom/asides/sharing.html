@@ -1,0 +1,20 @@
+<section>
+<h1>Share The Wealth</h1>
+<ul>
+  {% if site.facebook_like %}
+  <li class="post cohoe-socialli">
+    <div class="fb-like" data-send="false" data-width="450" data-show-faces="false"></div>
+    </li>
+  {% endif %}
+  {% if site.google_plus_one %}
+  <li class="post cohoe-socialli">
+  <div class="g-plusone" data-size="{{ site.google_plus_one_size }}"></div>
+  </li>
+  {% endif %}
+  {% if site.twitter_tweet_button %}
+  <li class="post cohoe-socialli">
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="{{ site.url }}{{ page.url }}" data-via="{{ site.twitter_user }}" data-counturl="{{ site.url }}{{ page.url }}" >Tweet</a>
+  </li>
+  {% endif %}
+</ul>
+</section>
