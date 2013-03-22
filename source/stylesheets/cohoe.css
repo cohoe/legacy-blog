@@ -12,3 +12,10 @@
 .cohoe-socialli {
 	padding-top: .7em !important;
 }
+
+.cohoe-profile {
+	/**width: 128px;
+	height: 150px;**/
+	float: right;
+	margin-left: 20px;
+}
