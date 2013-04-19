@@ -5,6 +5,7 @@ date: 2013-01-03 00:23
 comments: true
 sharing: true
 categories: Rants
+alias: /rants/fixmemaybe
 ---
 Fix Me Maybe (parody of Call Me Maybe)
 Words by Grant Cohoe (cohoe)
@@ -15,7 +16,7 @@ This was dedicated to Ross Delinger (rossdylan) because: "FIX THE DAMN IRC SERVE
 <a href="http://csh.rit.edu/~ducker/fixmemaybe.mp3">MP3 - Sung by Alex Howland (ducker)</a>
 
 Lyrics:
-<pre>
+```
 I started as a project
 Something come Fall we'd forget
 The system full of neglect
@@ -121,4 +122,4 @@ I was broken so bad
 And you should know that
 
 So fix me, maybe?
-</pre>
+```

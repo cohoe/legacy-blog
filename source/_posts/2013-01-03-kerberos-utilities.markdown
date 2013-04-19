@@ -5,6 +5,7 @@ date: 2013-01-03 00:36
 comments: true
 sharing: true
 categories: Guides
+alias: /guides/kerberosutils
 ---
 There are a number of useful Kerberos client utilities that can help you when working with authentication services. 
 

@@ -5,6 +5,7 @@ date: 2013-01-03 00:34
 comments: true
 sharing: true
 categories: Guides
+alias: /guides/multipath-ha
 ---
 # Multipath Routing
 Multipath routing is when you have a router with multiple equal-cost paths to a single destination. Since each of these routes carries the same weight, the router will distribute traffic across all of them roughly equally. You can read more on this technology on <a href="https://en.wikipedia.org/wiki/Equal-cost_multi-path_routing">Wikipedia</a>. This is more about the implementation of such a topology. 

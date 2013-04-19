@@ -5,6 +5,7 @@ date: 2013-01-03 00:42
 comments: true
 sharing: true
 categories: Rants 
+alias: /rants/facebook
 ---
 If I am the requester or the requestee, it means that I have had a conversation with you (Not chat/texted. Actual person-to-person) on at least two separate occasions. (Occasionally this may be reduced to one depending on circumstances) Do not get this confused with what I consider a "dialog". A dialog is nothing more than "Hi! How are you today? What's up?". A conversation entails we discussed and compared our thoughts on at least one topic at length >5min. Also If you are from my present, it means that I consider there a statistically significant chance that we will see each other in person again in the future. If you are from my past, then we talked at least twice on several (>2) occasions. If you are from my future, well that feature hasn't been implemented yet and will probably cause me to segfault.
 
