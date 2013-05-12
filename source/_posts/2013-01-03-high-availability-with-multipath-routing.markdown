@@ -12,7 +12,8 @@ Multipath routing is when you have a router with multiple equal-cost paths to a 
 
 # The Topology
 In my setup, I have three clients on the 192.168.0.0/24 subnet with gateway 192.168.0.254. Likewise I have three servers on the 10.0.0.0/24 subnet with gateway 10.0.0.254. I want my clients to always be able to access a webserver at host 172.16.0.1/32. This is configured as a loopback address on each of the three servers. This is the multipath part of the project. Each of the servers has the same IP address on a loopback interface and will therefore answer on it. However since the shared router between these two networks has no idea the 172.16.0.1/32 network is available via the servers, my clients cannot access it. This is where the routing comes into play. I will be using an OSPF daemon on my servers to send LSA's (read up on OSPF if you are not familiar) to the router. 
-<img src="https://www.grantcohoe.com/sites/default/files/styles/galleryformatter_slide/public/guides/multipath.PNG" alt="" title="" class="image-galleryformatter_slide" />
+<img src="http://www.grantcohoe.com/images/blog/multipath.png" alt="" title="" />
+
 # Server Configuration
 ## Firewall
 You need to allow OSPF traffic to enter your system. IPtables supports the OSPF transport so you only need a minimum of one rule:

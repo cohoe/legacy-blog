@@ -171,4 +171,5 @@ $SERVICE radvd start
 
 # End Result
 You now have a dual-homed server with two external networks, two internal networks, and IPv6 connectivity to all. Both external networks can receive their configuration via DHCP and will dynamically adjust their routing accordingly. 
-<img src="https://www.grantcohoe.com/sites/default/files/enterprise.PNG" width="662" height="457" alt="" title="" />
+
+<img src="http://www.grantcohoe.com/images/blog/enterprise-diagram.png" width="662" height="457" alt="" title="" />
