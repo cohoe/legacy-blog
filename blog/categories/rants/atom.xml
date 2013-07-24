@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[Category: Rants | Grant Cohoe]]></title>
-  <link href="http://www.grantcohoe.com/blog/categories/rants/atom.xml" rel="self"/>
-  <link href="http://www.grantcohoe.com/"/>
-  <updated>2013-07-24T11:32:28-04:00</updated>
-  <id>http://www.grantcohoe.com/</id>
+  <link href="http://cohoe.github.com/blog/categories/rants/atom.xml" rel="self"/>
+  <link href="http://cohoe.github.com/"/>
+  <updated>2013-07-24T13:41:30-04:00</updated>
+  <id>http://cohoe.github.com/</id>
   <author>
     <name><![CDATA[Grant Cohoe]]></name>
     
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[Facebook Friend Guidelines]]></title>
-    <link href="http://www.grantcohoe.com/blog/2013/01/03/facebook-friend-guidelines/"/>
+    <link href="http://cohoe.github.com/blog/2013/01/03/facebook-friend-guidelines/"/>
     <updated>2013-01-03T00:42:00-05:00</updated>
-    <id>http://www.grantcohoe.com/blog/2013/01/03/facebook-friend-guidelines</id>
+    <id>http://cohoe.github.com/blog/2013/01/03/facebook-friend-guidelines</id>
     <content type="html"><![CDATA[<p>If I am the requester or the requestee, it means that I have had a conversation with you (Not chat/texted. Actual person-to-person) on at least two separate occasions. (Occasionally this may be reduced to one depending on circumstances) Do not get this confused with what I consider a "dialog". A dialog is nothing more than "Hi! How are you today? What's up?". A conversation entails we discussed and compared our thoughts on at least one topic at length >5min. Also If you are from my present, it means that I consider there a statistically significant chance that we will see each other in person again in the future. If you are from my past, then we talked at least twice on several (>2) occasions. If you are from my future, well that feature hasn't been implemented yet and will probably cause me to segfault.</p>
 
 <p>The logic behind these guidelines is relatively simple. There is no substitute for real life interaction. The idea of "meeting someone over Facebook" doesn't sit well with me. Whenever I see a person friend-request someone they don't really know or have had any degree of conversation with, it makes me question their ability to do so face-to-face. It also helps avoid the potential "stalker" effect that can come about easily with social media.</p>
@@ -32,9 +32,9 @@
   
   <entry>
     <title type="html"><![CDATA[Fix Me Maybe]]></title>
-    <link href="http://www.grantcohoe.com/blog/2013/01/03/fix-me-maybe/"/>
+    <link href="http://cohoe.github.com/blog/2013/01/03/fix-me-maybe/"/>
     <updated>2013-01-03T00:23:00-05:00</updated>
-    <id>http://www.grantcohoe.com/blog/2013/01/03/fix-me-maybe</id>
+    <id>http://cohoe.github.com/blog/2013/01/03/fix-me-maybe</id>
     <content type="html"><![CDATA[<p>Fix Me Maybe (parody of Call Me Maybe)
 Words by Grant Cohoe (cohoe)
 Music &amp; original words by Carly Rae Jepsen</p>

@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[Category: Projects | Grant Cohoe]]></title>
-  <link href="http://www.grantcohoe.com/blog/categories/projects/atom.xml" rel="self"/>
-  <link href="http://www.grantcohoe.com/"/>
-  <updated>2013-07-24T11:32:28-04:00</updated>
-  <id>http://www.grantcohoe.com/</id>
+  <link href="http://cohoe.github.com/blog/categories/projects/atom.xml" rel="self"/>
+  <link href="http://cohoe.github.com/"/>
+  <updated>2013-07-24T13:41:30-04:00</updated>
+  <id>http://cohoe.github.com/</id>
   <author>
     <name><![CDATA[Grant Cohoe]]></name>
     
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[CSH Wireless Network Deployment]]></title>
-    <link href="http://www.grantcohoe.com/blog/2013/04/12/csh-wireless-network-deployment/"/>
+    <link href="http://cohoe.github.com/blog/2013/04/12/csh-wireless-network-deployment/"/>
     <updated>2013-04-12T17:58:00-04:00</updated>
-    <id>http://www.grantcohoe.com/blog/2013/04/12/csh-wireless-network-deployment</id>
+    <id>http://cohoe.github.com/blog/2013/04/12/csh-wireless-network-deployment</id>
     <content type="html"><![CDATA[<p>We wanted to deploy our own wireless network across the floor. I decided to make the project happen.</p>
 
 <h1>Requirements</h1>
@@ -117,9 +117,9 @@ wlccp ap wds ip address 192.168.0.250
   
   <entry>
     <title type="html"><![CDATA[Cross-Platform Authentication Services]]></title>
-    <link href="http://www.grantcohoe.com/blog/2013/02/27/cross-platform-authentication-services/"/>
+    <link href="http://cohoe.github.com/blog/2013/02/27/cross-platform-authentication-services/"/>
     <updated>2013-02-27T22:47:00-05:00</updated>
-    <id>http://www.grantcohoe.com/blog/2013/02/27/cross-platform-authentication-services</id>
+    <id>http://cohoe.github.com/blog/2013/02/27/cross-platform-authentication-services</id>
     <content type="html"><![CDATA[<p>You are a nerd. You like doing nerd-y things. You run an entirely *nix-based network. But like all nerds, you have that one pesky Windows machine that you want to have available for your users. Or you just want the same SSO password from your Kerberos KDC. Regardless, you want Windows to talk to MIT Kerberos. Believe it or not, this is SUPPORTED!</p>
 
 <h2>Process Overview</h2>
@@ -178,9 +178,9 @@ ksetup /mapuser * *
   
   <entry>
     <title type="html"><![CDATA[Dynamic Dual-Home Linux Server]]></title>
-    <link href="http://www.grantcohoe.com/blog/2013/01/03/dynamic-dual-home-linux-server/"/>
+    <link href="http://cohoe.github.com/blog/2013/01/03/dynamic-dual-home-linux-server/"/>
     <updated>2013-01-03T01:15:00-05:00</updated>
-    <id>http://www.grantcohoe.com/blog/2013/01/03/dynamic-dual-home-linux-server</id>
+    <id>http://cohoe.github.com/blog/2013/01/03/dynamic-dual-home-linux-server</id>
     <content type="html"><![CDATA[<h1>Requirements</h1>
 
 <p>I have a shiny new VM server sitting in my dorm room. I have access to two networks, one operated by my dorm organization and the other provided to me by RIT. Both get me to the internet, but do so through different paths/SLAs. I want my server to be accessible from both networks. I also want to be able to attach VM hosts to NAT'd networks behind each respective network. This gives me a total of four possible VM networks (primary-external, primary-internal, secondary-external, secondary-internal). I have a Hurricane Electric IPv6 tunnel endpoint configured on the server, and want IPv6 connectivity available on ALL networks regardless of being external or internal. And to complicate matters, my external IP addresses are given to me via DHCP so I cannot set anything statically. Make it so.</p>
@@ -376,9 +376,9 @@ $SERVICE radvd start
   
   <entry>
     <title type="html"><![CDATA[System Technology Accounting and Resource Registration Solution (STARRS)]]></title>
-    <link href="http://www.grantcohoe.com/blog/2013/01/01/system-technology-accounting-and-resource-registration-solution-starrs/"/>
+    <link href="http://cohoe.github.com/blog/2013/01/01/system-technology-accounting-and-resource-registration-solution-starrs/"/>
     <updated>2013-01-01T20:10:00-05:00</updated>
-    <id>http://www.grantcohoe.com/blog/2013/01/01/system-technology-accounting-and-resource-registration-solution-starrs</id>
+    <id>http://cohoe.github.com/blog/2013/01/01/system-technology-accounting-and-resource-registration-solution-starrs</id>
     <content type="html"><![CDATA[<h1>Background</h1>
 
 <p>Like most of my projects, it all started with CSH. RIT allocates us two /24 public-facing networks to distribute out to our users. These resources need to have some degree of accounting in the event a user does something stupid (piracy, kiddie-pr0n, etc). RIT handles this with their own internal application, referred to as "start.rit.edu". <em>Fun aside, Start.RIT was coded by an old CSHer, now RIT employee and CSH advisor. He still maintains portions of it today.</em> When the CSH network got to the point of needing our own internal application, a member (<a href="http://www.csh.rit.edu/~sunday/">Joe Sunday</a>) created "start.csh.rit.edu". Similar to it's RIT counterpart, start.csh allowed administrators to register machines and distribute resources on the network. Start.csh also allowed for users to manage firewall rules for their hosts at the border firewall systems. On the backend, it had a script that would automatically generate an ISC-DHCPD config file and load it into the server.</p>

@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[Category: Guides | Grant Cohoe]]></title>
-  <link href="http://www.grantcohoe.com/blog/categories/guides/atom.xml" rel="self"/>
-  <link href="http://www.grantcohoe.com/"/>
-  <updated>2013-07-24T11:32:28-04:00</updated>
-  <id>http://www.grantcohoe.com/</id>
+  <link href="http://cohoe.github.com/blog/categories/guides/atom.xml" rel="self"/>
+  <link href="http://cohoe.github.com/"/>
+  <updated>2013-07-24T13:41:30-04:00</updated>
+  <id>http://cohoe.github.com/</id>
   <author>
     <name><![CDATA[Grant Cohoe]]></name>
     
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[STARRS Installation Guide]]></title>
-    <link href="http://www.grantcohoe.com/blog/2013/04/24/starrs-installation-guide/"/>
+    <link href="http://cohoe.github.com/blog/2013/04/24/starrs-installation-guide/"/>
     <updated>2013-04-24T11:06:00-04:00</updated>
-    <id>http://www.grantcohoe.com/blog/2013/04/24/starrs-installation-guide</id>
+    <id>http://cohoe.github.com/blog/2013/04/24/starrs-installation-guide</id>
     <content type="html"><![CDATA[<h1>Introduction</h1>
 
 <h2>Purpose</h2>
@@ -463,9 +463,9 @@ service httpd restart
   
   <entry>
     <title type="html"><![CDATA[Stanford Webauth on Enterprise Linux]]></title>
-    <link href="http://www.grantcohoe.com/blog/2013/02/13/stanford-webauth-on-enterprise-linux/"/>
+    <link href="http://cohoe.github.com/blog/2013/02/13/stanford-webauth-on-enterprise-linux/"/>
     <updated>2013-02-13T12:38:00-05:00</updated>
-    <id>http://www.grantcohoe.com/blog/2013/02/13/stanford-webauth-on-enterprise-linux</id>
+    <id>http://cohoe.github.com/blog/2013/02/13/stanford-webauth-on-enterprise-linux</id>
     <content type="html"><![CDATA[<h2>Background</h2>
 
 <p>Lets say you are in a domain, and you wish to access several different web services. How often do you find you have to enter the same username and password over and over again to get to each website? Wouldn't it be nice if you could just enter it once and automagically have access to all the web services you need? Well guess what? You can!</p>
@@ -864,9 +864,9 @@ SSLCACertificateFile /etc/pki/example.com/example-ca.crt
   
   <entry>
     <title type="html"><![CDATA[IP over DNS Exploit]]></title>
-    <link href="http://www.grantcohoe.com/blog/2013/01/03/ip-over-dns-exploit/"/>
+    <link href="http://cohoe.github.com/blog/2013/01/03/ip-over-dns-exploit/"/>
     <updated>2013-01-03T01:21:00-05:00</updated>
-    <id>http://www.grantcohoe.com/blog/2013/01/03/ip-over-dns-exploit</id>
+    <id>http://cohoe.github.com/blog/2013/01/03/ip-over-dns-exploit</id>
     <content type="html"><![CDATA[<h1>The Basics</h1>
 
 <p>First let's review how your traffic gets to it's destination. You open up your favorite web browser and punch in "www.google.com". Since your computer works with IP addresses, and not names (like people), you need to do a process of resolving the name. The Domain Name System (DNS) is the service that does this. Your ISP runs DNS servers, that are typically given to you in your DHCP lease. Your computer sends a query to this DNS server asking "what is the IP address of www.google.com". Since your ISP does not have control over the "google.com" domain, the request is forwarded to another server. Eventually someone says "Hey! www.google.com is at 72.14.204.104". This response is sent back through the servers to your computer.</p>
@@ -914,9 +914,9 @@ Worth it for education: A LOT</p>
   
   <entry>
     <title type="html"><![CDATA[Secure Mirroring Highly-Available OpenLDAP Cluster]]></title>
-    <link href="http://www.grantcohoe.com/blog/2013/01/03/secure-mirroring-highly-available-openldap-cluster/"/>
+    <link href="http://cohoe.github.com/blog/2013/01/03/secure-mirroring-highly-available-openldap-cluster/"/>
     <updated>2013-01-03T00:41:00-05:00</updated>
-    <id>http://www.grantcohoe.com/blog/2013/01/03/secure-mirroring-highly-available-openldap-cluster</id>
+    <id>http://cohoe.github.com/blog/2013/01/03/secure-mirroring-highly-available-openldap-cluster</id>
     <content type="html"><![CDATA[<h1>Background</h1>
 
 <p>My organization stores user information in an OpenLDAP directory server. This includes contact information, shell preferences, iButton IDs, etc. The directory server does not store the users password and relies on a Kerberos KDC to provide authentication via SASL. This is a widely supported configuration and is popular because you can achieve SSO (Single Sign-On) and keep passwords out of your directory. Our shell access machines are configured to do LDAP authentication of users which basically instructs PAM to do a bind to the LDAP server using the credentials provided by the user. If the bind is successful, the user logs in. If not, well sucks to be them. Before this project we had a single server handling the directory running CentOS 5.8/OpenLDAP 2.3. If this server went poof, then all userdata is lost and no one could log into any other servers (or websites if configured with Stanford Webauth. See the guide for more on this). Obviously this is a problem that needed correcting.</p>
@@ -943,7 +943,7 @@ Worth it for education: A LOT</p>
 
 <p>I spun up two new machines, lets call them "warlock.example.com" and "ldap2.example.com". Each of them runs my favorite Scientific Linux 6.2 but with OpenLDAP 2.4. You cannot do MirrorMode between 2.3 and 2.4.</p>
 
-<p><img src="http://www.grantcohoe.com/sites/default/files/styles/medium/public/ldaptopo.PNG" alt="" title="" class="image-medium" /></p>
+<p><img src="http://cohoe.github.com/sites/default/files/styles/medium/public/ldaptopo.PNG" alt="" title="" class="image-medium" /></p>
 
 <h1>Configuration</h1>
 
@@ -1272,9 +1272,9 @@ Check your certificate files on the SERVER. Odds are you have an incorrect path.
   
   <entry>
     <title type="html"><![CDATA[Kerberos Utilities]]></title>
-    <link href="http://www.grantcohoe.com/blog/2013/01/03/kerberos-utilities/"/>
+    <link href="http://cohoe.github.com/blog/2013/01/03/kerberos-utilities/"/>
     <updated>2013-01-03T00:36:00-05:00</updated>
-    <id>http://www.grantcohoe.com/blog/2013/01/03/kerberos-utilities</id>
+    <id>http://cohoe.github.com/blog/2013/01/03/kerberos-utilities</id>
     <content type="html"><![CDATA[<p>There are a number of useful Kerberos client utilities that can help you when working with authentication services.</p>
 
 <h1>kinit</h1>

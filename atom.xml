@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[Grant Cohoe]]></title>
-  <link href="http://www.grantcohoe.com/atom.xml" rel="self"/>
-  <link href="http://www.grantcohoe.com/"/>
-  <updated>2013-07-24T11:32:28-04:00</updated>
-  <id>http://www.grantcohoe.com/</id>
+  <link href="http://cohoe.github.com/atom.xml" rel="self"/>
+  <link href="http://cohoe.github.com/"/>
+  <updated>2013-07-24T13:41:30-04:00</updated>
+  <id>http://cohoe.github.com/</id>
   <author>
     <name><![CDATA[Grant Cohoe]]></name>
     
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[STARRS Installation Guide]]></title>
-    <link href="http://www.grantcohoe.com/blog/2013/04/24/starrs-installation-guide/"/>
+    <link href="http://cohoe.github.com/blog/2013/04/24/starrs-installation-guide/"/>
     <updated>2013-04-24T11:06:00-04:00</updated>
-    <id>http://www.grantcohoe.com/blog/2013/04/24/starrs-installation-guide</id>
+    <id>http://cohoe.github.com/blog/2013/04/24/starrs-installation-guide</id>
     <content type="html"><![CDATA[<h1>Introduction</h1>
 
 <h2>Purpose</h2>
@@ -665,9 +665,9 @@ sample will populate sample data into the database. Set to anything other than <
   
   <entry>
     <title type="html"><![CDATA[Backups for Photo Majors]]></title>
-    <link href="http://www.grantcohoe.com/blog/2013/04/19/backups-for-photo-majors/"/>
+    <link href="http://cohoe.github.com/blog/2013/04/19/backups-for-photo-majors/"/>
     <updated>2013-04-19T22:38:00-04:00</updated>
-    <id>http://www.grantcohoe.com/blog/2013/04/19/backups-for-photo-majors</id>
+    <id>http://cohoe.github.com/blog/2013/04/19/backups-for-photo-majors</id>
     <content type="html"><![CDATA[<p>Data backups are something every single person should do. This presentation is with specific regard to non-technical users who want a little bit of information and some suggestions on what to do.</p>
 
 <p>This presentation was never given explicitly, but it was used for a Public Speaking class.</p>
@@ -678,9 +678,9 @@ sample will populate sample data into the database. Set to anything other than <
   
   <entry>
     <title type="html"><![CDATA[Impact of Disk Alignment in Virtualized Environments]]></title>
-    <link href="http://www.grantcohoe.com/blog/2013/04/19/impact-of-disk-alignment-in-virtualized-environments/"/>
+    <link href="http://cohoe.github.com/blog/2013/04/19/impact-of-disk-alignment-in-virtualized-environments/"/>
     <updated>2013-04-19T22:35:00-04:00</updated>
-    <id>http://www.grantcohoe.com/blog/2013/04/19/impact-of-disk-alignment-in-virtualized-environments</id>
+    <id>http://cohoe.github.com/blog/2013/04/19/impact-of-disk-alignment-in-virtualized-environments</id>
     <content type="html"><![CDATA[<p>This presentation discusses the impact of disk alignment with specific regard to virtual environments. Performance can be greatly hurt by misaligned partitions both on the VM and host and all layers in between.</p>
 
 <p>Presented at <a href="http://barcamproc.org">Barcamp Rochester</a> in Spring 2013</p>
@@ -691,9 +691,9 @@ sample will populate sample data into the database. Set to anything other than <
   
   <entry>
     <title type="html"><![CDATA[CSH Wireless Network Deployment]]></title>
-    <link href="http://www.grantcohoe.com/blog/2013/04/12/csh-wireless-network-deployment/"/>
+    <link href="http://cohoe.github.com/blog/2013/04/12/csh-wireless-network-deployment/"/>
     <updated>2013-04-12T17:58:00-04:00</updated>
-    <id>http://www.grantcohoe.com/blog/2013/04/12/csh-wireless-network-deployment</id>
+    <id>http://cohoe.github.com/blog/2013/04/12/csh-wireless-network-deployment</id>
     <content type="html"><![CDATA[<p>We wanted to deploy our own wireless network across the floor. I decided to make the project happen.</p>
 
 <h1>Requirements</h1>
@@ -838,9 +838,9 @@ sample will populate sample data into the database. Set to anything other than <
   
   <entry>
     <title type="html"><![CDATA[Cross-Platform Authentication Services]]></title>
-    <link href="http://www.grantcohoe.com/blog/2013/02/27/cross-platform-authentication-services/"/>
+    <link href="http://cohoe.github.com/blog/2013/02/27/cross-platform-authentication-services/"/>
     <updated>2013-02-27T22:47:00-05:00</updated>
-    <id>http://www.grantcohoe.com/blog/2013/02/27/cross-platform-authentication-services</id>
+    <id>http://cohoe.github.com/blog/2013/02/27/cross-platform-authentication-services</id>
     <content type="html"><![CDATA[<p>You are a nerd. You like doing nerd-y things. You run an entirely *nix-based network. But like all nerds, you have that one pesky Windows machine that you want to have available for your users. Or you just want the same SSO password from your Kerberos KDC. Regardless, you want Windows to talk to MIT Kerberos. Believe it or not, this is SUPPORTED!</p>
 
 <h2>Process Overview</h2>
@@ -912,9 +912,9 @@ sample will populate sample data into the database. Set to anything other than <
   
   <entry>
     <title type="html"><![CDATA[Stanford Webauth on Enterprise Linux]]></title>
-    <link href="http://www.grantcohoe.com/blog/2013/02/13/stanford-webauth-on-enterprise-linux/"/>
+    <link href="http://cohoe.github.com/blog/2013/02/13/stanford-webauth-on-enterprise-linux/"/>
     <updated>2013-02-13T12:38:00-05:00</updated>
-    <id>http://www.grantcohoe.com/blog/2013/02/13/stanford-webauth-on-enterprise-linux</id>
+    <id>http://cohoe.github.com/blog/2013/02/13/stanford-webauth-on-enterprise-linux</id>
     <content type="html"><![CDATA[<h2>Background</h2>
 
 <p>Lets say you are in a domain, and you wish to access several different web services. How often do you find you have to enter the same username and password over and over again to get to each website? Wouldn&#8217;t it be nice if you could just enter it once and automagically have access to all the web services you need? Well guess what? You can!</p>
@@ -1467,9 +1467,9 @@ NOTE: If you wrote these in your home directory and cp&#8217;d them into their r
   
   <entry>
     <title type="html"><![CDATA[IP over DNS Exploit]]></title>
-    <link href="http://www.grantcohoe.com/blog/2013/01/03/ip-over-dns-exploit/"/>
+    <link href="http://cohoe.github.com/blog/2013/01/03/ip-over-dns-exploit/"/>
     <updated>2013-01-03T01:21:00-05:00</updated>
-    <id>http://www.grantcohoe.com/blog/2013/01/03/ip-over-dns-exploit</id>
+    <id>http://cohoe.github.com/blog/2013/01/03/ip-over-dns-exploit</id>
     <content type="html"><![CDATA[<h1>The Basics</h1>
 
 <p>First let&#8217;s review how your traffic gets to it&#8217;s destination. You open up your favorite web browser and punch in &#8220;www.google.com&#8221;. Since your computer works with IP addresses, and not names (like people), you need to do a process of resolving the name. The Domain Name System (DNS) is the service that does this. Your ISP runs DNS servers, that are typically given to you in your DHCP lease. Your computer sends a query to this DNS server asking &#8220;what is the IP address of www.google.com&#8221;. Since your ISP does not have control over the &#8220;google.com&#8221; domain, the request is forwarded to another server. Eventually someone says &#8220;Hey! www.google.com is at 72.14.204.104&#8221;. This response is sent back through the servers to your computer.</p>
@@ -1517,9 +1517,9 @@ Worth it for education: A LOT</p>
   
   <entry>
     <title type="html"><![CDATA[Dynamic Dual-Home Linux Server]]></title>
-    <link href="http://www.grantcohoe.com/blog/2013/01/03/dynamic-dual-home-linux-server/"/>
+    <link href="http://cohoe.github.com/blog/2013/01/03/dynamic-dual-home-linux-server/"/>
     <updated>2013-01-03T01:15:00-05:00</updated>
-    <id>http://www.grantcohoe.com/blog/2013/01/03/dynamic-dual-home-linux-server</id>
+    <id>http://cohoe.github.com/blog/2013/01/03/dynamic-dual-home-linux-server</id>
     <content type="html"><![CDATA[<h1>Requirements</h1>
 
 <p>I have a shiny new VM server sitting in my dorm room. I have access to two networks, one operated by my dorm organization and the other provided to me by RIT. Both get me to the internet, but do so through different paths/SLAs. I want my server to be accessible from both networks. I also want to be able to attach VM hosts to NAT&#8217;d networks behind each respective network. This gives me a total of four possible VM networks (primary-external, primary-internal, secondary-external, secondary-internal). I have a Hurricane Electric IPv6 tunnel endpoint configured on the server, and want IPv6 connectivity available on ALL networks regardless of being external or internal. And to complicate matters, my external IP addresses are given to me via DHCP so I cannot set anything statically. Make it so.</p>
@@ -1823,9 +1823,9 @@ You also need access to two networks.</li>
   
   <entry>
     <title type="html"><![CDATA[Facebook Friend Guidelines]]></title>
-    <link href="http://www.grantcohoe.com/blog/2013/01/03/facebook-friend-guidelines/"/>
+    <link href="http://cohoe.github.com/blog/2013/01/03/facebook-friend-guidelines/"/>
     <updated>2013-01-03T00:42:00-05:00</updated>
-    <id>http://www.grantcohoe.com/blog/2013/01/03/facebook-friend-guidelines</id>
+    <id>http://cohoe.github.com/blog/2013/01/03/facebook-friend-guidelines</id>
     <content type="html"><![CDATA[<p>If I am the requester or the requestee, it means that I have had a conversation with you (Not chat/texted. Actual person-to-person) on at least two separate occasions. (Occasionally this may be reduced to one depending on circumstances) Do not get this confused with what I consider a &#8220;dialog&#8221;. A dialog is nothing more than &#8220;Hi! How are you today? What&#8217;s up?&#8221;. A conversation entails we discussed and compared our thoughts on at least one topic at length >5min. Also If you are from my present, it means that I consider there a statistically significant chance that we will see each other in person again in the future. If you are from my past, then we talked at least twice on several (>2) occasions. If you are from my future, well that feature hasn&#8217;t been implemented yet and will probably cause me to segfault.</p>
 
 <p>The logic behind these guidelines is relatively simple. There is no substitute for real life interaction. The idea of &#8220;meeting someone over Facebook&#8221; doesn&#8217;t sit well with me. Whenever I see a person friend-request someone they don&#8217;t really know or have had any degree of conversation with, it makes me question their ability to do so face-to-face. It also helps avoid the potential &#8220;stalker&#8221; effect that can come about easily with social media.</p>
@@ -1840,9 +1840,9 @@ You also need access to two networks.</li>
   
   <entry>
     <title type="html"><![CDATA[Secure Mirroring Highly-Available OpenLDAP Cluster]]></title>
-    <link href="http://www.grantcohoe.com/blog/2013/01/03/secure-mirroring-highly-available-openldap-cluster/"/>
+    <link href="http://cohoe.github.com/blog/2013/01/03/secure-mirroring-highly-available-openldap-cluster/"/>
     <updated>2013-01-03T00:41:00-05:00</updated>
-    <id>http://www.grantcohoe.com/blog/2013/01/03/secure-mirroring-highly-available-openldap-cluster</id>
+    <id>http://cohoe.github.com/blog/2013/01/03/secure-mirroring-highly-available-openldap-cluster</id>
     <content type="html"><![CDATA[<h1>Background</h1>
 
 <p>My organization stores user information in an OpenLDAP directory server. This includes contact information, shell preferences, iButton IDs, etc. The directory server does not store the users password and relies on a Kerberos KDC to provide authentication via SASL. This is a widely supported configuration and is popular because you can achieve SSO (Single Sign-On) and keep passwords out of your directory. Our shell access machines are configured to do LDAP authentication of users which basically instructs PAM to do a bind to the LDAP server using the credentials provided by the user. If the bind is successful, the user logs in. If not, well sucks to be them. Before this project we had a single server handling the directory running CentOS 5.8/OpenLDAP 2.3. If this server went poof, then all userdata is lost and no one could log into any other servers (or websites if configured with Stanford Webauth. See the guide for more on this). Obviously this is a problem that needed correcting.</p>
@@ -1869,7 +1869,7 @@ You also need access to two networks.</li>
 
 <p>I spun up two new machines, lets call them &#8220;warlock.example.com&#8221; and &#8220;ldap2.example.com&#8221;. Each of them runs my favorite Scientific Linux 6.2 but with OpenLDAP 2.4. You cannot do MirrorMode between 2.3 and 2.4.</p>
 
-<p><img src="http://www.grantcohoe.com/sites/default/files/styles/medium/public/ldaptopo.PNG" alt="" title="" class="image-medium" /></p>
+<p><img src="http://cohoe.github.com/sites/default/files/styles/medium/public/ldaptopo.PNG" alt="" title="" class="image-medium" /></p>
 
 <h1>Configuration</h1>
 
@@ -2296,9 +2296,9 @@ Now to make it convenient to test your new configuration, edit your <code>/etc/o
   
   <entry>
     <title type="html"><![CDATA[Kerberos Utilities]]></title>
-    <link href="http://www.grantcohoe.com/blog/2013/01/03/kerberos-utilities/"/>
+    <link href="http://cohoe.github.com/blog/2013/01/03/kerberos-utilities/"/>
     <updated>2013-01-03T00:36:00-05:00</updated>
-    <id>http://www.grantcohoe.com/blog/2013/01/03/kerberos-utilities</id>
+    <id>http://cohoe.github.com/blog/2013/01/03/kerberos-utilities</id>
     <content type="html"><![CDATA[<p>There are a number of useful Kerberos client utilities that can help you when working with authentication services.</p>
 
 <h1>kinit</h1>
@@ -2417,9 +2417,9 @@ Now to make it convenient to test your new configuration, edit your <code>/etc/o
   
   <entry>
     <title type="html"><![CDATA[High-Availability with Multipath Routing]]></title>
-    <link href="http://www.grantcohoe.com/blog/2013/01/03/high-availability-with-multipath-routing/"/>
+    <link href="http://cohoe.github.com/blog/2013/01/03/high-availability-with-multipath-routing/"/>
     <updated>2013-01-03T00:34:00-05:00</updated>
-    <id>http://www.grantcohoe.com/blog/2013/01/03/high-availability-with-multipath-routing</id>
+    <id>http://cohoe.github.com/blog/2013/01/03/high-availability-with-multipath-routing</id>
     <content type="html"><![CDATA[<h1>Multipath Routing</h1>
 
 <p>Multipath routing is when you have a router with multiple equal-cost paths to a single destination. Since each of these routes carries the same weight, the router will distribute traffic across all of them roughly equally. You can read more on this technology on <a href="https://en.wikipedia.org/wiki/Equal-cost_multi-path_routing">Wikipedia</a>. This is more about the implementation of such a topology.</p>
@@ -2541,9 +2541,9 @@ Now to make it convenient to test your new configuration, edit your <code>/etc/o
   
   <entry>
     <title type="html"><![CDATA[Secure OpenLDAP Server with Kerberos Authentication]]></title>
-    <link href="http://www.grantcohoe.com/blog/2013/01/03/secure-openldap-server-with-kerberos-authentication/"/>
+    <link href="http://cohoe.github.com/blog/2013/01/03/secure-openldap-server-with-kerberos-authentication/"/>
     <updated>2013-01-03T00:26:00-05:00</updated>
-    <id>http://www.grantcohoe.com/blog/2013/01/03/secure-openldap-server-with-kerberos-authentication</id>
+    <id>http://cohoe.github.com/blog/2013/01/03/secure-openldap-server-with-kerberos-authentication</id>
     <content type="html"><![CDATA[<h1>Host Configuration</h1>
 
 <p>There are some things we need to set up prior to installing and configuring OpenLDAP.</p>
@@ -3059,9 +3059,9 @@ Now to make it convenient to test your new configuration, edit your <code>/etc/o
   
   <entry>
     <title type="html"><![CDATA[Fix Me Maybe]]></title>
-    <link href="http://www.grantcohoe.com/blog/2013/01/03/fix-me-maybe/"/>
+    <link href="http://cohoe.github.com/blog/2013/01/03/fix-me-maybe/"/>
     <updated>2013-01-03T00:23:00-05:00</updated>
-    <id>http://www.grantcohoe.com/blog/2013/01/03/fix-me-maybe</id>
+    <id>http://cohoe.github.com/blog/2013/01/03/fix-me-maybe</id>
     <content type="html"><![CDATA[<p>Fix Me Maybe (parody of Call Me Maybe)
 Words by Grant Cohoe (cohoe)
 Music &amp; original words by Carly Rae Jepsen</p>
@@ -3288,9 +3288,9 @@ Music &amp; original words by Carly Rae Jepsen</p>
   
   <entry>
     <title type="html"><![CDATA[Makefile-based PKI Management]]></title>
-    <link href="http://www.grantcohoe.com/blog/2013/01/01/makefile-based-pki-management/"/>
+    <link href="http://cohoe.github.com/blog/2013/01/01/makefile-based-pki-management/"/>
     <updated>2013-01-01T23:03:00-05:00</updated>
-    <id>http://www.grantcohoe.com/blog/2013/01/01/makefile-based-pki-management</id>
+    <id>http://cohoe.github.com/blog/2013/01/01/makefile-based-pki-management</id>
     <content type="html"><![CDATA[<p>Using a couple of seed files, you can easily get started managing your own PKI for your network. You need to have OpenSSL and Make installed on the system you are working with.</p>
 
 <p>First, pick a directory to store your certificates in. I am going to use <code>/etc/pki/example.com</code> since this is where all the other system SSL stuff is stored and for you SELinux people, will already have the right contexts. cd into that directory and create the Makefile:</p>
@@ -3712,9 +3712,9 @@ Music &amp; original words by Carly Rae Jepsen</p>
   
   <entry>
     <title type="html"><![CDATA[System Technology Accounting and Resource Registration Solution (STARRS)]]></title>
-    <link href="http://www.grantcohoe.com/blog/2013/01/01/system-technology-accounting-and-resource-registration-solution-starrs/"/>
+    <link href="http://cohoe.github.com/blog/2013/01/01/system-technology-accounting-and-resource-registration-solution-starrs/"/>
     <updated>2013-01-01T20:10:00-05:00</updated>
-    <id>http://www.grantcohoe.com/blog/2013/01/01/system-technology-accounting-and-resource-registration-solution-starrs</id>
+    <id>http://cohoe.github.com/blog/2013/01/01/system-technology-accounting-and-resource-registration-solution-starrs</id>
     <content type="html"><![CDATA[<h1>Background</h1>
 
 <p>Like most of my projects, it all started with CSH. RIT allocates us two /24 public-facing networks to distribute out to our users. These resources need to have some degree of accounting in the event a user does something stupid (piracy, kiddie-pr0n, etc). RIT handles this with their own internal application, referred to as &#8220;start.rit.edu&#8221;. <em>Fun aside, Start.RIT was coded by an old CSHer, now RIT employee and CSH advisor. He still maintains portions of it today.</em> When the CSH network got to the point of needing our own internal application, a member (<a href="http://www.csh.rit.edu/~sunday/">Joe Sunday</a>) created &#8220;start.csh.rit.edu&#8221;. Similar to it&#8217;s RIT counterpart, start.csh allowed administrators to register machines and distribute resources on the network. Start.csh also allowed for users to manage firewall rules for their hosts at the border firewall systems. On the backend, it had a script that would automatically generate an ISC-DHCPD config file and load it into the server.</p>

@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[Category: Presentations | Grant Cohoe]]></title>
-  <link href="http://www.grantcohoe.com/blog/categories/presentations/atom.xml" rel="self"/>
-  <link href="http://www.grantcohoe.com/"/>
-  <updated>2013-07-24T11:32:28-04:00</updated>
-  <id>http://www.grantcohoe.com/</id>
+  <link href="http://cohoe.github.com/blog/categories/presentations/atom.xml" rel="self"/>
+  <link href="http://cohoe.github.com/"/>
+  <updated>2013-07-24T13:41:30-04:00</updated>
+  <id>http://cohoe.github.com/</id>
   <author>
     <name><![CDATA[Grant Cohoe]]></name>
     
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[Backups for Photo Majors]]></title>
-    <link href="http://www.grantcohoe.com/blog/2013/04/19/backups-for-photo-majors/"/>
+    <link href="http://cohoe.github.com/blog/2013/04/19/backups-for-photo-majors/"/>
     <updated>2013-04-19T22:38:00-04:00</updated>
-    <id>http://www.grantcohoe.com/blog/2013/04/19/backups-for-photo-majors</id>
+    <id>http://cohoe.github.com/blog/2013/04/19/backups-for-photo-majors</id>
     <content type="html"><![CDATA[<p>Data backups are something every single person should do. This presentation is with specific regard to non-technical users who want a little bit of information and some suggestions on what to do.</p>
 
 <p>This presentation was never given explicitly, but it was used for a Public Speaking class.</p>
@@ -28,9 +28,9 @@
   
   <entry>
     <title type="html"><![CDATA[Impact of Disk Alignment in Virtualized Environments]]></title>
-    <link href="http://www.grantcohoe.com/blog/2013/04/19/impact-of-disk-alignment-in-virtualized-environments/"/>
+    <link href="http://cohoe.github.com/blog/2013/04/19/impact-of-disk-alignment-in-virtualized-environments/"/>
     <updated>2013-04-19T22:35:00-04:00</updated>
-    <id>http://www.grantcohoe.com/blog/2013/04/19/impact-of-disk-alignment-in-virtualized-environments</id>
+    <id>http://cohoe.github.com/blog/2013/04/19/impact-of-disk-alignment-in-virtualized-environments</id>
     <content type="html"><![CDATA[<p>This presentation discusses the impact of disk alignment with specific regard to virtual environments. Performance can be greatly hurt by misaligned partitions both on the VM and host and all layers in between.</p>
 
 <p>Presented at <a href="http://barcamproc.org">Barcamp Rochester</a> in Spring 2013</p>

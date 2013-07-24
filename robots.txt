@@ -1,4 +1,4 @@
 User-agent: *
 Disallow: 
 
-Sitemap: http://www.grantcohoe.com/sitemap.xml 
+Sitemap: http://cohoe.github.com/sitemap.xml 
