@@ -1,0 +1,1361 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Guides | Grant Cohoe]]></title>
+  <link href="http://www.grantcohoe.com/blog/categories/guides/atom.xml" rel="self"/>
+  <link href="http://www.grantcohoe.com/"/>
+  <updated>2013-07-24T11:32:28-04:00</updated>
+  <id>http://www.grantcohoe.com/</id>
+  <author>
+    <name><![CDATA[Grant Cohoe]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[STARRS Installation Guide]]></title>
+    <link href="http://www.grantcohoe.com/blog/2013/04/24/starrs-installation-guide/"/>
+    <updated>2013-04-24T11:06:00-04:00</updated>
+    <id>http://www.grantcohoe.com/blog/2013/04/24/starrs-installation-guide</id>
+    <content type="html"><![CDATA[<h1>Introduction</h1>
+
+<h2>Purpose</h2>
+
+<p>The purpose of this guide is to help an IT administrator install and configure the <a href="http://grantcohoe.com/projects/starrs">STARRS</a> network asset tracking application for a basic site.</p>
+
+<h2>Audience</h2>
+
+<p>The intended audience of this guide is IT administrators with Linux experience (specifically Red Hat) and a willingness to use open-source software.</p>
+
+<h2>Commitment</h2>
+
+<p>The install process should take around an hour provided appropriate resources.</p>
+
+<h1>Description</h1>
+
+<h2>Definition</h2>
+
+<p>STARRS is a self-service network resource tracking and registration web application used to monitor resource utilization (such as IP addresses, DNS records, computers, etc). For more details, view the project description <a href="http://grantcohoe.com/projects/starrs">here</a>.</p>
+
+<h2>Physical</h2>
+
+<p>STARRS requires a database host and web server to operate. It is recommended to use a single virtual appliance for all STARRS functionality.</p>
+
+<h2>Process</h2>
+
+<ul>
+<li>The virtual appliance is provisioned (out of scope of this guide)</li>
+<li>Core software is installed</li>
+<li>Dependent software packages are downloaded and installed</li>
+<li>STARRS is acquired, configured, and installed</li>
+<li>The web server is configured to allow access</li>
+</ul>
+
+
+<h1>Installation</h1>
+
+<h2>Virtual Appliance</h2>
+
+<p>STARRS was tested only on RHEL-based Linux distributions. Anything RHEL6.0+ is compatible. There are no major requirements for the virtual appliance and a minimal software install will suffice. In this example we will be using a Scientific Linux 6.4 virtual machine.</p>
+
+<h2>Connectivity</h2>
+
+<p>Ensure that you are able to log into your remote system as any administrative user (in this example, root) and have internet access.</p>
+
+<p><code>
+[root@starrs-test ~]# cat /etc/redhat-release
+Scientific Linux release 6.4 (Carbon)
+</code></p>
+
+<h2>System Security</h2>
+
+<h3>Firewall</h3>
+
+<p>Firewalls can get in the way of allowing web access to the server. Only perform these steps if you have a system firewall installed and intend on using it. In this example we will use the RHEL default <code>iptables</code>.</p>
+
+<ol>
+<li><p>Add a rule to the system firewall to allow HTTP and HTTPS traffic to the server.
+<code>
+iptables -I INPUT 1 -p tcp --dport 80 -j ACCEPT
+iptables -I INPUT 1 -p tcp --dport 443 -j ACCEPT
+</code></p></li>
+<li><p>Save the firewall configuration (no restart required)
+<code>
+service iptables save
+</code></p></li>
+</ol>
+
+
+<p>NOTE: If you have IPv6 enabled on your system, make sure to apply firewall rules to the IPv6 firewall as well.</p>
+
+<h3>SELinux</h3>
+
+<p>Any RHEL administrator has dealt with SELinux at some point in their career. There are system-wide settings that allow/deny actions by programs running on the server. Disabling SELinux is not a solution.</p>
+
+<ol>
+<li>Allow Apache/httpd to connect to database engines
+<code>
+setsebool -P httpd_can_network_connect=on
+setsebool -P httpd_can_network_connect_db=on
+</code></li>
+</ol>
+
+
+<h2>Core Software</h2>
+
+<p>STARRS heavily depends on the PostgreSQL database engine for operation. PgSQL must be at version 9.0 or higher, which is NOT available from the standard RHELish repositories. PgSQL will also require the PL/Perl and PL/Python support packages (also NOT located in the repos). You will need to add new software repositories to your appliance.</p>
+
+<h3>Utilities</h3>
+
+<p>These programs will be needed at some point or another in the installation process.</p>
+
+<ol>
+<li><p>Install the following packages through yum.
+<code>
+yum install cpan wget git make perl-YAML -y
+</code></p></li>
+<li><p>We will also need the development tools group of packages installed.
+<code>
+yum groupinstall "Development tools" -y
+</code></p></li>
+</ol>
+
+
+<h3>PostgreSQL Database Engine</h3>
+
+<ol>
+<li><p>On your own computer, open up <a href="http://yum.postgresql.org/">yum.postgresql.org</a> and click on the latest available PostgreSQL Release link. In this case we will be using 9.2.</p></li>
+<li><p>Locate the approprate repository link for your operating system (Fedora, CentOS, SL, etc) and architecture (i386, x86_64, etc). In this case we will be using <code>Scientific Linux 6 - i386</code>.</p></li>
+<li><p>Download the package from the link you located onto the virtual appliance into any convenient directory.
+<code>
+wget http://yum.postgresql.org/9.2/redhat/rhel-6-i386/pgdg-sl92-9.2-8.noarch.rpm
+</code></p></li>
+<li><p>Install the PostgreSQL repository package file that was downloaded with <code>yum</code>. Answer yes if asked for verification.
+<code>
+yum install pgdg-sl92-9.2-8.noarch.rpm
+</code></p></li>
+<li><p>You need to ensure that the base PostgreSQL packages are hidden from future package searches and updated. Add an exclude line to your base OS repository file located in <code>/etc/yum.repos.d/</code>. This will prevent any PgSQL packages from being used out of the base packages.
+```</p>
+
+<h1>This example uses the sl.repo file. This will depend on your variant of OS (CentOS-base.repo for CentOS).</h1>
+
+<p>[sl]
+name=Scientific Linux $releasever - $basearch
+...
+exclude=postgresql*</p></li>
+</ol>
+
+
+<p>[sl-security]
+```</p>
+
+<ol>
+<li><p>Install the required PgSQL packages using the Yum package manager.
+<code>
+yum install postgresql92 postgresql92-plperl postgresql92-server
+</code></p></li>
+<li><p>Initialize the PgSQL database server
+<code>
+[root@starrs-test ~]# service postgresql-9.2 initdb
+Initializing database:                                     [  OK  ]
+[root@starrs-test ~]#
+</code></p></li>
+<li><p>Make PgSQL start on system boot
+<code>
+chkconfig postgresql-9.2 on
+</code></p></li>
+<li><p>Start the PgSQL service
+<code>
+[root@starrs-test ~]# service postgresql-9.2 start
+Starting postgresql-9.2 service:                           [  OK  ]
+[root@starrs-test ~]#
+</code></p></li>
+<li><p><code>su</code> to the Postgres account and assign a password to the postgres user account using the query below. Exit back to root when done. This password should be kept secure!
+```
+[root@starrs-test ~]# su postgres -
+bash-4.1$ psql
+could not change directory to "/root"
+psql (9.2.4)
+Type "help" for help.</p></li>
+</ol>
+
+
+<p>postgres=# ALTER USER postgres WITH PASSWORD 'supersecurepasswordhere';
+ALTER ROLE
+postgres=# \q
+bash-4.1$ exit
+exit
+[root@starrs-test ~]#
+<code>
+The STARRS installer requires passwordless access to the postgres account. This is achievable by creating a</code>.pgpass``` file in the root home directory.</p>
+
+<ol>
+<li><p>Create a file at <code>~/.pgpass</code> like such:
+<code>
+localhost:5432:*:postgres:supersecurepasswordhere
+localhost:5432:*:starrs_admin:adminpass
+localhost:5432:*:starrs_client:clientpass
+</code>
+You can replace the passwords with whatever you want. Note the passwords for later.</p></li>
+<li><p>This file should be readable only by the user that created it. Change permissions accordingly.
+<code>
+chmod 600 .pgpass
+</code></p></li>
+<li><p>You now need to allow users to login to the database server from the server itself. Open the <code>/var/lib/pgsql/9.2/data/pg_hba.conf</code> and change all methods to <code>md5</code> like so:
+```</p>
+
+<h1>TYPE  DATABASE        USER            ADDRESS                 METHOD</h1></li>
+</ol>
+
+
+<h1>"local" is for Unix domain socket connections only</h1>
+
+<p>local   all             all                                     md5</p>
+
+<h1>IPv4 local connections:</h1>
+
+<p>host    all             all             127.0.0.1/32            md5</p>
+
+<h1>IPv6 local connections:</h1>
+
+<p>host    all             all             ::1/128                 md5
+```</p>
+
+<p>This will enable login from Localhost only. If you need remote access, only allow the specific IP addresses or subnets that you need. Security is good.</p>
+
+<ol>
+<li><p>Reload the postgres service to bring in the changes
+<code>
+service postgresql-9.2 reload
+</code></p></li>
+<li><p>Create admin and client accounts for STARRS.
+```
+[root@starrs-test ~]# psql -h localhost -U postgres
+psql (9.2.4)
+Type "help" for help.</p></li>
+</ol>
+
+
+<p>postgres=# create user starrs_admin with password 'adminpass';
+CREATE ROLE
+postgres=# create user starrs_client with password 'clientpass';
+CREATE ROLE
+postgres=# \q
+[root@starrs-test ~]#
+```</p>
+
+<ol>
+<li>Verify that you can log into the database server without being prompted for a password.
+```
+[root@starrs-test ~]# psql -h localhost -U postgres
+psql (9.2.4)
+Type "help" for help.</li>
+</ol>
+
+
+<p>postgres=# \q</p>
+
+<p>[root@starrs-test ~]#
+```
+If you get prompted for a password, <b>STOP!</b> You need to have this working in order to proceed. Make sure you typed everything in the file correctly and its permissions are set.</p>
+
+<h2>Dependencies</h2>
+
+<p>STARRS has many other software dependencies in order to function. These are mostly Perl modules that extend the capabilities of the language. These modules are (CPAN and package are provided however not all packages may be available):</p>
+
+<ul>
+<li>Net::IP (perl-Net-IP)</li>
+<li>Net::LDAP (perl-LDAP)</li>
+<li>Net::DNS (perl-Net-DNS)</li>
+<li>Net::SNMP (perl-Net-SNMP)</li>
+<li>Net::SMTP (perl-Mail-Sender)</li>
+<li>Crypt::DES (perl-Crypt-DES)</li>
+<li>VMware::vCloud</li>
+<li>Data::Validate::Domain</li>
+</ul>
+
+
+<p>NOTE: The first time you run CPAN you will be asked some basic setup questions. Answering the defaults are fine for most installations.</p>
+
+<ol>
+<li>Install each of these modules. Some of them are available as packages in yum.
+<code>
+yum install perl-Net-IP perl-LDAP perl-Net-DNS perl-Mail-Sender perl-Net-SNMP perl-Crypt-DES -y
+cpan -i Data::Validate::Domain
+cpan -i VMware::vCloud
+</code></li>
+</ol>
+
+
+<h2>Download/Configure STARRS</h2>
+
+<p>STARRS comes in two parts: The backend (database) and the Web interface. Each one is stored in it's own repository on Github. You will need to download both in order to use the application. Right now we will focus on the backend.</p>
+
+<ol>
+<li><p>You will need a directory to store the downloaded repos in. I recommend using <code>/opt</code>. Clone (download) the current versions of the repositories using Git into that directory.
+<code>
+[root@starrs-test ~]# cd /opt/
+[root@starrs-test opt]# git clone https://github.com/cohoe/starrs -q
+[root@starrs-test opt]# ls
+starrs
+[root@starrs-test opt]#
+</code></p></li>
+<li><p>Open the installer file at <code>/opt/starrs/Setup/Installer.pl</code>. You will need to edit the values in the Settings section of the file to match your specific installation. Example:
+```perl</p>
+
+<h1>Settings</h1>
+
+<p>my $dbsuperuser = "postgres";
+my $dbadminuser = "starrs_admin";
+my $dbadminpass = "adminpass";
+my $dbclientuser = "starrs_client";
+my $dbclientpass = "clientpass";
+my $sample = undef;</p></li>
+</ol>
+
+
+<p>my $dbhost = "localhost";
+my $dbport = 5432;
+my $dbname = "starrs";
+```</p>
+
+<p>dbsuperuser is the root postgres account (usually just 'postgres').
+dbadminuser is the STARRS admin user you created above.
+dbclientuser is the STARRS client user you created above.
+sample will populate sample data into the database. Set to anything other than <code>undef</code> to enable sample content.</p>
+
+<ol>
+<li>Run the install script
+<code>text
+perl /opt/starrs/Setup/Installer.pl
+</code></li>
+</ol>
+
+
+<p>A lot of text will flash across the screen. This is expected. If you see errors, then something is wrong and you should revisit the setup instructions.</p>
+
+<p>You can verify that STARRS is functioning by running some simple queries.
+```
+[root@starrs-test starrs]# psql -h localhost -U postgres starrs
+psql (9.2.4)
+Type "help" for help.</p>
+
+<p>starrs=# SELECT api.initialize('root');
+NOTICE:  table "user_privileges" does not exist, skipping
+CONTEXT:  SQL statement "DROP TABLE IF EXISTS "user_privileges""
+PL/pgSQL function api.initialize(text) line 19 at SQL statement</p>
+
+<pre><code>initialize
+</code></pre>
+
+<hr />
+
+<p> Greetings admin!
+(1 row)</p>
+
+<p>starrs=# SELECT * FROM api.get_systems(NULL);
+ system_name | owner | group | comment | date_created | date_modified | type | os_name | last_modifier | platform_name | asset | datacenter | location
+-------------+-------+-------+---------+--------------+---------------+------+---------+---------------+---------------+-------+------------+----------
+(0 rows)</p>
+
+<p>starrs=# \q
+[root@starrs-test starrs]#</p>
+
+<p>```</p>
+
+<p>If you see "Greetings admin!" and you can perform the queries without error, then your backend is all set up and is ready for the web interface.</p>
+
+<h3>Apache2/httpd</h3>
+
+<p>The STARRS web interface requires a web server to be installed. Only Apache has been tested. If you have a new system then you might not have Apache (or in RHELish, httpd) installed.</p>
+
+<ol>
+<li><p>If you do not have Apache/httpd installed, install it.
+<code>
+yum install httpd php php-pgsql -y
+</code></p></li>
+<li><p>Navigate to the <code>/etc/httpd/conf.d</code> directory.</p></li>
+<li><p>Remove the <code>welcome.conf</code> that exists there.
+<code>
+cd /etc/httpd/conf.d/
+rm -rf welcome.conf
+</code></p></li>
+<li><p>Enable httpd to start on boot
+<code>
+chkconfig httpd on
+</code></p></li>
+<li><p>Start the httpd service. (Warning messages are fine, as long as the service starts you should be fine)
+```
+[root@starrs-test ~]# service httpd start
+Starting httpd: httpd: apr_sockaddr_info_get() failed for starrs-test.grantcohoe.com
+httpd: Could not reliably determine the server's fully qualified domain name, using 127.0.0.1 for ServerName</p>
+
+<pre><code>                                                    [  OK  ]
+</code></pre>
+
+<p>[root@starrs-test ~]#
+```</p></li>
+</ol>
+
+
+<h3>PHP Configuration</h3>
+
+<p>A minor change to the system PHP configuration allows the use of short tags for cleaner code. This feature must be enabled in the <code>/etc/php.ini</code> file.</p>
+
+<ol>
+<li>In the php.ini file, set <code>short_open_tag = on</code></li>
+</ol>
+
+
+<h3>Web Interface</h3>
+
+<p>You will be cloning the starrs-web into the Apache web root directory to simply deployment.</p>
+
+<ol>
+<li><p>Change directory to <code>/var/www/html/</code> and clone the repository. <b>Note the . at the end of the clone command.</b>
+<code>
+[root@starrs-test ~]# cd /var/www/html/
+[root@starrs-test html]# git clone https://github.com/cohoe/starrs-web -q .
+</code></p></li>
+<li><p>Copy the <code>application/config/database.php.example</code> to <code>application/config/database.php</code></p></li>
+<li><p>Edit the copied/renamed database file and enter your database connection settings. Example:
+<code>php
+$db['default']['hostname'] = 'localhost';
+$db['default']['username'] = 'starrs_admin';
+$db['default']['password'] = 'adminpass';
+$db['default']['database'] = 'starrs';
+</code></p></li>
+<li><p>Copy the <code>application/config/impulse.php.example</code> to <code>application/config/impulse.php</code></p></li>
+<li><p>For this web environment, the defaults in this file are fine. In this file you can change which environment variable to get the current user from.</p></li>
+<li><p>Apache needs to be given some special instructions to serve up the application correctly. Create a file at <code>/etc/httpd/conf.d/starrs.conf</code> with the following contents:
+```
+<Directory "/var/www/html"></p>
+
+<pre><code> AllowOverride all
+ AuthType basic
+ AuthName "STARRS Sample Auth (root:admin)"
+ AuthBasicProvider file
+ AuthUserFile    "/etc/httpd/conf.d/starrs-auth.db"
+ require valid-user
+</code></pre>
+
+<p></Directory>
+```</p></li>
+<li><p>Since we reference an authenication database, you will need to create this file (<code>starrs-auth.db</code>).
+<code>
+htpasswd -b -c /etc/httpd/conf.d/starrs-auth.db root admin
+</code></p></li>
+<li><p>Restart Apache to apply the changes. (A reload is not sufficient enough)
+<code>
+service httpd restart
+</code></p></li>
+</ol>
+
+
+<h1>Testing</h1>
+
+<p>At this point you should have a fully functioning STARRS installation. Navigate to your server in a web browser and you should be prompted for login credentials. As we established in the authentication database file, the username is root and the password is admin. If you get the STARRS main page, then success! Otherwise start looking through log files to figure out what is wrong.</p>
+
+<p>Detailed troubleshooting is out of the scope of this guide. System Administrator cleverness is a rare skill, but is the most useful thing when trying to figure out what happened. Shoot me an email if you really feel something is wrong.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Stanford Webauth on Enterprise Linux]]></title>
+    <link href="http://www.grantcohoe.com/blog/2013/02/13/stanford-webauth-on-enterprise-linux/"/>
+    <updated>2013-02-13T12:38:00-05:00</updated>
+    <id>http://www.grantcohoe.com/blog/2013/02/13/stanford-webauth-on-enterprise-linux</id>
+    <content type="html"><![CDATA[<h2>Background</h2>
+
+<p>Lets say you are in a domain, and you wish to access several different web services. How often do you find you have to enter the same username and password over and over again to get to each website? Wouldn't it be nice if you could just enter it once and automagically have access to all the web services you need? Well guess what? You can!</p>
+
+<p>It all works off of MIT Kerberos. Kerberos is a mechanism that centralizes your authentication to one service and allows for Single Sign-On. The concept of SSO is fairly simple: Enter your credentials once and that's it. It save you from typing them over and over again and protects against certain attacks.</p>
+
+<p>WebAuth was developed at Stanford University and brings "kerberization" to web services. All you need is some modules, a KDC, and a webserver.</p>
+
+<p>In this guide, we will be utilizing the Kerberos realm/domain name of EXAMPLE.COM. We will also be using two servers:</p>
+
+<ul>
+<li>gmcsrvx2.example.com: The Webauth WebKDC</li>
+<li>gmcsrvx3.example.com: A secondary web server</li>
+<li>webauth.example.com: A DNS CNAME to gmcsrvx2.example.com</li>
+</ul>
+
+
+<p>Note that you will need a pre-existing Kerberos KDC in your network.</p>
+
+<p>There are three components of the WebAuth system. WebAuth typically refers to the component that provides authorized access to certain content. The WebKDC is the process that handles communication with the Kerberos KDC and distributes tickets out to the client machines. The WebLogin pages are the login/logoff/password change pages that are presented to the user to enter their credentials. Certain binary packages provided by Stanford do not contain components of the WebAuth system. This is why we are going to build it from source.</p>
+
+<h2>Server Setup</h2>
+
+<h3>Packages</h3>
+
+<p>Each machine you plan to install WebAuth on needs the following packages:</p>
+
+<ul>
+<li>httpd-devel</li>
+<li>krb5-devel</li>
+<li>curl-devel</li>
+<li>mod_ssl</li>
+<li>mod_fcgid</li>
+<li>perl-FCGI</li>
+<li>perl-Template-Toolkit</li>
+<li>perl-Crypt-SSLeay</li>
+<li>cpan</li>
+</ul>
+
+
+<p>Enterprise Linux does not include several required Perl modules for this to work. You are going to need to install them via CPAN. If you have never run CPAN before, do it once just to get the preliminary setup working.</p>
+
+<ul>
+<li>CGI::Application::Plugin::TT</li>
+<li>CGI::Application::Plugin::AutoRunmode</li>
+<li>CGI::Application::Plugin::Forward</li>
+<li>CGI::Application::Plugin::Redirect</li>
+</ul>
+
+
+<p>You also need Remctl, an interface to Kerberos. For EL6 we are using remctl 2.11 available from the Fedora 15 repositories.
+<code>
+wget http://mirror.rit.edu/fedora/linux/releases/15/Everything/i386/os/Packages/remctl-2.11-12.fc15.i686.rpm
+wget http://mirror.rit.edu/fedora/linux/releases/15/Everything/i386/os/Packages/remctl-devel-2.11-12.fc15.i686.rpm
+yum localinstall remctl*
+</code></p>
+
+<h3>Firewall</h3>
+
+<p>Open up ports 80 (HTTP) and 443 (HTTPS) since we will be doing web stuff.</p>
+
+<h3>NTP</h3>
+
+<p>Since you will be doing Kerberos stuff, you need a synchronized clock. If you do not know how to do this, see my guide on <a href="http://www.grantcohoe.com/guides/system/ntp">Setting up NTP</a>.</p>
+
+<h3>Kerberos</h3>
+
+<p>Your machine needs to be a Kerberos client (meaning valid DNS, krb5.conf, and host prinicpal in its /etc/krb5.keytab). We will be using three keytabs for this application:</p>
+
+<h4>/etc/krb5.keytab</h4>
+
+<ul>
+<li>host/gmcsrvx2.example.com@EXAMPLE.COM</li>
+
+<h4>/etc/webauth/webauth.keytab</h4></li>
+<li>webauth/gmcsrvx2.example.com@EXAMPLE.COM</li>
+
+<h4>/etc/webkdc/webkdc.keytab</h4></li>
+<li>service/webkdc@EXAMPLE.COM</li>
+NOTE: If you wrote these in your home directory and cp'd them into their respective paths, check your SELinux contexts.</li>
+</ul>
+
+
+<h3>SSL Certificates</h3>
+
+<p>You need an SSL certificate matching the hostname of each server (gmcsrvx2.example.com, gmcsrvx3.example.com, webauth.example.com) avaiable for your Apache configuration.</p>
+
+<p><em>IMPORTANT</em>:You also need to ensure that your CA is trusted by Curl (the system). If in doubt, cat your CA cert into <code>/etc/pki/tls/certs/ca-bundle.crt</code>. You will get really odd errors if you do not do this.</p>
+
+<h3>Shared Libraries</h3>
+
+<p>We will be installing WebAuth into <code>/usr/local</code> and this need its libraries to be linked in the system.
+<code>
+echo '/usr/local/lib' &gt;&gt; /etc/ld.so.conf.d/locallib.conf
+</code>
+We will need to run <code>ldconfig</code> to load in the WebAuth libraries later on.</p>
+
+<h2>Compile and Install WebAuth</h2>
+
+<p>The latest version at the time of this writing is webauth-4.1.1 and is avaiable from <a href="http://webauth.stanford.edu/download.html">Stanford University</a>. Grab the source tarball since the packages do not include features that you will need in a brand new installation.
+<code>
+[root@gmcsrvx2 ~]# tar xfz webauth-4.1.1.tar.gz
+[root@gmcsrvx2 ~]# cd webauth-4.1.1
+[root@gmcsrvx2 webauth-4.1.1]# ./configure --enable-webkdc
+checking for a BSD-compatible install... /usr/bin/install -c
+checking whether build environment is sane... yes
+checking for a thread-safe mkdir -p... /bin/mkdir -p
+....
+....
+config.status: executing depfiles commands
+config.status: executing libtool commands
+config.status: executing include/webauth/defines.h commands
+[root@gmcsrvx2 webauth-4.1.1]#
+</code></p>
+
+<p>Assuming everything is all good, go ahead and build it.
+<code>
+[root@gmcsrvx2 webauth-4.1.1]# make
+make  all-am
+make[1]: Entering directory `/root/webauth-4.1.1'
+....
+....
+Manifying blib/man3/WebKDC::WebKDCException.3pm
+make[2]: Leaving directory `/root/webauth-4.1.1/perl'
+make[1]: Leaving directory `/root/webauth-4.1.1'
+[root@gmcsrvx2 webauth-4.1.1]#
+</code></p>
+
+<p>And assuming everything is happy, make install:
+<code>
+[root@gmcsrvx2 webauth-4.1.1]# make install
+make[1]: Entering directory `/root/webauth-4.1.1'
+test -z "/usr/local/lib" || /bin/mkdir -p "/usr/local/lib"
+....
+....
+test -z "/usr/local/include/webauth" || /bin/mkdir -p "/usr/local/include/webauth"
+ /usr/bin/install -c -m 644 include/webauth/basic.h include/webauth/keys.h include/webauth/tokens.h include/webauth/util.h include/webauth/webkdc.h '/usr/local/include/webauth'
+make[1]: Leaving directory `/root/webauth-4.1.1'
+[root@gmcsrvx2 webauth-4.1.1]#
+</code></p>
+
+<p>Now ensure that the new libraries get loaded by running <code>ldconfig</code>. This looks at the files in that ld.so.conf.d directory and adds them to the library path. MAKE SURE YOU DO THIS!!!</p>
+
+<p>The Apache modules for WebAuth have been compiled into <code>/usr/local/libexec/apache2/modules</code>:
+<code>
+[root@gmcsrvx2 ~]# ls /usr/local/libexec/apache2/modules/
+mod_webauth.la  mod_webauthldap.la  mod_webauthldap.so  mod_webauth.so  mod_webkdc.la  mod_webkdc.so
+</code></p>
+
+<h2>mod_webauth Configuration</h2>
+
+<p>Make sure you have the proper keytab set up at <code>/etc/webauth/webauth.keytab</code>. This file can technically be located anywhere as long as you configure the module accordingly.</p>
+
+<p>Next you need to create a local state directory for WebAuth. Usually this is <code>/var/lib/webauth</code>. The path can be changed as long as you set it in the following configuration file.</p>
+
+<p>The Apache module needs a configuration file to be included in the Apache server configuration. On Enterprise Linux, this can be located in <code>/etc/httpd/conf.d/mod_webauth.conf</code>:
+```</p>
+
+<h1>Load the module that you compiled.</h1>
+
+<p>LoadModule webauth_module     /usr/local/libexec/apache2/modules/mod_webauth.so</p>
+
+<h1>Some fancy WebAuth stuff</h1>
+
+<p>WebAuthKeyRingAutoUpdate      on
+WebAuthKeyringKeyLifetime     30d</p>
+
+<h1>The path to some critical files. These should be secured.</h1>
+
+<p>WebAuthKeyring                /var/lib/webauth/keyring
+WebAuthServiceTokenCache      /var/lib/webauth/service_token_cache
+WebAuthCredCacheDir           /var/lib/webauth/cred_cache</p>
+
+<h1>The path to the keytab that webauth will use to authenticate with your KDC</h1>
+
+<p>WebAuthKeytab                 /etc/webauth/webauth.keytab</p>
+
+<h1>The URL to point to if you need to login. MAKE SURE THIS IS CORRECT!</h1>
+
+<p>WebAuthLoginURL               "https://webauth.example.com/login"
+WebAuthWebKdcURL              "https://webauth.example.com/webkdc-service/"</p>
+
+<h1>The Kerberos principal to use when authenticating with the keytab above</h1>
+
+<p>WebAuthWebKdcPrincipal        service/webkdc</p>
+
+<h1>SSL is a good thing. Plaintext passwords are bad. Secure this server.</h1>
+
+<p>WebAuthSSLRedirect            On
+WebAuthWebKdcSSLCertFile      /etc/pki/example.com/example-ca.crt
+<code>
+Again, adjust paths to suit your tastes. The</code>WebAuthWebKdcSSLCertFile``` should be your public CA certificate that you probably cat'd earlier.</p>
+
+<h2>mod_webkdc Configuration</h2>
+
+<p>Make sure you have the proper keytab set up at <code>/etc/webkdc/webkdc.keytab</code>. This file can technically be located anywhere as long as you configure the module accordingly.</p>
+
+<p>Next you need to create a local state directory for the WebKDC. Usually this is <code>/var/lib/webkdc</code>. The path can be changed as long as you set it in the configuration files.</p>
+
+<p>The WebKDC utilizes an ACL to allow only certain hosts to get tickets. This goes in <code>/etc/webkdc/token.acl</code>:
+```</p>
+
+<h1>These lines allow all principals that under the webauth service to generate a token</h1>
+
+<p>krb5:webauth/*@EXAMPLE.COM id
+krb5:webauth/gmcsrvx2.example.com@EXAMPLE.COM cred krb5 krbtgt/EXAMPLE.COM@EXAMPLE.COM
+```</p>
+
+<p>For the WebLogin pages, another configuration file is used to specify the information for it (in <code>/etc/webkdc/webkdc.conf</code>). This is seperate from the Apache module configuration loaded by the webserver.
+``` perl</p>
+
+<h1>The KEYRING_PATH should match what you put in your httpd config</h1>
+
+<p>$KEYRING_PATH = "/var/lib/webkdc/keyring";
+$URL = "https://webauth.example.com/webkdc-service/";</p>
+
+<h1>You can make custom skins for the weblogin page. Change the path here</h1>
+
+<p>$TEMPLATE_PATH = "./generic/templates";
+```
+NOTE: You CANNOT change the location of this file or the WebKDC module will freak out.</p>
+
+<p>Note that certain directives must match the Apache configuration. We will make that now in <code>/etc/httpd/conf.d/mod_webkdc.conf</code>:
+``` text</p>
+
+<h1>Load the module that you compiled.</h1>
+
+<p>LoadModule webkdc_module /usr/local/libexec/apache2/modules/mod_webkdc.so</p>
+
+<h1>Some fancy WebKdc stuff</h1>
+
+<p>WebKdcServiceTokenLifetime    30d</p>
+
+<h1>The path to some critical files. These should be secured.</h1>
+
+<p>WebKdcKeyring                 /var/lib/webkdc/keyring</p>
+
+<h1>The path to the keytab and access control list that the webkdc will use to authenticate with your KDC</h1>
+
+<p>WebKdcKeytab                  /etc/webkdc/webkdc.keytab
+WebKdcTokenAcl                /etc/webkdc/token.acl</p>
+
+<h1>Debugging information is wonderful. Turn this off when you get everything working.</h1>
+
+<p>WebKdcDebug                   On
+```
+Ensure that your paths match what you set up earlier.</p>
+
+<h2>mod_webauthldap Configuration</h2>
+
+<p>This step should only be done if you have an LDAP server operating in your network and can accept SASL binds. You can make certain LDAP attributes available in the web environment as server variables for your web applications. This is configured in <code>/etc/httpd/conf.d/mod_webauthldap.conf</code>:
+```</p>
+
+<h1>Load the module that you compiled</h1>
+
+<p>LoadModule webauthldap_module /usr/local/libexec/apache2/modules/mod_webauthldap.so</p>
+
+<h1>Webauth Keytab &amp; credential cache file</h1>
+
+<p>WebAuthLdapKeytab /etc/webauth/webauth.keytab
+WebAuthLdapTktCache /var/lib/webauth/krb5cc_ldap</p>
+
+<h1>LDAP Host Information</h1>
+
+<p>WebAuthLdapHost ldap.example.com
+WebAuthLdapBase ou=users,dc=example,dc=com
+WebAuthLdapAuthorizationAttribute privilegeAttribute
+WebAuthLdapDebug on</p>
+
+<p><Location /></p>
+
+<pre><code>    WebAuthLdapAttribute givenName
+    WebAuthLdapAttribute sn
+    WebAuthLdapAttribute cn
+    WebAuthLdapAttribute mail
+</code></pre>
+
+<p></Location>
+```</p>
+
+<h2>Misc Permissions</h2>
+
+<p>Most of the files that you created do not have the appropriate permissions to be read/written by the webserver. Lets fix that.
+<code>
+[root@gmcsrvx2 ~ ]# chcon -t bin_t /usr/local/share/weblogin/*.fcgi
+[root@gmcsrvx2 ~ ]# chown -R apache:apache /usr/local/share/weblogin
+[root@gmcsrvx2 ~ ]# chcon -R -t httpd_sys_rw_content_t /usr/local/share/weblogin/generic
+[root@gmcsrvx2 ~ ]# chown root:apache /etc/webkdc/webkdc.keytab
+[root@gmcsrvx2 ~ ]# chmod 640 /etc/webkdc/webkdc.keytab
+[root@gmcsrvx2 ~ ]# chown root:apache /etc/webauth/webauth.keytab
+[root@gmcsrvx2 ~ ]# chmod 640 /etc/webauth/webauth.keytab
+[root@gmcsrvx2 ~ ]# chown -R apache:apache /var/lib/webkdc
+[root@gmcsrvx2 ~ ]# chown -R apache:apache /var/lib/webauth
+[root@gmcsrvx2 ~ ]# chmod 700 /var/lib/webkdc
+[root@gmcsrvx2 ~ ]# chmod 700 /var/lib/webauth
+</code></p>
+
+<h2>Apache VHosts</h2>
+
+<p>I created a VHost for both "webauth.example.com" and "gmcsrvx2.example.com", with the latter requiring user authentication to view. I name these after the hostname they are serving in <code>/etc/httpd/conf.d/webauth.conf</code>, Just throw a simple Hello World into the DocumentRoot that you configure for your testing host. Note that you must have NameVirtualHost-ing setup for both ports 80 and 443.
+```
+<VirtualHost *:80></p>
+
+<pre><code>ServerName webauth.example.com
+ServerAlias webauth
+# Send them to somewhere useful if they request the root of this VHost
+RedirectMatch   permanent ^/$ https://gmcsrvx2.example.com/
+# Send non-HTTPS traffic to HTTPS since we are dealing with passwords
+RedirectMatch   permanent ^/(.+)$ https://webauth.example.com/$1
+</code></pre>
+
+<p></VirtualHost></p>
+
+<p><VirtualHost *:443></p>
+
+<pre><code># Name to respond to
+ServerName webauth.example.com
+ServerAlias webauth
+
+# Root directory
+DocumentRoot /usr/local/share/weblogin
+
+# SSL
+SSLEngine On
+SSLCertificateFile /etc/pki/example.com/webauth/host-cert.pem
+SSLCertificateKeyFile /etc/pki/example.com/webauth/host-key.pem
+SSLCACertificateFile /etc/pki/example.com/example-ca.crt
+
+# Web Login directory needs some special love
+&lt;Directory "/usr/local/share/weblogin"&gt;
+        AllowOverride none
+        Options ExecCGI
+        AddHandler fcgid-script .fcgi
+        Order allow,deny
+        Allow from all
+&lt;/Directory&gt;
+
+# This allows you to not need to put the file extension on the scripts
+ScriptAlias /login "/usr/local/share/weblogin/login.fcgi"
+ScriptAlias /logout "/usr/local/share/weblogin/logout.fcgi"
+ScriptAlias /pwchange "/usr/local/share/weblogin/pwchange.fcgi"
+
+# More special options to make things load right based on your template
+Alias /images "/usr/local/share/weblogin/generic/images"
+Alias /help.html "/usr/local/share/weblogin/generic/help.heml"
+Alias /style.css "/usr/local/share/weblogin/generic/style.css"
+
+# This is the actual web KDC
+&lt;Location /webkdc-service&gt;
+        SetHandler webkdc
+&lt;/Location&gt;
+</code></pre>
+
+<p></VirtualHost>
+```</p>
+
+<p>And the host file at <code>/etc/httpd/conf.d/gmcsrvx2.conf</code>:
+```
+<VirtualHost *:80></p>
+
+<pre><code>ServerName gmcsrvx2.example.com
+ServerAlias gmcsrvx2
+DocumentRoot /var/www/html
+RedirectMatch   permanent ^/(.+)$ https://gmcsrvx2.example.com/$1
+</code></pre>
+
+<p></VirtualHost></p>
+
+<p><VirtualHost *:443></p>
+
+<pre><code>ServerName gmcsrvx2.example.com
+ServerAlias gmcsrvx2
+DocumentRoot /var/www/gmcsrvx2
+SSLEngine On
+SSLCertificateFile /etc/pki/example.com/gmcsrvx2/host-cert.pem
+SSLCertificateKeyFile /etc/pki/example.com/gmcsrvx2/host-key.pem
+SSLCACertificateFile /etc/pki/example.com/example-ca.crt
+
+# Require a webauth valid user to access this directory
+&lt;Directory "/var/www/gmcsrvx2"&gt;
+        AuthType WebAuth
+        Require valid-user
+&lt;/Directory&gt;
+</code></pre>
+
+<p></VirtualHost>
+```</p>
+
+<p>Once you are all set, start Apache. Then navigate your web browser to the host (http://gmcsrvx2.example.com). This should first redirect you to HTTPS, then bounce you to the WebLogin pages. After authenticating, you should be able to access the server.</p>
+
+<h2>Conclusion</h2>
+
+<p>This is by no means a simple thing to get set up. An intimate knowlege how how Kerberos, Apache, and LDAP work is crucial to debugging issues relating to WebAuth. All of my sample configuration files can be found in the <a href="http://archive.grantcohoe.com/projects/webauth/">Archive</a>.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[IP over DNS Exploit]]></title>
+    <link href="http://www.grantcohoe.com/blog/2013/01/03/ip-over-dns-exploit/"/>
+    <updated>2013-01-03T01:21:00-05:00</updated>
+    <id>http://www.grantcohoe.com/blog/2013/01/03/ip-over-dns-exploit</id>
+    <content type="html"><![CDATA[<h1>The Basics</h1>
+
+<p>First let's review how your traffic gets to it's destination. You open up your favorite web browser and punch in "www.google.com". Since your computer works with IP addresses, and not names (like people), you need to do a process of resolving the name. The Domain Name System (DNS) is the service that does this. Your ISP runs DNS servers, that are typically given to you in your DHCP lease. Your computer sends a query to this DNS server asking "what is the IP address of www.google.com". Since your ISP does not have control over the "google.com" domain, the request is forwarded to another server. Eventually someone says "Hey! www.google.com is at 72.14.204.104". This response is sent back through the servers to your computer.</p>
+
+<p>After resolving the name, your computer now creates a data packet that will be sent to the computer at 72.14.204.104. The packet gets there by looking at your hosts route table and will hit your default gateway.</p>
+
+<h1>The Technology</h1>
+
+<p>IP over DNS is a method of encapsulating IP packets inside a DNS query. This essentially creates a VPN between a server and a client. In my case, I setup and configured the Iodine DNS server on my server located at RIT that I would use to route my traffic to the internet. Inside the tunnel exists the subnet of 192.168.0.0/27, with the server being at 192.168.0.1. My client connected and received IP address 192.168.0.2.</p>
+
+<h1>The Problem</h1>
+
+<p>Certain WLAN installations will include a guest SSID that non-controlled clients can associate to (In this scenario, I will use ExampleGuest, keeping the actual one I used anonymous). Often your traffic will get routed to a captive portal first, requiring you to enter credentials supplied by your organization. Until you do so, none of your traffic will reach it's destination outside the LAN... UNLESS you discover a vulnerability, such as the one we are going to explore.</p>
+
+<p>When I walked into the Example Corp site, I flipped open my trusty laptop and got to work. After associating with the ExampleGuest SSID, I was given the IP address 10.24.50.22/24 with gateway 10.24.50.1. I opened my web browser in attempt to get to "www.google.com", and was immediately directed to the captive portal asking me to log in. Obviously I do not have credentials to this network, so I am at a dead end at this time.</p>
+
+<p>Next I whipped out a terminal session, and did a lookup on "www.google.com". Lo and behold the name was resolved to it's external IP address. This means that DNS traffic was being allowed past the captive portal and out onto the network. If "www.google.com" resolved to something like "1.1.1.1" or an address in the 10.24.0.0/16 space, I know that the captive portal is grabbing all of my traffic. This would be the end of this experiment. However as I saw, this was not the case. External DNS queries were still being answered. Time to do some hacks.</p>
+
+<h1>The Exploit</h1>
+
+<p>Step 1) I need my Iodine client to be able to "query" my remote name server. I added a static route to my laptop that forced traffic to my server through the gateway given to me by the DHCP server. (ip route add 129.21.50.104 via 10.24.50.1)</p>
+
+<p>Step 2) I need to establish my IPoDNS tunnel. (iodine -P mypasswordwenthere tunnel.grantcohoe.com) A successful connection gave me the IP address 192.168.0.2. I was then able to ping 192.168.0.1, which is the inside IP address of the tunnel).</p>
+
+<p>Step 3) I need to change my default gateway to the server address inside the tunnel (ip route add default via 192.168.0.1).</p>
+
+<p>And with that, all of my traffic is going to be encapsulated over the IP over DNS tunnel and sent to my server as DNS queries, this giving me unrestricted internet access bypassing the captive portal.</p>
+
+<h1>The Defense</h1>
+
+<p>This entire experiment would grind to a halt if DNS queries were not being handled externally. The network administrator should enable features necessary to either drop DNS requests or answer them with the captive portal IP address.</p>
+
+<h1>The Conclusion</h1>
+
+<p>End result: Unrestricted internet access over a wireless network that I have no credentials to.</p>
+
+<p>Difficulty of setting this up: HIGH
+Speed of tunneled internet: SLOW
+Worth it for practical use: NOT AT ALL
+Worth it for education: A LOT</p>
+
+<p>This sort of trick can work on airplane and hotel wireless systems as well. Most sites do not think to have their captive portals capture DNS traffic in addition to regular IP traffic. As we can see here, it can be used against them.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Secure Mirroring Highly-Available OpenLDAP Cluster]]></title>
+    <link href="http://www.grantcohoe.com/blog/2013/01/03/secure-mirroring-highly-available-openldap-cluster/"/>
+    <updated>2013-01-03T00:41:00-05:00</updated>
+    <id>http://www.grantcohoe.com/blog/2013/01/03/secure-mirroring-highly-available-openldap-cluster</id>
+    <content type="html"><![CDATA[<h1>Background</h1>
+
+<p>My organization stores user information in an OpenLDAP directory server. This includes contact information, shell preferences, iButton IDs, etc. The directory server does not store the users password and relies on a Kerberos KDC to provide authentication via SASL. This is a widely supported configuration and is popular because you can achieve SSO (Single Sign-On) and keep passwords out of your directory. Our shell access machines are configured to do LDAP authentication of users which basically instructs PAM to do a bind to the LDAP server using the credentials provided by the user. If the bind is successful, the user logs in. If not, well sucks to be them. Before this project we had a single server handling the directory running CentOS 5.8/OpenLDAP 2.3. If this server went poof, then all userdata is lost and no one could log into any other servers (or websites if configured with Stanford Webauth. See the guide for more on this). Obviously this is a problem that needed correcting.</p>
+
+<h1>Technology</h1>
+
+<h2>LDAP Synchronization</h2>
+
+<p>OpenLDAP 2.4 introduced a method of replication called "mirrormode". This allows you to use their already existing syncrepl protocol to synchronize data between multiple servers. Previously (OpenLDAP &lt;= 2.3) only allowed you to do a master-slave style of replication where the slaves are read-only and would be unwilling to perform changes. Obviously this has some limitations in that if your master (or "provider" in OpenLDAP-ish) were to die, then your users cannot do any changes until you get it back online. Using MirrorMode, you can create an "N-way Multi-Master" topology that allows all servers to be read/write and instantly replicate their changes to the others.</p>
+
+<h2>High Availability</h2>
+
+<p>To enable users to have LDAP access even if one of the servers dies, we need a way to keep the packets flowing and automatically failover to the secondary servers. Linux has a package called "Heartbeat" that allows this sort of functionality. If you are familiar with Cisco HSRP or the open-source VRRP, it works the same way. Server A is assigned an IP address (lets say 10.0.0.1) and Server B is assigned a different address (lets say 10.0.0.2). Heartbeat is configured to provide a third IP address (10.0.0.3) that will always be available between the two. On the primary server, an ethernet alias is created with the virtualized IP address. Periodic heartbeats (keep-alive packets) are sent out to the other servers to indicate "I'm still here!". Should these messages start disappearing (like when the server dies), the secondary will notice the lack of updates and automatically create a similar alias interface on itself and assign that virtualized IP. This allows you to give your clients one host, but have it seemlessly float between several real ones.</p>
+
+<h2>SASL Authentication</h2>
+
+<p>The easy way of configuring MirrorMode requires you to store your replication DN's credentials in plaintext in the config file. Obviously this is not very secure since you are storing passwords in plaintext. As such we can use the hosts Kerberos principal to bind to the LDAP server as the replication DN and perform all of the tasks we need to do. This is much better than plaintext!</p>
+
+<h2>SSL</h2>
+
+<p>Since we like being secure, we should really be using LDAPS (LDAP + SSL) to get our data. We will be setting this up too using our PKI. We will save this for the end since we want to ensure that our core functionality actually works first.</p>
+
+<h1>New Servers</h1>
+
+<p>I spun up two new machines, lets call them "warlock.example.com" and "ldap2.example.com". Each of them runs my favorite Scientific Linux 6.2 but with OpenLDAP 2.4. You cannot do MirrorMode between 2.3 and 2.4.</p>
+
+<p><img src="http://www.grantcohoe.com/sites/default/files/styles/medium/public/ldaptopo.PNG" alt="" title="" class="image-medium" /></p>
+
+<h1>Configuration</h1>
+
+<h2>Packages</h2>
+
+<p>First we need to install the required packages for all of this nonsense to work.</p>
+
+<ul>
+<li>openldap (LDAP libraries)</li>
+<li>openldap-servers (Server)</li>
+<li>openldap-clients (Client utilities)</li>
+<li>cyrus-sasl (SASL daemon)</li>
+<li>cyrus-sasl-ldap (LDAP authentication for SASL)</li>
+<li>cyrus-sasl-gssapi (Kerberos authentication for SASL)</li>
+<li>krb5-workstation (Kerberos client utilities)</li>
+<li>heartbeat (Failover)</li>
+</ul>
+
+
+<p>If you are coming off of a fresh minimal install, you might want to install openssh-clients and vim as well. Some packages may not be included in your base distribution and may need other repositories (EPEL, etc)</p>
+
+<h2>Kerberos Keytabs</h2>
+
+<p>Each host needs its own set of host/ and ldap/ principals as well as a shared one for the virtualized address. In the end, you need a keytab with the following principals:</p>
+
+<ul>
+<li>host/ldap1.example.com@EXAMPLE.COM</li>
+<li>ldap/ldap1.example.com@EXAMPLE.COM</li>
+<li>host/ldap.example.com@EXAMPLE.COM</li>
+<li>ldap/ldap.example.com@EXAMPLE.COM</li>
+</ul>
+
+
+<p>WARNING: Each time you write a -randkey'd principal to a keytab, it's KVNO (Key Version Number) is increased, thus invalidating all previous written principals. You need to merge the shared principals into each hosts keytab. See my guide on Kerberos Utilities for information on doing this.</p>
+
+<p>Put this file at /etc/krb5.keytab and set an ACL on it such that the LDAP user can read it.
+<code>
+[root@ldap1 ~]# chmod 640 /etc/krb5.keytab
+[root@ldap1 ~]# setfacl -m u:ldap:r /etc/krb5.keytab
+[root@ldap1 ~]#
+</code>
+If you see something like "kerberos error 13" or "get_sec_context: 13" it means that someone cannot read the keytab, usually the LDAP server. Fix it.</p>
+
+<h2>NTP</h2>
+
+<p>Kerberos and the OpenLDAP synchronization require synchronized clocks. If you aren't already set up for this, follow my guide for setting up NTP on a system before continuing.</p>
+
+<h2>SASL</h2>
+
+<p>You need saslauthd to be running on both LDAP servers. If you do not already have this set up, follow my guide for SASL Authentication before continuing.</p>
+
+<h2>Logging</h2>
+
+<p>We will be using Syslog and Logrotate to manage the logfiles for the LDAP daemon (slapd). By default it will spit out to local4. This is configurable depending on your system, but for me I am leaving it as the default. Add an entry to your <code>rsyslog</code> config file (usually <code>/etc/rsyslog.conf</code>) for <code>slapd</code>
+<code>
+local4.*                /var/log/slapd.log
+</code>
+Now unless we tell <code>logrotate</code> to rotate this file, it will get infinitely large and cause you lots of headaches. I created a config file to automatically rotate this log according the the system defaults. This was done at <code>/etc/logrotate.d/slapd</code>:
+```
+/var/log/slapd.log {</p>
+
+<pre><code>missingok
+</code></pre>
+
+<p>}
+```
+Then restart <code>rsyslog</code>. Logrotate runs on a cron job and is not required to be restarted.</p>
+
+<h2>Data Directory</h2>
+
+<p>Since I am grabbing the data from my old LDAP server, I will not be setting up a new data directory. On the old server and on the new master, the data directory is <code>/var/lib/ldap/</code>. I simply scp'd all of the contents from the old server over to this directory. If you do this, I recommend stopping the old server for a moment to ensure that there are no changes occurring while you work. After scp-ing everything, make sure to chown everything to the LDAP user. I also recommend running <code>slapindex</code> to ensure that all data gets reindexed.</p>
+
+<p><code>Client Library Configuration</code>
+Now to make it convenient to test your new configuration, edit your <code>/etc/openldap/ldap.conf</code> to change the URI and add the certificate settings.
+<code>
+BASE            dc=example,dc=com
+URI             ldaps://ldap.example.com
+TLS_CACERT      /etc/pki/tls/example-ca.crt
+TLS_REQCERT     allow
+</code>
+When configuring this file on the servers, TLS_REQCERT must be set to ALLOW since we are doing Syncrepl over LDAPS. Obviously since we are using a shared certificate for ldap.example.com, it will not match the hostname of the server and will fail. On all of your clients, they should certainly "demand" the certificate. But in this instance that prevents us from accomplishing Syncrepl over LDAPS.</p>
+
+<h2>Certificates for LDAPS</h2>
+
+<p>Since people want to be secure, OpenLDAP has the ability to do sessions inside of TLS tunnels. This works the same way HTTPS traffic does. To do this you need to have the ability to generate SSL certificates based on a given CA. This procedure varies from organization to organization. Regardless of your method, the hostname you chose is critical as this will be the name that is verified. In this setup, we are creating a host called "ldap.example.com" that all LDAP clients will be configured to use. As such the same SSL certificate for both hosts will be generated for "ldap.example.com" and placed on each server.</p>
+
+<p>I placed the public certificate at <code>/etc/pki/tls/certs/slapd.pem</code>, the secret key in <code>/etc/pki/tls/private/slapd.pem</code>, and my CA certificate at <code>/etc/pki/tls/example-ca.crt</code>. After obtaining my files, I verify them to make sure that they will actually work:
+<code>
+[root@ldap1 ~]# openssl verify -CAfile /etc/pki/tls/example-ca.crt /etc/pki/tls/certs/slapd.pem
+/etc/pki/tls/certs/slapd.pem: OK
+[root@ldap1 ~]#
+</code></p>
+
+<p>You need to allow the LDAP account to read the private certificate:
+<code>
+[root@ldap1 ~]# setfacl -m u:ldap:r /etc/pki/tls/private/slapd.pem
+</code></p>
+
+<h2>Server Configuration</h2>
+
+<p>If you are using a previous server configuration, just scp the entire <code>/etc/openldap</code> code over to the new servers. Make sure you blow away any files or directories that may have been added for you before you copy. If you are not, you might need to do a bit of setup. OpenLDAP 2.4 uses a new method of configuration called "cn=config", which stores the configuration data in the LDAP database. However since this is not fully supported by most clients, I am still using the config file. For setting up a fresh install, see one of my other articles on this. (Still in progress at the time of this writing)</p>
+
+<p>The following directives will need to be placed in your slapd.conf for the SSL certificates:
+<code>
+TLSCertificateFile /etc/pki/tls/certs/slapd.pem
+TLSCertificateKeyFile /etc/pki/tls/private/slapd.pem
+TLSCACertificateFile /etc/pki/tls/example-ca.crt
+</code>
+Depending on your system, you may need to configure the daemon to run on ldaps://. On Red-Hat based systems this is in <code>/etc/sysconfig/ldap</code>.</p>
+
+<p>You need to add two things to your configuration for Syncrepl to function. First to your <code>slapd.conf</code>:
+```</p>
+
+<h1>Syncrepl ServerID</h1>
+
+<p>serverID 001</p>
+
+<h1>Syncrepl configuration for mirroring instant replication between another</h1>
+
+<h1>server. The binddn should be the host/ principal of this server</h1>
+
+<h1>stored in the Kerberos keytab</h1>
+
+<p>syncrepl rid=001
+provider=ldaps://ldap2.example.com
+type=refreshAndPersist
+retry="5 5 300 +"
+searchbase="dc=example,dc=com"
+attrs="*,+"
+bindmethod=sasl
+binddn="cn=ldap1,ou=hosts,dc=example,dc=com"
+mirrormode TRUE
+```
+The serverID value must uniquely identify the server. Make sure you change it when inserting the configuration onto the secondary server. Likewise change the Syncrepl RID as well for the same reason.</p>
+
+<p>Secondly you need need to allow the replication binddn full read access to all objects. This should go in your ACL file (which could be your slapd.conf, but shouldnt be).
+```
+access to *</p>
+
+<pre><code>    by dn.exact="cn=ldap1,ou=hosts,dc=example,dc=com" read
+    by dn.exact="cn=ldap2,ou=hosts,dc=example,dc=com" read
+</code></pre>
+
+<p>```
+WARNING: If you do not have an existing ACL setup, doing just these entries will prevent anything else from doing anything with your server. These directives are meant to be ADDED to an existing ACL.</p>
+
+<p>You should be all set and ready to start the server.
+<code>
+[root@ldap1 ~]# service slapd start
+Starting slapd:                                            [  OK  ]
+[root@ldap1 ~]#
+</code></p>
+
+<p>Make sure that when you do your SASL bind, the server reports your DN correctly. To verify this:
+<code>
+ldap1 ~ # su ldap -s /bin/bash
+bash-4.1$ kinit -k -t /etc/krb5.keytab host/ldap1.example.com
+bash-4.1$ ldapwhoami -Q
+dn:cn=ldap1,ou=hosts,dc=example,dc=com
+bash-4.1$
+</code>
+That DN is the one that should be in your ACL and have read access to everything.</p>
+
+<p>Since the LDAP user will always need this principal, I recommend adding a cronjob to keep the ticket alive. I wrote a script that will renew your ticket and fix an SELinux permissioning problem as well. You can get it <a href="http://archive.grantcohoe.com/projects/ldap/slaprenew">here</a>. Just throw it into your <code>/usr/local/sbin/</code> directory. There are better ways of doing this, but this one works just as well.
+<code>
+0 */2 * * * /usr/local/sbin/slaprenew
+</code></p>
+
+<h2>Firewall</h2>
+
+<p>Dont forget to open up ports 389 and 636 for LDAP and LDAPSSL!</p>
+
+<h2>Searching</h2>
+
+<p>After configuring both the master and the secondary servers, we now need to get the data initially replicated across your secondaries. Assuming you did like me and copied the data directory from an old server, your master is the only one that has real data. Start the service on this machine. If all went according to plan, you should be able to search for an object to verify that it works.
+```
+[root@ldap1 ~]# kinit user
+Password for user@EXAMPLE.COM:
+[root@ldap1 ~]# ldapsearch -h localhost uid=user uidNumber -Q -LLL
+dn: uid=user,ou=users,dc=example,dc=com
+uidNumber: 10046</p>
+
+<p>[root@ldap1 ~]#
+```
+If you get errors, increase the debug level (-d 1) and work out any issues.</p>
+
+<h2>Replication</h2>
+
+<p>After doing a kinit as the LDAP user described above (host/ldap2.example.com), start the LDAP server on the secondary. If you tail the slapd log file, you should start seeing replication events occurring really fast. This is the server loading its data from the provider as specified in slapd.conf. Once it is done, try searching the server in a similar fashion as above.
+<code>
+[root@ldap2 ~]# tail /var/log/slapd.log
+slapd[15759]: syncrepl_entry: rid=001 be_search (0)
+slapd[15759]: syncrepl_entry: rid=001 uid=user,ou=Users,dc=example,dc=com
+slapd[15759]: syncrepl_entry: rid=001 be_add uid=user,ou=Users,dc=example,dc=com (0)
+slapd[15759]: syncrepl_entry: rid=001 LDAP_RES_SEARCH_ENTRY(LDAP_SYNC_ADD)
+slapd[15759]: syncrepl_entry: rid=001 inserted UUID 84ba3544-5be8-102b-9a32-4dfcdb785320
+slapd[15759]: syncrepl_entry: rid=001 be_search (0)
+slapd[15759]: syncrepl_entry: rid=001 uid=user,ou=Users,dc=example,dc=com
+slapd[15759]: syncrepl_entry: rid=001 be_add uid=user,ou=Users,dc=example,dc=com (0)
+slapd[15759]: syncrepl_entry: rid=001 LDAP_RES_SEARCH_ENTRY(LDAP_SYNC_ADD)
+slapd[15759]: syncrepl_entry: rid=001 inserted UUID 84c04164-5be8-102b-9a33-4dfcdb785320
+slapd[15759]: syncrepl_entry: rid=001 be_search (0)
+</code></p>
+
+<h2>Heartbeat</h2>
+
+<p>Heartbeat provides failover for configured resources between several Linux systems. In this case we are going to provide high-availability of an alias IP address (10.0.0.3) which we will distribute to clients as the LDAP server (ldap.example.com). Heartbeat configuration is very simple and only requires three files:</p>
+
+<p><code>/etc/ha.d/haresources</code> contains the resources that we will be failing over. It should be the same on both servers.
+<code>
+ldap1.example.com IPaddr::10.0.0.3/24/eth0:1/10.0.0.255
+</code>
+The reason the name of the host above is not "ldap.example.com" is because the entry must be a node listed in the configuration file (below).</p>
+
+<p><code>/etc/ha.d/authkeys</code> contains a shared secret used to secure the heartbeat messages. This is to ensure that someone doesnt just throw up a server and claim to be a part of your cluster.
+<code>
+auth 1
+1 md5 mysupersecretpassword
+</code></p>
+
+<p>Make sure to chmod it to something not world-readable (600 is recommend).</p>
+
+<p>Finally, <code>/etc/ha.d/ha.cf</code> is the Heartbeat configuration file. It should contain entries for each server in your cluster, timers, and log files.
+<code>
+mcast           eth0 225.0.0.1 694 1 0
+auto_failback   on
+keepalive 1
+deadtime 5
+debugfile       /var/log/ha-debug.log
+logfile         /var/log/ha.log
+logfacility     local0
+udp             eth0
+node            ldap1.example.com
+node            ldap2.example.com
+</code></p>
+
+<p>After all this is set, start the heartbeat service. After a bit you should see another ethernet interface show up on your primary. To test failover, unplug one of the machines and see what happens!</p>
+
+<h2>DNS Hack</h2>
+
+<p>A side affect of having the LDAP server respond on the shared IP address is that it gets confused about its hostname. As such you need to edit your <code>/etc/hosts</code> file to point the ldap.example.com name to each of the actual host IP addresses. In this example, ldap1 is 10.0.0.1 and ldap2 is 10.0.0.2. You should modify your hosts file to include:
+<code>
+10.0.0.1 ldap.example.com ldap
+10.0.0.2 ldap.example.com ldap
+</code>
+The first entry should be the address of the local system (10.0.0.2 should be the first in the case of ldap2).</p>
+
+<p>Your DNS server should be able to do forward and reverse lookups for <code>ldap.example.com</code> going to 10.0.0.3 (the highly available address).</p>
+
+<p>If you are having issues binding between the servers or binding from clients, it is usually due to DNS problems.</p>
+
+<h1>Testing</h1>
+
+<p>If all went according to plan, you should be able to see Sync messages in your slapd log file.
+<code>
+slapd[11059]: slapd starting
+slapd[11059]: do_syncrep2: rid=002 LDAP_RES_INTERMEDIATE - REFRESH_DELETE
+</code></p>
+
+<p>Likewise if you log into a client machine (in my case, I made this the KDC) you should be able to search at only the ldap.example.com host. The others will return errors.
+```
+[root@kdc ~]# ldapsearch -Q -LLL uid=user displayName -h ldap.example.com
+dn: uid=user,ou=users,dc=example,dc=com
+displayName: Firstname Lastname (user)</p>
+
+<p>[root@kdc ~]# ldapsearch -Q -LLL uid=user displayName -h ldap1.example.com
+ldap_sasl_interactive_bind_s: Invalid credentials (49)</p>
+
+<pre><code>    additional info: SASL(-13): authentication failure: GSSAPI Failure: gss_accept_sec_context
+</code></pre>
+
+<p>[root@kdc ~]# ldapsearch -Q -LLL uid=user displayName -h ldap2.example.com
+ldap_sasl_interactive_bind_s: Invalid credentials (49)</p>
+
+<pre><code>    additional info: SASL(-13): authentication failure: GSSAPI Failure: gss_accept_sec_context
+</code></pre>
+
+<p>[root@kdc ~]#
+```
+The reason is that the client has a different view of what the server's hostname is. This difference causes SASL to freak out and not allow you to bind.</p>
+
+<h1>Errors</h1>
+
+<p>```
+[root@kdc ~]# ldapsearch -h ldap.example.com uid=user
+SASL/GSSAPI authentication started
+ldap_sasl_interactive_bind_s: Invalid credentials (49)</p>
+
+<pre><code>    additional info: SASL(-13): authentication failure: GSSAPI Failure: gss_accept_sec_context
+</code></pre>
+
+<p>[root@kdc ~]#
+<code>
+On the server reveals the error of:
+</code>
+slapd[9888]: GSSAPI Error: Unspecified GSS failure.  Minor code may provide more information (Wrong principal in request)
+slapd[9888]: text=SASL(-13): authentication failure: GSSAPI Failure: gss_accept_sec_context
+```
+This means your DNS is not hacked or functional. Fix it according to the instructions</p>
+
+<p>The LDAP log says:
+<code>
+slapd[1901]: do_syncrepl: rid=005 rc -2 retrying
+slapd[1901]: slap_client_connect: URI=ldap://ldap2.example.com ldap_sasl_interactive_bind_s failed (-2)
+</code>
+and <code>/var/log/messages</code> contains:
+<code>
+GSSAPI Error: Unspecified GSS failure.  Minor code may provide more information (Credentials cache permissions incorrect)
+</code></p>
+
+<p>You need to change the SELinux context of your KRB5CC file (default is <code>/tmp/krb5cc_$UIDOFLDAPUSER</code> on Scientific Linux) to something the slapd process can read. Since every time you re-initialize the ticket you risk defaulting the permissions, I recommend using my script in your cronjob from above. If someone finds a better way to do this, please let me know!</p>
+
+<p>If after enabling SSL on your client you receive (using -d 1):
+<code>
+TLS: can't connect: TLS error -5938:Encountered end of file.
+</code>
+Check your certificate files on the SERVER. Odds are you have an incorrect path.</p>
+
+<h1>Summary</h1>
+
+<p>You now have two independent LDAP servers running OpenLDAP 2.4 and synchronizing data between them. They are intended to listen on a Heartbeat-ed service IP address that will always be available even if one of the servers dies. You can also do SASL binds to each server to avoid having passwords stored in your configuration files.</p>
+
+<p>If after reading this you feel there is something that can be improved or isnt clear, feel free to contact me! Also you can grab sample configuration files that I used at <a href="http://archive.grantcohoe.com/projects/ldap">http://archive.grantcohoe.com/projects/ldap</a>.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Kerberos Utilities]]></title>
+    <link href="http://www.grantcohoe.com/blog/2013/01/03/kerberos-utilities/"/>
+    <updated>2013-01-03T00:36:00-05:00</updated>
+    <id>http://www.grantcohoe.com/blog/2013/01/03/kerberos-utilities</id>
+    <content type="html"><![CDATA[<p>There are a number of useful Kerberos client utilities that can help you when working with authentication services.</p>
+
+<h1>kinit</h1>
+
+<p>kinit will initiate a new ticket from the Kerberos system. This is how you renew your tickets to access kerberized services or renew service principals for daemons. You can kinit interactively by simply running kinit and giving it the principal you want to init as:
+<code>
+gmcsrvx1 ~ # kinit grant
+Password for grant@GRANTCOHOE.COM:
+gmcsrvx1 ~ #
+</code>
+No response is good, and you can view your initialized ticket with klist (discussed later on).</p>
+
+<p>You can also kinit with a keytab by giving it the path to a keytab and a principal.
+<code>
+gmcsrvx1 ~ # kinit -k -t /etc/krb5.keytab host/gmcsrvx1.grantcohoe.com
+gmcsrvx1 ~ #
+</code>
+Note that it did not prompt me for a password. That is because it is using the stored principal key in the keytab to authenticate to the Kerberos server.</p>
+
+<h1>klist</h1>
+
+<p>klist is commonly used for two purposes: 1) List your current Kerberos tickets and 2) List the principals stored in a keytab. Running klist without any arguments will perform the first action.
+```
+gmcsrvx1 ~ # klist
+Ticket cache: FILE:/tmp/krb5cc_0
+Default principal: grant@GRANTCOHOE.COM</p>
+
+<p>Valid starting     Expires            Service principal
+04/18/12 12:44:31  04/19/12 12:44:30  krbtgt/GRANTCOHOE.COM@GRANTCOHOE.COM</p>
+
+<pre><code>renew until 04/18/12 12:44:31
+</code></pre>
+
+<p><code>
+To list the contents of a keytab:
+</code>
+gmcsrvx1 ~ # klist -k -t /etc/krb5.keytab
+Keytab name: WRFILE:/etc/krb5.keytab
+KVNO Timestamp         Principal</p>
+
+<hr />
+
+<p>   2 02/16/12 14:50:12 host/gmcsrvx1.grantcohoe.com@GRANTCOHOE.COM
+   2 02/16/12 14:50:12 host/gmcsrvx1.grantcohoe.com@GRANTCOHOE.COM
+   2 02/16/12 14:50:12 host/gmcsrvx1.grantcohoe.com@GRANTCOHOE.COM
+gmcsrvx1 ~ #
+```
+The duplication of the principal names represents each of the encryption types that are stored in the keytab. In my case, I use three encryption types to store my principals. If you support older deprecated enc-types (as Kerberos calls them), you will see more entries here.</p>
+
+<h1>kdestroy</h1>
+
+<p>kdestroy destroys all Kerberos tickets for your current user. You can verify this by doing:
+<code>
+gmcsrvx1 ~ # kdestroy
+gmcsrvx1 ~ # klist
+klist: No credentials cache found (ticket cache FILE:/tmp/krb5cc_0)
+gmcsrvx1 ~ #
+</code></p>
+
+<h1>ktutil</h1>
+
+<p>The Keytab Utility lets you view and modify keytab files. To start, you need to read in a keytab
+```
+ktutil:  rkt /etc/krb5.keytab
+ktutil:  list
+slot KVNO Principal</p>
+
+<hr />
+
+<p>   1    2 host/gmcsrvx1.grantcohoe.com@GRANTCOHOE.COM
+   2    2 host/gmcsrvx1.grantcohoe.com@GRANTCOHOE.COM
+   3    2 host/gmcsrvx1.grantcohoe.com@GRANTCOHOE.COM
+ktutil:<br/>
+<code>
+If you want to merge two keytabs, you can repeat the read command and the second keytab will be appended to the list. You can also selectively add and delete entries to the keytab as well. Once you are done, you can write the keytab out to a file.
+</code>
+ktutil:  wkt /etc/krb5.keytab
+ktutil:  quit
+gmcsrvx1 ~ #
+```</p>
+]]></content>
+  </entry>
+  
+</feed>

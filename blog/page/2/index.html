@@ -1,0 +1,1869 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Grant Cohoe</title>
+  <meta name="author" content="Grant Cohoe">
+
+  
+  <meta name="description" content="There are a number of useful Kerberos client utilities that can help you when working with authentication services. kinit kinit will initiate a new &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://www.grantcohoe.com/blog/page/2/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/stylesheets/cohoe.css" type="text/css" rel="stylesheet">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="Grant Cohoe" type="application/atom+xml">
+  <link href='http://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-37491721-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <div id="logo">
+  	<div class="clear"></div>
+  </div>
+  <h1><a href="/">Grant Cohoe</a></h1>
+  
+    <h2>Cloud plumber, bit wrangler, solution engineer.</h2>
+  
+  <div class="clear"></div>
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:www.grantcohoe.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/blog/">Blog</a></li>
+  <li><a href="/skills">Skills</a></li>
+  <li><a href="/about">About</a></li>
+ <!-- <li><a href="/blog/archives">Archives</a></li>-->
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div class="blog-index">
+  
+  
+  
+    <article>
+      
+  <header>
+    
+      <!-- Now we're back to normal posts. Note the links used under href in both headers.-->
+        <h1 class="entry-title"><a href="/blog/2013/01/03/kerberos-utilities/">Kerberos Utilities</a></h1>
+      
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-01-03T00:36:00-05:00" pubdate data-updated="true">Jan 3<span>rd</span>, 2013</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>There are a number of useful Kerberos client utilities that can help you when working with authentication services.</p>
+
+<h1>kinit</h1>
+
+<p>kinit will initiate a new ticket from the Kerberos system. This is how you renew your tickets to access kerberized services or renew service principals for daemons. You can kinit interactively by simply running kinit and giving it the principal you want to init as:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>gmcsrvx1 ~ # kinit grant
+</span><span class='line'>Password for grant@GRANTCOHOE.COM: 
+</span><span class='line'>gmcsrvx1 ~ # </span></code></pre></td></tr></table></div></figure>
+
+
+<p>No response is good, and you can view your initialized ticket with klist (discussed later on).</p>
+
+<p>You can also kinit with a keytab by giving it the path to a keytab and a principal.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>gmcsrvx1 ~ # kinit -k -t /etc/krb5.keytab host/gmcsrvx1.grantcohoe.com
+</span><span class='line'>gmcsrvx1 ~ # </span></code></pre></td></tr></table></div></figure>
+
+
+<p>Note that it did not prompt me for a password. That is because it is using the stored principal key in the keytab to authenticate to the Kerberos server.</p>
+
+<h1>klist</h1>
+
+<p>klist is commonly used for two purposes: 1) List your current Kerberos tickets and 2) List the principals stored in a keytab. Running klist without any arguments will perform the first action.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>gmcsrvx1 ~ # klist
+</span><span class='line'>Ticket cache: FILE:/tmp/krb5cc_0
+</span><span class='line'>Default principal: grant@GRANTCOHOE.COM
+</span><span class='line'>
+</span><span class='line'>Valid starting     Expires            Service principal
+</span><span class='line'>04/18/12 12:44:31  04/19/12 12:44:30  krbtgt/GRANTCOHOE.COM@GRANTCOHOE.COM
+</span><span class='line'>  renew until 04/18/12 12:44:31</span></code></pre></td></tr></table></div></figure>
+
+
+<p>To list the contents of a keytab:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>gmcsrvx1 ~ # klist -k -t /etc/krb5.keytab 
+</span><span class='line'>Keytab name: WRFILE:/etc/krb5.keytab
+</span><span class='line'>KVNO Timestamp         Principal
+</span><span class='line'>---- ----------------- -------------------------------------------------------
+</span><span class='line'>   2 02/16/12 14:50:12 host/gmcsrvx1.grantcohoe.com@GRANTCOHOE.COM
+</span><span class='line'>   2 02/16/12 14:50:12 host/gmcsrvx1.grantcohoe.com@GRANTCOHOE.COM
+</span><span class='line'>   2 02/16/12 14:50:12 host/gmcsrvx1.grantcohoe.com@GRANTCOHOE.COM
+</span><span class='line'>gmcsrvx1 ~ # </span></code></pre></td></tr></table></div></figure>
+
+
+<p>The duplication of the principal names represents each of the encryption types that are stored in the keytab. In my case, I use three encryption types to store my principals. If you support older deprecated enc-types (as Kerberos calls them), you will see more entries here.</p>
+
+<h1>kdestroy</h1>
+
+<p>kdestroy destroys all Kerberos tickets for your current user. You can verify this by doing:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>gmcsrvx1 ~ # kdestroy
+</span><span class='line'>gmcsrvx1 ~ # klist
+</span><span class='line'>klist: No credentials cache found (ticket cache FILE:/tmp/krb5cc_0)
+</span><span class='line'>gmcsrvx1 ~ # </span></code></pre></td></tr></table></div></figure>
+
+
+<h1>ktutil</h1>
+
+<p>The Keytab Utility lets you view and modify keytab files. To start, you need to read in a keytab</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>ktutil:  rkt /etc/krb5.keytab 
+</span><span class='line'>ktutil:  list
+</span><span class='line'>slot KVNO Principal
+</span><span class='line'>---- ---- --------------------------------------------------------------------
+</span><span class='line'>   1    2 host/gmcsrvx1.grantcohoe.com@GRANTCOHOE.COM
+</span><span class='line'>   2    2 host/gmcsrvx1.grantcohoe.com@GRANTCOHOE.COM
+</span><span class='line'>   3    2 host/gmcsrvx1.grantcohoe.com@GRANTCOHOE.COM
+</span><span class='line'>ktutil:  </span></code></pre></td></tr></table></div></figure>
+
+
+<p>If you want to merge two keytabs, you can repeat the read command and the second keytab will be appended to the list. You can also selectively add and delete entries to the keytab as well. Once you are done, you can write the keytab out to a file.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>ktutil:  wkt /etc/krb5.keytab 
+</span><span class='line'>ktutil:  quit
+</span><span class='line'>gmcsrvx1 ~ # </span></code></pre></td></tr></table></div></figure>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <!-- Now we're back to normal posts. Note the links used under href in both headers.-->
+        <h1 class="entry-title"><a href="/blog/2013/01/03/high-availability-with-multipath-routing/">High-Availability With Multipath Routing</a></h1>
+      
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-01-03T00:34:00-05:00" pubdate data-updated="true">Jan 3<span>rd</span>, 2013</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h1>Multipath Routing</h1>
+
+<p>Multipath routing is when you have a router with multiple equal-cost paths to a single destination. Since each of these routes carries the same weight, the router will distribute traffic across all of them roughly equally. You can read more on this technology on <a href="https://en.wikipedia.org/wiki/Equal-cost_multi-path_routing">Wikipedia</a>. This is more about the implementation of such a topology.</p>
+
+<h1>The Topology</h1>
+
+<p>In my setup, I have three clients on the 192.168.0.0/24 subnet with gateway 192.168.0.254. Likewise I have three servers on the 10.0.0.0/24 subnet with gateway 10.0.0.254. I want my clients to always be able to access a webserver at host 172.16.0.1/32. This is configured as a loopback address on each of the three servers. This is the multipath part of the project. Each of the servers has the same IP address on a loopback interface and will therefore answer on it. However since the shared router between these two networks has no idea the 172.16.0.1/32 network is available via the servers, my clients cannot access it. This is where the routing comes into play. I will be using an OSPF daemon on my servers to send LSA&#8217;s (read up on OSPF if you are not familiar) to the router.
+<img src="http://www.grantcohoe.com/images/blog/multipath.png" alt="" title="" /></p>
+
+<h1>Server Configuration</h1>
+
+<h2>Firewall</h2>
+
+<p>You need to allow OSPF traffic to enter your system. IPtables supports the OSPF transport so you only need a minimum of one rule:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>iptables -I INPUT 1 -p ospf -j ACCEPT</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Save you firewall configuration after changing it.</p>
+
+<h2>Package Installation</h2>
+
+<p>You need to install Quagga, a suite of routing daemons that will be used to talk OSPF with the router. These packages are available in most operating systems.</p>
+
+<h2>Interface Configuration</h2>
+
+<p>Configure your main interface statically as you normally would. You also need to setup a loopback interface for the highly-available host. Procedure for this varies by operating system. Since I am using Scientific Linux, I have a configuration file in <code>/etc/sysconfig/network-scripts/ifcfg-lo:1</code>:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>DEVICE=lo:1
+</span><span class='line'>IPADDR=172.16.0.1
+</span><span class='line'>NETMASK=255.255.255.255
+</span><span class='line'>ONBOOT=yes</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Make sure you restart your network process (or your host) after you do this. I first thought the reason this entire thing wasn&#8217;t working was a Linux-ism as my FreeBSD testing worked fine. I later discovered that it was because hot-adding an interface sometimes doesn&#8217;t add all the data we need to the kernel route table.</p>
+
+<h2>OSPF Configuration</h2>
+
+<p>Quagga&#8217;s ospfd has a single configuration file that is very Cisco-like in syntax. It is located at <code>/etc/quagga/ospfd.conf</code>:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>hostname server1
+</span><span class='line'>interface eth0
+</span><span class='line'>router ospf
+</span><span class='line'>  ospf router-id 10.0.0.1
+</span><span class='line'>  network 10.0.0.0/24 area 0
+</span><span class='line'>  network 172.16.0.1/32 area 0
+</span><span class='line'>log stdout</span></code></pre></td></tr></table></div></figure>
+
+
+<p>ospfd has a partner program called zebra that manages the kernel route table entries learned via OSPF. While we may not necessarily want these, zebra must be running and configured in order for this to work. Edit your <code>/etc/quagga/zebra.conf</code>:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>hostname server1
+</span><span class='line'>interface eth0</span></code></pre></td></tr></table></div></figure>
+
+
+<p>After you are all set, start zebra and ospfd (and make sure they are set to come up on boot).</p>
+
+<h1>Router Configuration</h1>
+
+<p>I am using a virtualized Cisco 7200 router in my testing environment. You may have to modify your interfaces, but otherwise this configuration is generic across all IOS:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>R1&gt;enable
+</span><span class='line'>R1#configure terminal
+</span><span class='line'>Enter configuration commands, one per line.  End with CNTL/Z.
+</span><span class='line'>R1(config)#router ospf 1
+</span><span class='line'>R1(config-router)#network 10.0.0.0 0.0.0.255 area 0
+</span><span class='line'>R1(config-router)#end</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This enables OSPF on the 10.0.0.0/24 network and will start listening for LSAs. When it processes a new one, the route will be inserted into the routing table. After a while, you should see something like this:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>R1#show ip route ospf
+</span><span class='line'>     172.16.0.0/32 is subnetted, 1 subnets
+</span><span class='line'>O       172.16.0.1 [110/11] via 10.0.0.3, 00:04:42, GigabitEthernet1/0
+</span><span class='line'>                   [110/11] via 10.0.0.2, 00:04:42, GigabitEthernet1/0
+</span><span class='line'>                   [110/11] via 10.0.0.1, 00:04:42, GigabitEthernet1/0</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This is multipath routing. The host 172.16.0.1/32 has three equal paths available to get to it.</p>
+
+<h1>Testing</h1>
+
+<p>To verify that my clients were actually getting load-balanced, I threw up an Apache webserver on each server with a static index.html file containing the ID of the server (server 1, server 2, server 3, etc). This way I can curl the highly-available IP address and can see which host I am getting routed to. You should see your clients get distributed out across any combination of the three servers.</p>
+
+<p>Now lets simulate a host being taken offline for maintenance. Rather than having to fail over a bunch of services, all you need to do is stop the ospfd process on the server. After the OSPF dead timer expires, the route will be removed and no more traffic will be routed to it. That host is now available for downtime without affecting any of the others. The router just redistributes the traffic on the remaining routes.</p>
+
+<p>But lets say the host immediately dies. There is no notification to the router that the backend host is no longer responding. The only thing you can do at this point is wait for the OSPF dead timer to expire. You can configure this to be a shorter amount of time, thus making &#8220;failover&#8221; more transparent.</p>
+
+<h1>Summary</h1>
+
+<p>Multipath routing is basically a poor-mans load balancer. It has no checks to see if the services are actually running and responding appropriately. It also does not behave very well with sessions or data that involves lots of writes. However for static web hosting or for caching nameservers (the use that sparked my interest in this technology), it works quite well.</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <!-- Now we're back to normal posts. Note the links used under href in both headers.-->
+        <h1 class="entry-title"><a href="/blog/2013/01/03/secure-openldap-server-with-kerberos-authentication/">Secure OpenLDAP Server With Kerberos Authentication</a></h1>
+      
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-01-03T00:26:00-05:00" pubdate data-updated="true">Jan 3<span>rd</span>, 2013</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h1>Host Configuration</h1>
+
+<p>There are some things we need to set up prior to installing and configuring OpenLDAP.</p>
+
+<h2>Kerberos</h2>
+
+<p>You will need a working KDC somewhere in your domain. You also need to have the server configured as a Kerberos client (<code>/etc/krb5.conf</code>) and be able to <code>kinit</code> without issue.</p>
+
+<p>There are two principals that you will need in your <code>/etc/krb5.keytab</code>:</p>
+
+<ul>
+<li>host/server.example.com@EXAMPLE.COM
+<li>ldap/server.example.com@EXAMPLE.COM
+</ul>
+
+
+<h2>saslauthd</h2>
+
+<p>If you do not already have this working, see my guide on how to set it up.</p>
+
+<h1>Packages</h1>
+
+<p>You need the following for our setup:</p>
+
+<ul>
+<li>krb5-server-ldap (for the Kerberos schema)
+<li>openldap
+<li>openldap-clients
+<li>openldap-servers
+<li>cyrus-sasl-gssapi
+<li>cyrus-sasl-ldap
+</ul>
+
+
+<h1>SSL Certificates</h1>
+
+<p>You will need SSL certificates matching the hostname you intend your LDAP server to listen on (ldap.example.com is different than server.example.com). Procure these from your PKI administrator. I place mine in the default directories as shown:</p>
+
+<ul>
+<li>Server Public Key - /etc/pki/tls/certs/slapd.pem
+<li>Server Private Key - /etc/pki/tls/private/slapd.pem
+<li>CA Certificate - /etc/pki/tls/cert.pem
+</ul>
+
+
+<h1>ACLs</h1>
+
+<p>The LDAP user needs to be able to read the private key and keytab you configured earlier. Ensure that it can.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>[root@localhost ~]# setfacl -m u:ldap:r /etc/krb5.keytab
+</span><span class='line'>[root@localhost ~]# setfacl -m u:ldap:r /etc/pki/tls/private/slapd.pem</span></code></pre></td></tr></table></div></figure>
+
+
+<h1>OpenLDAP Configuration</h1>
+
+<h2>Directory Cleanup</h2>
+
+<p>By default there are some extra files in the configuration directory. Since we are not using the cn=config method of configuring the server, we are simply going to remove the things we don&#8217;t want.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>[root@localhost ~]# cd /etc/openldap/
+</span><span class='line'>[root@localhost ~]# rm -rf slapd.d ldap.conf cacerts</span></code></pre></td></tr></table></div></figure>
+
+
+<p>We will be re-creating ldap.conf later on with the settings that we want.</p>
+
+<h2>Kerberos Schema</h2>
+
+<p>Copy <code>/usr/share/doc/krb5-server-ldap-1.9/kerberos.schema</code> into your schema directory (default: <code>/etc/openldap/schema</code>. This contains all of the definitions for Kerberos-related attributes.</p>
+
+<h2>Data Directory</h2>
+
+<p>Decide where you want your data directory to be. By default this is <code>/var/lib/ldap</code> Copy over the standard DB_CONFIG file to that directory from <code>/usr/share/openldap-servers/DB_CONFIG.example</code>. This contains optimization information about the structure of the database.</p>
+
+<h2>Enable LDAPS</h2>
+
+<p>Some systems require you to explicitly enable LDAPS listening. On Red Hat Enterprise Linux-based distributions, this is done by changing <code>SLAPD_LDAPS</code> to YES in <code>/etc/sysconfig/ldap</code>.</p>
+
+<h2>slapd.conf</h2>
+
+<p>Create a <code>/etc/openldap/slapd.conf</code> to configure your server. You can grab a copy of my basic configuration file <a href="http://archive.grantcohoe.com/projects/ldap/slapd_basic.conf">here</a>.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+<span class='line-number'>60</span>
+<span class='line-number'>61</span>
+<span class='line-number'>62</span>
+<span class='line-number'>63</span>
+<span class='line-number'>64</span>
+<span class='line-number'>65</span>
+<span class='line-number'>66</span>
+<span class='line-number'>67</span>
+<span class='line-number'>68</span>
+</pre></td><td class='code'><pre><code class='text'><span class='line'># Include base schema files provided by the openldap-servers package.
+</span><span class='line'>include /etc/openldap/schema/corba.schema
+</span><span class='line'>include /etc/openldap/schema/core.schema
+</span><span class='line'>include /etc/openldap/schema/cosine.schema
+</span><span class='line'>include /etc/openldap/schema/duaconf.schema
+</span><span class='line'>include /etc/openldap/schema/dyngroup.schema
+</span><span class='line'>include /etc/openldap/schema/inetorgperson.schema
+</span><span class='line'>include /etc/openldap/schema/java.schema
+</span><span class='line'>include /etc/openldap/schema/misc.schema
+</span><span class='line'>include /etc/openldap/schema/nis.schema
+</span><span class='line'>include /etc/openldap/schema/openldap.schema
+</span><span class='line'>include /etc/openldap/schema/pmi.schema
+</span><span class='line'>include /etc/openldap/schema/ppolicy.schema
+</span><span class='line'>
+</span><span class='line'># Site-specific schema and ACL includes. These are either third-party or custom.
+</span><span class='line'>include /etc/openldap/schema/kerberos.schema
+</span><span class='line'>
+</span><span class='line'># Daemon files needed for the running of the daemon
+</span><span class='line'>pidfile /var/run/openldap/slapd.pid
+</span><span class='line'>argsfile /var/run/openldap/slapd.args
+</span><span class='line'>
+</span><span class='line'># Limit SASL options to only GSSAPI and not other client-favorites. Apparently there is an issue where
+</span><span class='line'># clients will default to non-working SASL mechanisms and will make you angry.
+</span><span class='line'>sasl-secprops noanonymous,noplain,noactive
+</span><span class='line'>
+</span><span class='line'># SASL connection information. The realm should be your Kerberos realm as configured for the system. The
+</span><span class='line'># host should be the LEGITIMATE hostname of this server
+</span><span class='line'>sasl-realm EXAMPLE.COM
+</span><span class='line'>sasl-host ldap.example.com
+</span><span class='line'>
+</span><span class='line'># SSL certificate file paths
+</span><span class='line'>TLSCertificateFile /etc/pki/tls/certs/slapd.pem
+</span><span class='line'>TLSCertificateKeyFile /etc/pki/tls/private/slapd.pem
+</span><span class='line'>TLSCACertificateFile /etc/pki/tls/cert.pem
+</span><span class='line'>
+</span><span class='line'># Rewrite certain SASL bind DNs to more readable ones. Otherwise you bind as some crazy default
+</span><span class='line'># that ends up in a different base than your actual one. This uses regex to rewrite that weird
+</span><span class='line'># DN and make it become one that you can put within your suffix.
+</span><span class='line'>authz-policy from
+</span><span class='line'>authz-regexp &quot;^uid=[^,/]+/admin,cn=example\.com,cn=gssapi,cn=auth&quot; &quot;cn=ldaproot,dc=example,dc=com&quot;
+</span><span class='line'>authz-regexp &quot;^uid=host/([^,]+)\.example\.com,cn=example\.com,cn=gssapi,cn=auth&quot; &quot;cn=$1,ou=hosts,dc=example,dc=com&quot;
+</span><span class='line'>authz-regexp &quot;^uid=([^,]+),cn=example\.com,cn=gssapi,cn=auth&quot; &quot;uid=$1,ou=users,dc=example,dc=com&quot;
+</span><span class='line'>
+</span><span class='line'># Logging
+</span><span class='line'>#loglevel 16384
+</span><span class='line'>loglevel 256
+</span><span class='line'>
+</span><span class='line'># Actual LDAP database for things you want
+</span><span class='line'>database bdb
+</span><span class='line'>suffix &quot;dc=example,dc=com&quot;
+</span><span class='line'>rootdn &quot;cn=ldaproot,dc=example,dc=com&quot;
+</span><span class='line'>rootpw {MD5}X03MO1qnZdYdgyfeuILPmQ==
+</span><span class='line'>directory /var/lib/ldap
+</span><span class='line'>
+</span><span class='line'># Indicies for the database. These are used to improve performance of the database
+</span><span class='line'>index entryCSN eq
+</span><span class='line'>index entryUUID eq
+</span><span class='line'>index objectClass eq,pres
+</span><span class='line'>index ou,cn,mail eq,pres,sub,approx
+</span><span class='line'>index uidNumber,gidNumber,loginShell eq,pres
+</span><span class='line'>
+</span><span class='line'># Configuration database
+</span><span class='line'>database config
+</span><span class='line'>rootdn &quot;cn=ldaproot,dc=example,dc=com&quot;
+</span><span class='line'>
+</span><span class='line'># Monitoring database
+</span><span class='line'>database monitor
+</span><span class='line'>rootdn &quot;cn=ldaproot,dc=example,dc=com&quot;
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>To generate a password for your directory and hash it, you can use the <code>slappasswd</code> utility. See my guide on LDAP utilities for details. After that you should be all set. Start the slapd service, but dont query it yet.</p>
+
+<h1>Client Configuration</h1>
+
+<p>The <code>/etc/openldap/ldap.conf</code> file is the system-wide default LDAP connection settings. This way you do not have to specify the host and protocol each time you want to run a command. Make it now.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='text'><span class='line'># OpenLDAP client configuration file. Used for host default settings
+</span><span class='line'>BASE            dc=example,dc=com
+</span><span class='line'>URI             ldaps://ldap.example.com
+</span><span class='line'>TLS_CACERT      /etc/pki/tls/cert.pem
+</span><span class='line'>TLS_REQCERT     demand
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h1>Population</h1>
+
+<p>Right now you should have a running server, but with no data in it. I created a simple example setup file to get a basic tree set up. At this point you need to architect how you want your directory to be organized. You may chose to follow this or chose your own.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+<span class='line-number'>60</span>
+<span class='line-number'>61</span>
+<span class='line-number'>62</span>
+<span class='line-number'>63</span>
+<span class='line-number'>64</span>
+<span class='line-number'>65</span>
+<span class='line-number'>66</span>
+<span class='line-number'>67</span>
+<span class='line-number'>68</span>
+<span class='line-number'>69</span>
+<span class='line-number'>70</span>
+</pre></td><td class='code'><pre><code class='text'><span class='line'>miranda ldap # cat setup.ldif
+</span><span class='line'>dn: dc=example,dc=com
+</span><span class='line'>dc: example
+</span><span class='line'>o: Example Corporation
+</span><span class='line'>objectclass: top
+</span><span class='line'>objectclass: dcObject
+</span><span class='line'>objectclass: organization
+</span><span class='line'>
+</span><span class='line'>dn: ou=hosts,dc=example,dc=com
+</span><span class='line'>ou: hosts
+</span><span class='line'>objectclass: top
+</span><span class='line'>objectclass: organizationalUnit
+</span><span class='line'>
+</span><span class='line'>dn: ou=users,dc=example,dc=com
+</span><span class='line'>ou: users
+</span><span class='line'>objectclass: top
+</span><span class='line'>objectclass: organizationalUnit
+</span><span class='line'>
+</span><span class='line'>dn: cn=ldap1,ou=hosts,dc=example,dc=com
+</span><span class='line'>cn: ldap1
+</span><span class='line'>sn: ldap1
+</span><span class='line'>objectclass: top
+</span><span class='line'>objectclass: person
+</span><span class='line'>
+</span><span class='line'>dn: cn=ldap2,ou=hosts,dc=example,dc=com
+</span><span class='line'>cn: ldap2
+</span><span class='line'>sn: ldap2
+</span><span class='line'>objectclass: top
+</span><span class='line'>objectclass: person
+</span><span class='line'>
+</span><span class='line'>dn: uid=user,ou=users,dc=example,dc=com
+</span><span class='line'>objectclass: top
+</span><span class='line'>objectclass: person
+</span><span class='line'>objectclass: organizationalPerson
+</span><span class='line'>objectclass: posixAccount
+</span><span class='line'>objectclass: inetOrgPerson
+</span><span class='line'>ou: Users
+</span><span class='line'>uid: user
+</span><span class='line'>uidNumber: 10000
+</span><span class='line'>gidNumber: 150
+</span><span class='line'>givenName: Firstname
+</span><span class='line'>sn: Lastname
+</span><span class='line'>cn: Firstname Lastname
+</span><span class='line'>gecos: Firstname Lastname
+</span><span class='line'>Description: Firstname Lastname
+</span><span class='line'>homeDirectory: /users/user
+</span><span class='line'>loginShell: /bin/bash
+</span><span class='line'>mail: firstname.lastname@example.com
+</span><span class='line'>displayname: Firstname Lastname (user)
+</span><span class='line'>userPassword: {SASL}user@EXAMPLE.COM
+</span><span class='line'>
+</span><span class='line'>dn: uid=admin,ou=users,dc=example,dc=com
+</span><span class='line'>objectclass: top
+</span><span class='line'>objectclass: person
+</span><span class='line'>objectclass: organizationalPerson
+</span><span class='line'>objectclass: posixAccount
+</span><span class='line'>objectclass: inetOrgPerson
+</span><span class='line'>ou: Users
+</span><span class='line'>uid: admin
+</span><span class='line'>uidNumber: 10001
+</span><span class='line'>gidNumber: 151
+</span><span class='line'>givenName: Firstname
+</span><span class='line'>sn: Lastname
+</span><span class='line'>cn: Firstname Lastname
+</span><span class='line'>gecos: Firstname Lastname
+</span><span class='line'>Description: Firstname Lastname
+</span><span class='line'>homeDirectory: /users/admin
+</span><span class='line'>loginShell: /bin/bash
+</span><span class='line'>mail: firstname.lastname@example.com
+</span><span class='line'>displayname: Firstname Lastname (admin)
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>You can add the contents of this file to your directory using ldapadd.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='text'><span class='line'>ldapadd -x -D cn=ldaproot,dc=example,dc=com -W -f setup.ldif
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h1>Testing</h1>
+
+<p>You should now be able to query your server and figure out who it thinks you are based on your Kerberos principal.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='text'><span class='line'>[root@ldap ~]# kinit user
+</span><span class='line'>Password for user@EXAMPLE.COM:
+</span><span class='line'>[root@ldap ~]# ldapwhoami
+</span><span class='line'>SASL/GSSAPI authentication started
+</span><span class='line'>SASL username: user@EXAMPLE.COM
+</span><span class='line'>SASL SSF: 56
+</span><span class='line'>SASL data security layer installed.
+</span><span class='line'>dn:uid=user,ou=users,dc=example,dc=com
+</span><span class='line'>[root@ldap ~]#
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Here you can see that it thinks that I am <code>uid=user,ou=users,dc=example,dc=com</code> given my principal of <code>user@EXAMPLE.COM</code>.</p>
+
+<p>Now try searching:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+</pre></td><td class='code'><pre><code class='text'><span class='line'>[root@ldap ~]# ldapsearch uid=user
+</span><span class='line'>SASL/GSSAPI authentication started
+</span><span class='line'>SASL username: user@EXAMPLE.COM
+</span><span class='line'>SASL SSF: 56
+</span><span class='line'>SASL data security layer installed.
+</span><span class='line'># extended LDIF
+</span><span class='line'>#
+</span><span class='line'># LDAPv3
+</span><span class='line'># base &lt;dc=example,dc=com&gt; (default) with scope subtree
+</span><span class='line'># filter: uid=user
+</span><span class='line'># requesting: ALL
+</span><span class='line'>#
+</span><span class='line'>
+</span><span class='line'># user, users, example.com
+</span><span class='line'>dn: uid=user,ou=users,dc=example,dc=com
+</span><span class='line'>objectClass: top
+</span><span class='line'>objectClass: person
+</span><span class='line'>objectClass: organizationalPerson
+</span><span class='line'>objectClass: posixAccount
+</span><span class='line'>objectClass: inetOrgPerson
+</span><span class='line'>ou: Users
+</span><span class='line'>uid: user
+</span><span class='line'>uidNumber: 10000
+</span><span class='line'>gidNumber: 150
+</span><span class='line'>givenName: Firstname
+</span><span class='line'>sn: Lastname
+</span><span class='line'>cn: Firstname Lastname
+</span><span class='line'>gecos: Firstname Lastname
+</span><span class='line'>description: Firstname Lastname
+</span><span class='line'>homeDirectory: /users/user
+</span><span class='line'>loginShell: /bin/bash
+</span><span class='line'>mail: firstname.lastname@example.com
+</span><span class='line'>displayName: Firstname Lastname (user)
+</span><span class='line'>
+</span><span class='line'># search result
+</span><span class='line'>search: 5
+</span><span class='line'>result: 0 Success
+</span><span class='line'>
+</span><span class='line'># numResponses: 2
+</span><span class='line'># numEntries: 1
+</span><span class='line'>[root@ldap ~]#
+</span></code></pre></td></tr></table></div></figure>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <!-- Now we're back to normal posts. Note the links used under href in both headers.-->
+        <h1 class="entry-title"><a href="/blog/2013/01/03/fix-me-maybe/">Fix Me Maybe</a></h1>
+      
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-01-03T00:23:00-05:00" pubdate data-updated="true">Jan 3<span>rd</span>, 2013</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Fix Me Maybe (parody of Call Me Maybe)
+Words by Grant Cohoe (cohoe)
+Music &amp; original words by Carly Rae Jepsen</p>
+
+<p>This was dedicated to Ross Delinger (rossdylan) because: &#8220;FIX THE DAMN IRC SERVER!&#8221; Like the original song, it then went a lot further than expected. What more might come of this?!</p>
+
+<p><a href="http://csh.rit.edu/~ducker/fixmemaybe.mp3">MP3 - Sung by Alex Howland (ducker)</a></p>
+
+<p>Lyrics:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+<span class='line-number'>60</span>
+<span class='line-number'>61</span>
+<span class='line-number'>62</span>
+<span class='line-number'>63</span>
+<span class='line-number'>64</span>
+<span class='line-number'>65</span>
+<span class='line-number'>66</span>
+<span class='line-number'>67</span>
+<span class='line-number'>68</span>
+<span class='line-number'>69</span>
+<span class='line-number'>70</span>
+<span class='line-number'>71</span>
+<span class='line-number'>72</span>
+<span class='line-number'>73</span>
+<span class='line-number'>74</span>
+<span class='line-number'>75</span>
+<span class='line-number'>76</span>
+<span class='line-number'>77</span>
+<span class='line-number'>78</span>
+<span class='line-number'>79</span>
+<span class='line-number'>80</span>
+<span class='line-number'>81</span>
+<span class='line-number'>82</span>
+<span class='line-number'>83</span>
+<span class='line-number'>84</span>
+<span class='line-number'>85</span>
+<span class='line-number'>86</span>
+<span class='line-number'>87</span>
+<span class='line-number'>88</span>
+<span class='line-number'>89</span>
+<span class='line-number'>90</span>
+<span class='line-number'>91</span>
+<span class='line-number'>92</span>
+<span class='line-number'>93</span>
+<span class='line-number'>94</span>
+<span class='line-number'>95</span>
+<span class='line-number'>96</span>
+<span class='line-number'>97</span>
+<span class='line-number'>98</span>
+<span class='line-number'>99</span>
+<span class='line-number'>100</span>
+<span class='line-number'>101</span>
+<span class='line-number'>102</span>
+<span class='line-number'>103</span>
+<span class='line-number'>104</span>
+<span class='line-number'>105</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>I started as a project
+</span><span class='line'>Something come Fall we'd forget
+</span><span class='line'>The system full of neglect
+</span><span class='line'>But now you've logged into me.
+</span><span class='line'>
+</span><span class='line'>Everything's been broke for awhile
+</span><span class='line'>It's not great R-T-P style
+</span><span class='line'>This wasn't supposed to be a trial
+</span><span class='line'>But now you've logged into me.
+</span><span class='line'>
+</span><span class='line'>Your session was open
+</span><span class='line'>Bytes of logs were flowin'
+</span><span class='line'>Files were c-h-ownin'
+</span><span class='line'>Need to get them daemons going
+</span><span class='line'>
+</span><span class='line'>I'm used to broken things
+</span><span class='line'>These users are crazy
+</span><span class='line'>But here's my address, 
+</span><span class='line'>so fix me maybe?
+</span><span class='line'>
+</span><span class='line'>It's hard to figure out
+</span><span class='line'>What is wrong here
+</span><span class='line'>But here's my address, 
+</span><span class='line'>so fix me maybe?
+</span><span class='line'>
+</span><span class='line'>I'm used to broken things
+</span><span class='line'>These users are crazy
+</span><span class='line'>But here's my address, 
+</span><span class='line'>so fix me maybe?
+</span><span class='line'>
+</span><span class='line'>And all the other boys
+</span><span class='line'>Try and break me
+</span><span class='line'>But here's my address,
+</span><span class='line'>so fix me maybe?
+</span><span class='line'>
+</span><span class='line'>You took your time with fix
+</span><span class='line'>Broke in no time 'cause they're pricks
+</span><span class='line'>You didn't help anything
+</span><span class='line'>But still, you're logged in me
+</span><span class='line'>
+</span><span class='line'>I page, and cache and write
+</span><span class='line'>Every morn day and night
+</span><span class='line'>Processor cycles aren't tight
+</span><span class='line'>But still, you're logged in me
+</span><span class='line'>
+</span><span class='line'>Your session was open
+</span><span class='line'>Bytes of logs were flowin'
+</span><span class='line'>Files were c-h-ownin'
+</span><span class='line'>Need to get them daemons going
+</span><span class='line'>
+</span><span class='line'>I'm used to broken things
+</span><span class='line'>These users are crazy
+</span><span class='line'>But here's my address, 
+</span><span class='line'>so fix me maybe?
+</span><span class='line'>
+</span><span class='line'>It's hard to figure out
+</span><span class='line'>What is wrong here
+</span><span class='line'>But here's my address, 
+</span><span class='line'>so fix me maybe?
+</span><span class='line'>
+</span><span class='line'>I'm used to broken things
+</span><span class='line'>These users are crazy
+</span><span class='line'>But here's my address, 
+</span><span class='line'>so fix me maybe?
+</span><span class='line'>
+</span><span class='line'>And all the other boys
+</span><span class='line'>Try and break me
+</span><span class='line'>But here's my address,
+</span><span class='line'>so fix me maybe?
+</span><span class='line'>
+</span><span class='line'>Before you came into my logs 
+</span><span class='line'>I was broken so bad
+</span><span class='line'>I was broken so bad
+</span><span class='line'>I was broken so so bad
+</span><span class='line'>
+</span><span class='line'>Before you came into my logs 
+</span><span class='line'>I was broken so bad
+</span><span class='line'>And you should know that
+</span><span class='line'>I was broken so bad
+</span><span class='line'>
+</span><span class='line'>It's hard to figure out
+</span><span class='line'>What is wrong here
+</span><span class='line'>But here's my address, 
+</span><span class='line'>so fix me maybe?
+</span><span class='line'>
+</span><span class='line'>I'm used to broken things
+</span><span class='line'>These users are crazy
+</span><span class='line'>But here's my address, 
+</span><span class='line'>so fix me maybe?
+</span><span class='line'>
+</span><span class='line'>And all the other boys
+</span><span class='line'>Try and break me
+</span><span class='line'>But here's my address,
+</span><span class='line'>so fix me maybe?
+</span><span class='line'>
+</span><span class='line'>Before you came into my logs 
+</span><span class='line'>I was broken so bad
+</span><span class='line'>I was broken so bad
+</span><span class='line'>I was broken so so bad
+</span><span class='line'>
+</span><span class='line'>Before you came into my logs 
+</span><span class='line'>I was broken so bad
+</span><span class='line'>And you should know that
+</span><span class='line'>
+</span><span class='line'>So fix me, maybe?</span></code></pre></td></tr></table></div></figure>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <!-- Now we're back to normal posts. Note the links used under href in both headers.-->
+        <h1 class="entry-title"><a href="/blog/2013/01/01/makefile-based-pki-management/">Makefile-based PKI Management</a></h1>
+      
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-01-01T23:03:00-05:00" pubdate data-updated="true">Jan 1<span>st</span>, 2013</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Using a couple of seed files, you can easily get started managing your own PKI for your network. You need to have OpenSSL and Make installed on the system you are working with.</p>
+
+<p>First, pick a directory to store your certificates in. I am going to use <code>/etc/pki/example.com</code> since this is where all the other system SSL stuff is stored and for you SELinux people, will already have the right contexts. cd into that directory and create the Makefile:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+</pre></td><td class='code'><pre><code class='make'><span class='line'><span class="nv">CONFIG</span><span class="o">=</span>config/openssl.cnf
+</span><span class='line'><span class="nv">PUB</span><span class="o">=</span>host-cert.pem
+</span><span class='line'><span class="nv">PRIV</span><span class="o">=</span>host-key.pem
+</span><span class='line'><span class="nv">REQ</span><span class="o">=</span>req.pem
+</span><span class='line'><span class="nv">PUBNPRIV</span><span class="o">=</span>host-combined.pem
+</span><span class='line'>
+</span><span class='line'><span class="nf">issue</span><span class="o">:</span>
+</span><span class='line'>  mkdir -p <span class="k">${</span><span class="nv">DEST</span><span class="k">}</span>
+</span><span class='line'>  openssl req -new -nodes -out <span class="k">${</span><span class="nv">DEST</span><span class="k">}</span>/<span class="k">${</span><span class="nv">REQ</span><span class="k">}</span> -config <span class="k">${</span><span class="nv">CONFIG</span><span class="k">}</span>
+</span><span class='line'>  mv <span class="k">${</span><span class="nv">PRIV</span><span class="k">}</span> <span class="k">${</span><span class="nv">DEST</span><span class="k">}</span>/
+</span><span class='line'>  openssl ca -out <span class="k">${</span><span class="nv">DEST</span><span class="k">}</span>/<span class="k">${</span><span class="nv">PUB</span><span class="k">}</span> -config <span class="k">${</span><span class="nv">CONFIG</span><span class="k">}</span> -infiles <span class="k">${</span><span class="nv">DEST</span><span class="k">}</span>/<span class="k">${</span><span class="nv">REQ</span><span class="k">}</span>
+</span><span class='line'>  <span class="k">if</span> <span class="o">[</span> <span class="k">${</span><span class="nv">DEST</span><span class="k">}</span> <span class="o">=</span> mail -o <span class="k">${</span><span class="nv">DEST</span><span class="k">}</span> <span class="o">=</span> mail/ <span class="o">]</span>; <span class="k">then </span>cp <span class="k">${</span><span class="nv">DEST</span><span class="k">}</span>/<span class="k">${</span><span class="nv">PUB</span><span class="k">}</span> <span class="k">${</span><span class="nv">DEST</span><span class="k">}</span>/<span class="k">${</span><span class="nv">PUBNPRIV</span><span class="k">}</span>; cat <span class="k">${</span><span class="nv">DEST</span><span class="k">}</span>/<span class="k">${</span><span class="nv">PRIV</span><span class="k">}</span> &gt;&gt; <span class="k">${</span><span class="nv">DEST</span><span class="k">}</span>/<span class="k">${</span><span class="nv">PUBNPRIV</span><span class="k">}</span>; <span class="k">fi</span>
+</span><span class='line'><span class="k">  </span>chmod <span class="nv">go</span><span class="o">=</span> <span class="k">${</span><span class="nv">DEST</span><span class="k">}</span>/<span class="k">${</span><span class="nv">PRIV</span><span class="k">}</span>
+</span><span class='line'>  <span class="k">if</span> <span class="o">[</span> -e <span class="k">${</span><span class="nv">DEST</span><span class="k">}</span>/<span class="k">${</span><span class="nv">PUBNPRIV</span><span class="k">}</span> <span class="o">]</span>; <span class="k">then </span>chmod <span class="nv">go</span><span class="o">=</span> <span class="k">${</span><span class="nv">DEST</span><span class="k">}</span>/<span class="k">${</span><span class="nv">PUBNPRIV</span><span class="k">}</span>; <span class="k">fi</span>
+</span><span class='line'>
+</span><span class='line'><span class="nf">revoke</span><span class="o">:</span>
+</span><span class='line'>  openssl ca -config <span class="k">${</span><span class="nv">CONFIG</span><span class="k">}</span> -revoke <span class="k">${</span><span class="nv">SOURCE</span><span class="k">}</span>/<span class="k">${</span><span class="nv">PUB</span><span class="k">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This lets us perform two actions (targets): Issue and Revoke. Issue will create a new host certificate from your CA. Revoke will expire an already-existing certificate. This is mainly used for renewal since you need to revoke then issue.</p>
+
+<p>Next we will need a configuration directory and some basic files:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='console'><span class='line'><span class="go">[root@gmcsrvx1 example.com ]# mkdir config config/newcerts config/CA</span>
+</span><span class='line'><span class="go">[root@gmcsrvx1 example.com ]# touch config/index.txt</span>
+</span><span class='line'><span class="go">[root@gmcsrvx1 example.com ]# echo &#39;01&#39; &gt; config/serial</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>After that, cd into the config directory and create an <code>openssl.cnf</code> file. This is the OpenSSL configuration file used for certificate generation:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+<span class='line-number'>60</span>
+<span class='line-number'>61</span>
+<span class='line-number'>62</span>
+<span class='line-number'>63</span>
+<span class='line-number'>64</span>
+<span class='line-number'>65</span>
+<span class='line-number'>66</span>
+<span class='line-number'>67</span>
+<span class='line-number'>68</span>
+<span class='line-number'>69</span>
+<span class='line-number'>70</span>
+<span class='line-number'>71</span>
+<span class='line-number'>72</span>
+<span class='line-number'>73</span>
+<span class='line-number'>74</span>
+<span class='line-number'>75</span>
+<span class='line-number'>76</span>
+</pre></td><td class='code'><pre><code class='text'><span class='line'># OpenSSL configuration file.
+</span><span class='line'>#
+</span><span class='line'># Adapted by Grant Cohoe 2011 (www.grantcohoe.com)
+</span><span class='line'># Original by some past CSHer (www.csh.rit.edu)
+</span><span class='line'>
+</span><span class='line'># Establish working directory.
+</span><span class='line'>
+</span><span class='line'>dir               = /etc/pki/example.com
+</span><span class='line'>
+</span><span class='line'>[ req ]
+</span><span class='line'>default_bits      = 2048          # Size of keys
+</span><span class='line'>default_keyfile   = host-key.pem      # name of generated keys
+</span><span class='line'>default_md        = sha1          # message digest algorithm
+</span><span class='line'>string_mask       = nombstr           # permitted characters
+</span><span class='line'>distinguished_name    = req_distinguished_name
+</span><span class='line'>req_extensions        = v3_req            # always use v3 extensions for reqs
+</span><span class='line'>
+</span><span class='line'>[ req_distinguished_name ]
+</span><span class='line'># Variable name  Prompt string
+</span><span class='line'>#----------------------  ----------------------------------
+</span><span class='line'>0.organizationName        = Organization Name (company)
+</span><span class='line'>organizationalUnitName    = Organizational Unit Name (department, division)
+</span><span class='line'>emailAddress          = Email
+</span><span class='line'>emailAddress_max      = 40
+</span><span class='line'>localityName          = Locality Name (city)
+</span><span class='line'>stateOrProvinceName       = State or Province Name (full name)
+</span><span class='line'>countryName           = Country Name (2 letter code)
+</span><span class='line'>countryName_min       = 2
+</span><span class='line'>countryName_max       = 2
+</span><span class='line'>commonName            = Common Name (full hostname)
+</span><span class='line'>commonName_max            = 64
+</span><span class='line'>
+</span><span class='line'># Default values for the above, for consistency and less typing.
+</span><span class='line'># Variable name  Value
+</span><span class='line'>#------------------------------  ------------------------------
+</span><span class='line'>0.organizationName_default        = Example Corp
+</span><span class='line'>organizationalUnitName_default    = System Engineering
+</span><span class='line'>emailAddress_default          = root@example.com
+</span><span class='line'>localityName_default          = Rochester
+</span><span class='line'>stateOrProvinceName_default       = New York
+</span><span class='line'>countryName_default               = US
+</span><span class='line'>
+</span><span class='line'>[ v3_ca ]
+</span><span class='line'>basicConstraints      = CA:TRUE
+</span><span class='line'>subjectKeyIdentifier  = hash
+</span><span class='line'>authorityKeyIdentifier    = keyid:always,issuer:always
+</span><span class='line'>
+</span><span class='line'>[ v3_req ]
+</span><span class='line'>basicConstraints      = CA:FALSE
+</span><span class='line'>subjectKeyIdentifier  = hash
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'>[ ca ]
+</span><span class='line'>default_ca    = CA_default
+</span><span class='line'>
+</span><span class='line'>[ CA_default ]
+</span><span class='line'>serial        = $dir/serial
+</span><span class='line'>database      = $dir/index.txt
+</span><span class='line'>new_certs_dir = $dir/newcerts
+</span><span class='line'>certificate   = $dir/CA/example-ca.crt
+</span><span class='line'>private_key   = $dir/CA/example-ca.key
+</span><span class='line'>default_days  = 365
+</span><span class='line'>default_md    = sha1
+</span><span class='line'>preserve      = no
+</span><span class='line'>email_in_dn   = no
+</span><span class='line'>nameopt       = default_ca
+</span><span class='line'>certopt       = default_ca
+</span><span class='line'>policy        = policy_match
+</span><span class='line'>
+</span><span class='line'>[ policy_match ]
+</span><span class='line'>countryName           = match
+</span><span class='line'>stateOrProvinceName       = match
+</span><span class='line'>organizationName      = match
+</span><span class='line'>organizationalUnitName    = optional
+</span><span class='line'>commonName            = supplied
+</span><span class='line'>emailAddress          = optional
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>You should ensure that the directory definition and organization information is changed to match what you want.</p>
+
+<p>After this you are ready to generate your CA:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='console'><span class='line'><span class="go">openssl req -config openssl.cnf -new -x509 -extensions v3_ca -keyout CA/example-ca.key -out CA/example-ca.crt -days 1825</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This will generate a CA certificate based on your settings file and will last for 5 years, after which you will need to renew it.</p>
+
+<p>Enter a certificate password when prompted. You do not need to specify a Common Name (CN) as asked later in the process. Ensure that the other field defaults are correct, as they came from your <code>openssl.cnf</code> file and are needed to match in other certificates.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+</pre></td><td class='code'><pre><code class='console'><span class='line'><span class="go">[root@gmcsrvx1 config]# openssl req -config openssl.cnf -new -x509 -extensions v3_ca -keyout CA/example-ca.key -out CA/example-ca.crt -days 1825</span>
+</span><span class='line'><span class="go">Generating a 2048 bit RSA private key</span>
+</span><span class='line'><span class="go">................................................................................</span>
+</span><span class='line'><span class="go">..................+++</span>
+</span><span class='line'><span class="go">writing new private key to &#39;CA/example-ca.key&#39;</span>
+</span><span class='line'><span class="go">Enter PEM pass phrase:</span>
+</span><span class='line'><span class="go">Verifying - Enter PEM pass phrase:</span>
+</span><span class='line'><span class="go">-----</span>
+</span><span class='line'><span class="go">You are about to be asked to enter information that will be incorporated</span>
+</span><span class='line'><span class="go">into your certificate request.</span>
+</span><span class='line'><span class="go">What you are about to enter is what is called a Distinguished Name or a DN.</span>
+</span><span class='line'><span class="go">There are quite a few fields but you can leave some blank</span>
+</span><span class='line'><span class="go">For some fields there will be a default value,</span>
+</span><span class='line'><span class="go">If you enter &#39;.&#39;, the field will be left blank.</span>
+</span><span class='line'><span class="go">-----</span>
+</span><span class='line'><span class="go">Organization Name (company) [Example Corp]:</span>
+</span><span class='line'><span class="go">Organizational Unit Name (department, division) [System Engineering]:</span>
+</span><span class='line'><span class="go">Email [root@example.com]:</span>
+</span><span class='line'><span class="go">Locality Name (city) [Rochester]:</span>
+</span><span class='line'><span class="go">State or Province Name (full name) [New York]:</span>
+</span><span class='line'><span class="go">Country Name (2 letter code) [US]:</span>
+</span><span class='line'><span class="go">Common Name (full hostname) []:</span>
+</span><span class='line'><span class="go">[root@gmcsrvx1 config]#</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Unfortunately this process creates the private key file to be world readable. This is extremely bad. Fix it. Also ensure that the public key is readable by all. It is supposed to be.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='console'><span class='line'><span class="go">[root@gmcsrvx1 config]# chmod 600 CA/example-ca.key</span>
+</span><span class='line'><span class="go">[root@gmcsrvx1 config]# chmod 644 CA/example-ca.crt</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now back up one directory (back to the working directory you started at). I usually make a symlink to the CA public key here so you can easily reference it.</p>
+
+<p>You can now issue SSL certificates by typing <code>make DEST=hostname</code> where hostname is the name of the server you are going to issue to.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+</pre></td><td class='code'><pre><code class='console'><span class='line'><span class="go">[root@gmcsrvx1 example.com]# make DEST=gmcsrvx1</span>
+</span><span class='line'><span class="go">mkdir -p gmcsrvx1</span>
+</span><span class='line'><span class="go">openssl req -new -nodes -out gmcsrvx1/req.pem -config config/openssl.cnf</span>
+</span><span class='line'><span class="go">Generating a 2048 bit RSA private key</span>
+</span><span class='line'><span class="go">..............................................+++</span>
+</span><span class='line'><span class="go">......................................+++</span>
+</span><span class='line'><span class="go">writing new private key to &#39;host-key.pem&#39;</span>
+</span><span class='line'><span class="go">-----</span>
+</span><span class='line'><span class="go">You are about to be asked to enter information that will be incorporated</span>
+</span><span class='line'><span class="go">into your certificate request.</span>
+</span><span class='line'><span class="go">What you are about to enter is what is called a Distinguished Name or a DN.</span>
+</span><span class='line'><span class="go">There are quite a few fields but you can leave some blank</span>
+</span><span class='line'><span class="go">For some fields there will be a default value,</span>
+</span><span class='line'><span class="go">If you enter &#39;.&#39;, the field will be left blank.</span>
+</span><span class='line'><span class="go">-----</span>
+</span><span class='line'><span class="go">Organization Name (company) [Example Corp]:</span>
+</span><span class='line'><span class="go">Organizational Unit Name (department, division) [System Engineering]:</span>
+</span><span class='line'><span class="go">Email [root@example.com]:</span>
+</span><span class='line'><span class="go">Locality Name (city) [Rochester]:</span>
+</span><span class='line'><span class="go">State or Province Name (full name) [New York]:</span>
+</span><span class='line'><span class="go">Country Name (2 letter code) [US]:</span>
+</span><span class='line'><span class="go">Common Name (full hostname) []:gmcsrvx1.example.com</span>
+</span><span class='line'><span class="go">mv host-key.pem gmcsrvx1/</span>
+</span><span class='line'><span class="go">openssl ca -out gmcsrvx1/host-cert.pem -config config/openssl.cnf -infiles gmcsr</span>
+</span><span class='line'><span class="go">Using configuration from config/openssl.cnf</span>
+</span><span class='line'><span class="go">Enter pass phrase for /etc/pki/example.com/config/CA/example-ca.key:</span>
+</span><span class='line'><span class="go">Check that the request matches the signature</span>
+</span><span class='line'><span class="go">Signature ok</span>
+</span><span class='line'><span class="go">The Subject&#39;s Distinguished Name is as follows</span>
+</span><span class='line'><span class="go">organizationName      :PRINTABLE:&#39;Example Corp&#39;</span>
+</span><span class='line'><span class="go">organizationalUnitName:PRINTABLE:&#39;System Engineering&#39;</span>
+</span><span class='line'><span class="go">localityName          :PRINTABLE:&#39;Rochester&#39;</span>
+</span><span class='line'><span class="go">stateOrProvinceName   :PRINTABLE:&#39;New York&#39;</span>
+</span><span class='line'><span class="go">countryName           :PRINTABLE:&#39;US&#39;</span>
+</span><span class='line'><span class="go">commonName            :PRINTABLE:&#39;gmcsrvx1.example.com&#39;</span>
+</span><span class='line'><span class="go">Certificate is to be certified until May  1 18:12:03 2013 GMT (365 days)</span>
+</span><span class='line'><span class="go">Sign the certificate? [y/n]:y</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'><span class="go">1 out of 1 certificate requests certified, commit? [y/n]y</span>
+</span><span class='line'><span class="go">Write out database with 1 new entries</span>
+</span><span class='line'><span class="go">Data Base Updated</span>
+</span><span class='line'><span class="go">if [ gmcsrvx1 = mail -o gmcsrvx1 = mail/ ]; then cp gmcsrvx1/host-cert.pem gmcsr.pem; fi</span>
+</span><span class='line'><span class="go">chmod go= gmcsrvx1/host-key.pem</span>
+</span><span class='line'><span class="go">if [ -e gmcsrvx1/host-combined.pem ]; then chmod go= gmcsrvx1/host-combined.pem;</span>
+</span><span class='line'><span class="go">[root@gmcsrvx1 example.com]#</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>If you look in the directory it made for you (the hostname you specified) you will find the private and public keys for the server.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='console'><span class='line'><span class="go">[root@gmcsrvx1 example.com]# ls -l gmcsrvx1/</span>
+</span><span class='line'><span class="go">total 12</span>
+</span><span class='line'><span class="go">-rw-r--r--. 1 root root 3997 May  1 14:12 host-cert.pem</span>
+</span><span class='line'><span class="go">-rw-------. 1 root root 1704 May  1 14:12 host-key.pem</span>
+</span><span class='line'><span class="go">-rw-r--r--. 1 root root 1171 May  1 14:12 req.pem</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>You can revoke this certificate using the makefile as well:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='console'><span class='line'><span class="go">[root@gmcsrvx1 example.com]# make revoke SOURCE=gmcsrvx1</span>
+</span><span class='line'><span class="go">openssl ca -config config/openssl.cnf -revoke gmcsrvx1/host-cert.pem</span>
+</span><span class='line'><span class="go">Using configuration from config/openssl.cnf</span>
+</span><span class='line'><span class="go">Enter pass phrase for /etc/pki/example.com/config/CA/example-ca.key:</span>
+</span><span class='line'><span class="go">Revoking Certificate 01.</span>
+</span><span class='line'><span class="go">Data Base Updated</span>
+</span><span class='line'><span class="go">[root@gmcsrvx1 example.com]#</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>There you go, yet another useful service to have around for dealing with your network. Raw files used above are available in the <a href="http://archive.grantcohoe.com/projects/ssl">Archive</a>. Now back to Webauth with me&#8230;</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <!-- Now we're back to normal posts. Note the links used under href in both headers.-->
+        <h1 class="entry-title"><a href="/blog/2013/01/01/system-technology-accounting-and-resource-registration-solution-starrs/">System Technology Accounting and Resource Registration Solution (STARRS)</a></h1>
+      
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-01-01T20:10:00-05:00" pubdate data-updated="true">Jan 1<span>st</span>, 2013</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h1>Background</h1>
+
+<p>Like most of my projects, it all started with CSH. RIT allocates us two /24 public-facing networks to distribute out to our users. These resources need to have some degree of accounting in the event a user does something stupid (piracy, kiddie-pr0n, etc). RIT handles this with their own internal application, referred to as &#8220;start.rit.edu&#8221;. <em>Fun aside, Start.RIT was coded by an old CSHer, now RIT employee and CSH advisor. He still maintains portions of it today.</em> When the CSH network got to the point of needing our own internal application, a member (<a href="http://www.csh.rit.edu/~sunday/">Joe Sunday</a>) created &#8220;start.csh.rit.edu&#8221;. Similar to it&#8217;s RIT counterpart, start.csh allowed administrators to register machines and distribute resources on the network. Start.csh also allowed for users to manage firewall rules for their hosts at the border firewall systems. On the backend, it had a script that would automatically generate an ISC-DHCPD config file and load it into the server.</p>
+
+<p>Unfortunately over time, bits of Start began to break. The fact that users could not register their own machines was a major source of irritation for the RTPs (Root-Type-Persons, or Sysadmins). When the network topology was shifted to accomodate some reorganization within RIT, the firewall rule system broke completely. There was no way to clear out old hosts that havent been on the network in years. And after the house DHCP server was compromised (then obliterated by the RTPs for security), the automatic DHCP generation was completely gone. We needed something new.</p>
+
+<p>Starting in the Spring of 2011 I starting to architect a new application to encoumpase the previous functionality and add a lot of new features and enhancements that would benefit us for years to come. Going into the projects, I knew one thing: It had to be based in PostgreSQL. Pg has native datatypes for IP addresses, subnets, and MAC addresses. I know that this would be invaluable to have later on in the project. I also knew that I didnt want to write a daemon that ran on some server imposing application logic.</p>
+
+<h1>Development</h1>
+
+<p>At this point in my career, I didn&#8217;t have a whole lot of database architecting experience. I began to search for a schema creation application to help me architect what I knew was going to be a complex schema. I ran across a service called <a href="http://www.schemabank.com">SchemaBank</a>. (SB is now defunct) It was a schema design webapp that supported Postgres. It also introduced me to two things that would change the course of the application forever: Triggers and Functions. I realized that I could use Pg as the backend daemon to the entire application. For client interaction with the application, I started to develop a set of wrapper API functions that would help impose the application logic on the stored data. While most of this was taken care of in the relations between entities, there were some that could not be expressed as a relation. Fast forward two months, and I had a first revision of the database and the API to start writing an interface for.</p>
+
+<p>At this point I didn&#8217;t know any sort of web languages other than HTML and CSS either. So using a book I won at BarCampRoc on <a href="http://shop.oreilly.com/product/9780596157142.do">PHP, MySQL, and Javascript</a> (a very good book by the way), I started to learn PHP. Originally I was going to go with a purely non-OOP model for the webapp, however after consulting one of my web-dev friends (<a href="http://iota.csh.rit.edu/">Ben Russell</a>), he suggested that I go with an OOP model and to use some sort of framework to avoid having to write a ton of extra code. At this point I went with one that another one of my web-dev friends had used, <a href="http://ellislab.com/codeigniter">Codeigniter</a>. So I set to work and started writing classes. During this time, I knew that I needed a new a new dhcpd.conf generation function. One of my friends (<a href="http://blog.agargiulo.com/">Anthony Gargiulo</a>) expressed an interest in helping out with the project, so I tasked him with writing a generation function in Perl. Four months later, I had a working PHP web interface (and he had a working dhcpd.conf generator). At this point, I had everything except a name. I dont really remember a lot about how it came about, but I think I took the first cool-sounding word that came to my head. I was in a Quake 3 Arena mood that day and remembered an old console command (impulse). I took that word and backronymed it to the IP Management Program for Use in Local Server Environments.</p>
+
+<h1>Initial Implementation</h1>
+
+<p>When we returned to RIT in the Fall, I set to work deploying IMPULSE. After a few hickups here and there, everything was in place and in use. Users were fairly receptive to it, mainly that they could register their devices themselves. However after some time, a few problems emerged. The web interface became terribly slow with all of the data that people had entered. It wasnt very efficient at allowing users to complete basic tasks and had a few bugs. Clearly some changes needed to occur, but during the course of the year I didn&#8217;t want to touch it. I spent 6 months writing code on this project, and I really didnt want to work on it again.</p>
+
+<h1>Refresh</h1>
+
+<p>My latest co-op offerred me a chance to take to the code once again, this time with a new use case in mind. They wanted something that could manage network registrations for developers in a complex environment, but there were a few major additions that needed to happen. IMPULSE needed to go global. It needeed more specific access control. It needed better device integration. And most importantly, it also needed a new interface. Armed with all the knowlege I have gained over the last year, I set out to work. 2 months later I had a new web interface and a lot of new fixes and enhancements to the core. However the name IMPULSE no longer applied. So I cooked up a new one: STARRS (System Technology Accounting and Resource Registration Solution). And that&#8217;s presumably what you actually care about.</p>
+
+<h1>Features</h1>
+
+<p>STARRS starts off with Datacenters, which correspond to your physical locations. Each datacenter contains Subnets and VLANs. Each datacenter then contains one or more Availability Zones, which are logical partitions of resources within the datacenter. AZs contain ranges of your subnets.</p>
+
+<p>Within datacenters are Systems. A system is a computer, based on a hardware Platform (usually Custom though). A system can have Interfaces which attach to your network. On each interface can be Addresses that are assigned from your Availability Zones. You can get your addresses in a variety of ways (depending on family). DHCP and Static for IPv4, and Autoconf, DHCPv6, and Static for IPv6. (Oh yeah, STARRS does both IPv4 and IPv6). Your addresses are given to you with a set expiration date. If you dont renew before that date (You will get email notifications), it will be automatically deleted. On your addresses, you can create a variety of DNS Records that can be added into managed DNS Zones. Zone DDNS updates are done with Keys that are stored within STARRS. If your address is configured with DHCP, you can be a member of a DHCP Class. Classes, Ranges, and Subnets all have a variety of configuration options that can be set. You can also set options globally. For network systems, you can store SNMP Credentials that STARRS can use to look up Switchport and CAM Table data. Using this you can easily locate your system interfaces in your infrastructure. And of course, you can search for systems that you have configured.</p>
+
+<p>STARRS depends on your existing authentication infrastructure for its user data. It does not track credentials within itself, but relies on the client to provide the user and external sources for privileging. The STARRS web interface gets the username from the web server from configurable PHP variables. It takes the username and calls an API initializing function that sets up your privilege levels. STARRS can get privilege data from one of the following:</p>
+
+<ul>
+<li>Local Tables</li>
+<li>OpenLDAP</li>
+<li>Active Directory</li>
+</ul>
+
+
+<p>Users can be global ADMINs and have RW access to everything in the database. They can be USERs who can create/edit/remove their own stuff, but cannot see certain confidential configuration and cannot edit other peoples stuff. People who are Group Admins can edit other peoples stuff in their group. There is also a PROGRAM user-level that allows external applications Read-Only access to user resources. If you don&#8217;t exist in the privilege source, you will be unable to initialize and do anything in STARRS.</p>
+
+<p>STARRS also has the ability to automatically generate a configuration file for the ISC-DHCPD server based on the resources you configure. It supports key-based DDNS updates to zones, DHCP classes, global/range/subnet/class options, and more. A cronjob runs to periodically generate, download, and reload the server configuration file. Eventually this might change to something more real, but for now this is what works.</p>
+
+<p>Use cases have STARRS working with the following web authentication services:</p>
+
+<ul>
+<li><a href="http://webauth.stanford.edu/">Stanford Webauth</a></li>
+<li><a href="http://httpd.apache.org/docs/2.2/mod/mod_ldap.html">Basic Auth w/ mod_ldap</a></li>
+</ul>
+
+
+<h1>Deployment</h1>
+
+<p>All of the code is available on Github in two repositories:</p>
+
+<ul>
+<li><a href="https://github.com/cohoe/starrs">Core/Database</a></li>
+<li><a href="https://github.com/cohoe/starrs-web">Web</a></li>
+</ul>
+
+
+<p>There is an unofficial and unsupported command-line interface written by a friend of mine (<a href="http://ryansb.com/">Ryan Brown</a>) located <a href="https://github.com/ryansb/ish">Here</a>.</p>
+
+<p>STARRS is licensed under the MIT license.</p>
+
+<h1>Demo</h1>
+
+<p>You can access <a href="http://starrsdemo.grantcohoe.com">the demo by clicking here.</a> Username is &#8216;root&#8217; and password is &#8216;admin&#8217;. The database resets itself every 24 hours at midnight, so don&#8217;t expect long-term persistence of data.</p>
+
+<h1>Who Should Use This</h1>
+
+<p>If you are a service provider to a group of users who consume network resources that you control. You want some way of accounting for what resources are in use and where they are in your network. The use cases of it so far are:</p>
+
+<ul>
+<li>Computer Science House - Dorm of college students (about 350 systems)</li>
+<li>Work - Product developers in 4 sites across 3 countries (1000+ systems)</li>
+<li>Enterprise - My personal VM server (30 systems)</li>
+</ul>
+
+
+<h1>Future</h1>
+
+<p>There are a couple of enhancements on deck for the next release (whever that may be). See the respective Github project issues for details. However STARRS will soon be encompasing libvirt support. When you create a system, you can specify it to be a Virtual Machine living on a Host in one of your datacenters. None of this has been worked on, but the idea is for STARRS to be a complete network management solution. Maybe I&#8217;ll call it CloudSTARRS (like rockstars, but in the cloud haha).</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  <div class="pagination">
+    
+    <a href="/blog/archives">Blog Archives</a>
+    
+    <a class="next" href="/blog/">Newer &rarr;</a>
+    
+  </div>
+</div>
+<aside class="sidebar">
+  
+    <section>
+  <h1>Categories</h1>
+  <ul>
+    
+      <li><a class='category' href='/blog/categories/projects/'>Projects</a></li>
+    
+      <li><a class='category' href='/blog/categories/guides/'>Guides</a></li>
+    
+      <li><a class='category' href='/blog/categories/rants/'>Rants</a></li>
+    
+      <li><a class='category' href='/blog/categories/presentations/'>Presentations</a></li>
+    
+  </ul>
+</section>
+<section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2013/04/24/starrs-installation-guide/">STARRS Installation Guide</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/04/19/backups-for-photo-majors/">Backups for Photo Majors</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/04/19/impact-of-disk-alignment-in-virtualized-environments/">Impact of Disk Alignment in Virtualized Environments</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/04/12/csh-wireless-network-deployment/">CSH Wireless Network Deployment</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/02/27/cross-platform-authentication-services/">Cross-Platform Authentication Services</a>
+      </li>
+    
+  </ul>
+</section>
+
+  
+</aside>
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2013 - Grant Cohoe -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

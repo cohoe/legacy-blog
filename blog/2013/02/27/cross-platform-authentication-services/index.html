@@ -1,0 +1,327 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Cross-Platform Authentication Services - Grant Cohoe</title>
+  <meta name="author" content="Grant Cohoe">
+
+  
+  <meta name="description" content="You are a nerd. You like doing nerd-y things. You run an entirely *nix-based network. But like all nerds, you have that one pesky Windows machine &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://www.grantcohoe.com/blog/2013/02/27/cross-platform-authentication-services/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/stylesheets/cohoe.css" type="text/css" rel="stylesheet">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="Grant Cohoe" type="application/atom+xml">
+  <link href='http://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-37491721-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <div id="logo">
+  	<div class="clear"></div>
+  </div>
+  <h1><a href="/">Grant Cohoe</a></h1>
+  
+    <h2>Cloud plumber, bit wrangler, solution engineer.</h2>
+  
+  <div class="clear"></div>
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:www.grantcohoe.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/blog/">Blog</a></li>
+  <li><a href="/skills">Skills</a></li>
+  <li><a href="/about">About</a></li>
+ <!-- <li><a href="/blog/archives">Archives</a></li>-->
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      
+        <h1 class="entry-title">Cross-Platform Authentication Services</h1>
+      
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-02-27T22:47:00-05:00" pubdate data-updated="true">Feb 27<span>th</span>, 2013</time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>You are a nerd. You like doing nerd-y things. You run an entirely *nix-based network. But like all nerds, you have that one pesky Windows machine that you want to have available for your users. Or you just want the same SSO password from your Kerberos KDC. Regardless, you want Windows to talk to MIT Kerberos. Believe it or not, this is SUPPORTED!</p>
+
+<h2>Process Overview</h2>
+
+<p><img src="http://www.grantcohoe.com/images/blog/cross-auth-process.png" alt="" title=""  /></p>
+
+<br>
+
+
+<p>We start with the user entering their credentials. These are entered in the standard Windows logon screen (which I dearly miss from Windows 2003). From there, the client is configured to have it&#8217;s default domain (realm in this case) to be the MIT Kerberos realm that your machine is a member of. This would be the equivalent of an Active Directory domain.</p>
+
+<p>From here, your workstation acts just like any other Kerberized host. It uses it&#8217;s host principal (derived from what it thinks its hostname is) and configured password to authenticate to the KDC. Once it has verified it&#8217;s identity, it then goes to authenticate you. And if your password is correct, Windows lets you in!</p>
+
+<p>The question is: who does it let you in as? A Kerberos principal is nothing more than a name. It is not an account, or any object that actually contains information for the system. You must map Kerberos principals to accounts. These accounts are created in Windows as either local users or via Active Directory (a whole other can of worms). Usually, you will want to create a one-to-one mapping between principal and account (<code>grant@GRANTCOHOE.COM</code> principal = Windows account &#8220;grant&#8221;).</p>
+
+<h2>KDC Setup</h2>
+
+<p>On your KDC, open up <code>kadmin</code> with your administrative principal and create a host principal for the new machine. It needs to have a password that you know, so use your favorite password generating source.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>miranda ~ # kadmin -p cohoe/admin
+</span><span class='line'>Authenticating as principal cohoe/admin with password.
+</span><span class='line'>Password for cohoe/admin@GRANTCOHOE.COM:
+</span><span class='line'>kadmin:  ank host/caprica.grantcohoe.com@GRANTCOHOE.COM
+</span><span class='line'>WARNING: no policy specified for host/caprica.grantcohoe.com@GRANTCOHOE.COM; defaulting to no policy
+</span><span class='line'>Enter password for principal "host/caprica.grantcohoe.com@GRANTCOHOE.COM":
+</span><span class='line'>Re-enter password for principal "host/caprica.grantcohoe.com@GRANTCOHOE.COM":
+</span><span class='line'>Principal "host/caprica.grantcohoe.com@GRANTCOHOE.COM" created.
+</span><span class='line'>kadmin:  quit
+</span><span class='line'>miranda ~ #</span></code></pre></td></tr></table></div></figure>
+
+
+<p>That&#8217;s it for the KDC. On to the Windows machine!</p>
+
+<h2>Windows 7 Client</h2>
+
+<p>Windows 7 (as well as Server 2008 I believe) include the basic utilities required to support MIT Kerberos. This was available for XP and Server 2003 as &#8220;Microsoft Support Tools&#8221;. The utility we will be using is called <code>ksetup</code>. It allows for configuration of foreign-realm authentication systems.</p>
+
+<p>So to set your machine to authenticate to your already existing MIT Kerberos KDC, open up a command prompt and do the following:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>ksetup /setdomain GRANTCOHOE.COM
+</span><span class='line'>ksetup /addkdc GRANTCOHOE.COM kerberos.grantcohoe.com
+</span><span class='line'>ksetup /setmachpassword passwordfromearlier
+</span><span class='line'>ksetup /mapuser * *</span></code></pre></td></tr></table></div></figure>
+
+
+<p>After that, you need to set a Group Policy setting to automatically pick the right domain for you to login to. Open up the Group Policy Editor (gpedit.msc) and navigate to Local Computer Policy->Computer Configuration->Administrative Templates->System->Login->Assign a default domain for logon. Set this to your realm (GRANTCOHOE.COM in my case).</p>
+
+<p>Do a nice reboot of your system, and you should be ready to go!</p>
+
+<h2>Active Directory</h2>
+
+<p>Active Directory can be configured to trust a foreign Kerberos realm. It will NOT synchronize information with anything, but if you just need a bunch of users to log into something and no data with it, the process is not too terrible. Rather than duplicate the information, you can find the guide that I used here: <a href="http://pig.made-it.com/kerberos-trust.html">Microsoft trusting MIT Kerberos</a></p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Grant Cohoe</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-02-27T22:47:00-05:00" pubdate data-updated="true">Feb 27<span>th</span>, 2013</time>
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://www.grantcohoe.com/blog/2013/02/27/cross-platform-authentication-services/" data-via="grantcohoe" data-counturl="http://www.grantcohoe.com/blog/2013/02/27/cross-platform-authentication-services/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left articlenav" href="/blog/2013/02/13/stanford-webauth-on-enterprise-linux/" title="Previous Post: Stanford Webauth on Enterprise Linux">&laquo; Stanford Webauth on Enterprise Linux</a>
+      
+      
+        <a class="basic-alignment right articlenav" href="/blog/2013/04/12/csh-wireless-network-deployment/" title="Next Post: CSH Wireless Network Deployment">CSH Wireless Network Deployment &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Categories</h1>
+  <ul>
+    
+      <li><a class='category' href='/blog/categories/projects/'>Projects</a></li>
+    
+      <li><a class='category' href='/blog/categories/guides/'>Guides</a></li>
+    
+      <li><a class='category' href='/blog/categories/rants/'>Rants</a></li>
+    
+      <li><a class='category' href='/blog/categories/presentations/'>Presentations</a></li>
+    
+  </ul>
+</section>
+<section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2013/04/24/starrs-installation-guide/">STARRS Installation Guide</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/04/19/backups-for-photo-majors/">Backups for Photo Majors</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/04/19/impact-of-disk-alignment-in-virtualized-environments/">Impact of Disk Alignment in Virtualized Environments</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/04/12/csh-wireless-network-deployment/">CSH Wireless Network Deployment</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/02/27/cross-platform-authentication-services/">Cross-Platform Authentication Services</a>
+      </li>
+    
+  </ul>
+</section>
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2013 - Grant Cohoe -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

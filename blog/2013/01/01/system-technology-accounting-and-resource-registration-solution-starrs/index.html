@@ -1,0 +1,340 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>System Technology Accounting and Resource Registration Solution (STARRS) - Grant Cohoe</title>
+  <meta name="author" content="Grant Cohoe">
+
+  
+  <meta name="description" content="Background Like most of my projects, it all started with CSH. RIT allocates us two /24 public-facing networks to distribute out to our users. These &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://www.grantcohoe.com/blog/2013/01/01/system-technology-accounting-and-resource-registration-solution-starrs/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/stylesheets/cohoe.css" type="text/css" rel="stylesheet">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="Grant Cohoe" type="application/atom+xml">
+  <link href='http://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-37491721-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <div id="logo">
+  	<div class="clear"></div>
+  </div>
+  <h1><a href="/">Grant Cohoe</a></h1>
+  
+    <h2>Cloud plumber, bit wrangler, solution engineer.</h2>
+  
+  <div class="clear"></div>
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:www.grantcohoe.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/blog/">Blog</a></li>
+  <li><a href="/skills">Skills</a></li>
+  <li><a href="/about">About</a></li>
+ <!-- <li><a href="/blog/archives">Archives</a></li>-->
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      
+        <h1 class="entry-title">System Technology Accounting and Resource Registration Solution (STARRS)</h1>
+      
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-01-01T20:10:00-05:00" pubdate data-updated="true">Jan 1<span>st</span>, 2013</time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><h1>Background</h1>
+
+<p>Like most of my projects, it all started with CSH. RIT allocates us two /24 public-facing networks to distribute out to our users. These resources need to have some degree of accounting in the event a user does something stupid (piracy, kiddie-pr0n, etc). RIT handles this with their own internal application, referred to as &#8220;start.rit.edu&#8221;. <em>Fun aside, Start.RIT was coded by an old CSHer, now RIT employee and CSH advisor. He still maintains portions of it today.</em> When the CSH network got to the point of needing our own internal application, a member (<a href="http://www.csh.rit.edu/~sunday/">Joe Sunday</a>) created &#8220;start.csh.rit.edu&#8221;. Similar to it&#8217;s RIT counterpart, start.csh allowed administrators to register machines and distribute resources on the network. Start.csh also allowed for users to manage firewall rules for their hosts at the border firewall systems. On the backend, it had a script that would automatically generate an ISC-DHCPD config file and load it into the server.</p>
+
+<p>Unfortunately over time, bits of Start began to break. The fact that users could not register their own machines was a major source of irritation for the RTPs (Root-Type-Persons, or Sysadmins). When the network topology was shifted to accomodate some reorganization within RIT, the firewall rule system broke completely. There was no way to clear out old hosts that havent been on the network in years. And after the house DHCP server was compromised (then obliterated by the RTPs for security), the automatic DHCP generation was completely gone. We needed something new.</p>
+
+<p>Starting in the Spring of 2011 I starting to architect a new application to encoumpase the previous functionality and add a lot of new features and enhancements that would benefit us for years to come. Going into the projects, I knew one thing: It had to be based in PostgreSQL. Pg has native datatypes for IP addresses, subnets, and MAC addresses. I know that this would be invaluable to have later on in the project. I also knew that I didnt want to write a daemon that ran on some server imposing application logic.</p>
+
+<h1>Development</h1>
+
+<p>At this point in my career, I didn&#8217;t have a whole lot of database architecting experience. I began to search for a schema creation application to help me architect what I knew was going to be a complex schema. I ran across a service called <a href="http://www.schemabank.com">SchemaBank</a>. (SB is now defunct) It was a schema design webapp that supported Postgres. It also introduced me to two things that would change the course of the application forever: Triggers and Functions. I realized that I could use Pg as the backend daemon to the entire application. For client interaction with the application, I started to develop a set of wrapper API functions that would help impose the application logic on the stored data. While most of this was taken care of in the relations between entities, there were some that could not be expressed as a relation. Fast forward two months, and I had a first revision of the database and the API to start writing an interface for.</p>
+
+<p>At this point I didn&#8217;t know any sort of web languages other than HTML and CSS either. So using a book I won at BarCampRoc on <a href="http://shop.oreilly.com/product/9780596157142.do">PHP, MySQL, and Javascript</a> (a very good book by the way), I started to learn PHP. Originally I was going to go with a purely non-OOP model for the webapp, however after consulting one of my web-dev friends (<a href="http://iota.csh.rit.edu/">Ben Russell</a>), he suggested that I go with an OOP model and to use some sort of framework to avoid having to write a ton of extra code. At this point I went with one that another one of my web-dev friends had used, <a href="http://ellislab.com/codeigniter">Codeigniter</a>. So I set to work and started writing classes. During this time, I knew that I needed a new a new dhcpd.conf generation function. One of my friends (<a href="http://blog.agargiulo.com/">Anthony Gargiulo</a>) expressed an interest in helping out with the project, so I tasked him with writing a generation function in Perl. Four months later, I had a working PHP web interface (and he had a working dhcpd.conf generator). At this point, I had everything except a name. I dont really remember a lot about how it came about, but I think I took the first cool-sounding word that came to my head. I was in a Quake 3 Arena mood that day and remembered an old console command (impulse). I took that word and backronymed it to the IP Management Program for Use in Local Server Environments.</p>
+
+<h1>Initial Implementation</h1>
+
+<p>When we returned to RIT in the Fall, I set to work deploying IMPULSE. After a few hickups here and there, everything was in place and in use. Users were fairly receptive to it, mainly that they could register their devices themselves. However after some time, a few problems emerged. The web interface became terribly slow with all of the data that people had entered. It wasnt very efficient at allowing users to complete basic tasks and had a few bugs. Clearly some changes needed to occur, but during the course of the year I didn&#8217;t want to touch it. I spent 6 months writing code on this project, and I really didnt want to work on it again.</p>
+
+<h1>Refresh</h1>
+
+<p>My latest co-op offerred me a chance to take to the code once again, this time with a new use case in mind. They wanted something that could manage network registrations for developers in a complex environment, but there were a few major additions that needed to happen. IMPULSE needed to go global. It needeed more specific access control. It needed better device integration. And most importantly, it also needed a new interface. Armed with all the knowlege I have gained over the last year, I set out to work. 2 months later I had a new web interface and a lot of new fixes and enhancements to the core. However the name IMPULSE no longer applied. So I cooked up a new one: STARRS (System Technology Accounting and Resource Registration Solution). And that&#8217;s presumably what you actually care about.</p>
+
+<h1>Features</h1>
+
+<p>STARRS starts off with Datacenters, which correspond to your physical locations. Each datacenter contains Subnets and VLANs. Each datacenter then contains one or more Availability Zones, which are logical partitions of resources within the datacenter. AZs contain ranges of your subnets.</p>
+
+<p>Within datacenters are Systems. A system is a computer, based on a hardware Platform (usually Custom though). A system can have Interfaces which attach to your network. On each interface can be Addresses that are assigned from your Availability Zones. You can get your addresses in a variety of ways (depending on family). DHCP and Static for IPv4, and Autoconf, DHCPv6, and Static for IPv6. (Oh yeah, STARRS does both IPv4 and IPv6). Your addresses are given to you with a set expiration date. If you dont renew before that date (You will get email notifications), it will be automatically deleted. On your addresses, you can create a variety of DNS Records that can be added into managed DNS Zones. Zone DDNS updates are done with Keys that are stored within STARRS. If your address is configured with DHCP, you can be a member of a DHCP Class. Classes, Ranges, and Subnets all have a variety of configuration options that can be set. You can also set options globally. For network systems, you can store SNMP Credentials that STARRS can use to look up Switchport and CAM Table data. Using this you can easily locate your system interfaces in your infrastructure. And of course, you can search for systems that you have configured.</p>
+
+<p>STARRS depends on your existing authentication infrastructure for its user data. It does not track credentials within itself, but relies on the client to provide the user and external sources for privileging. The STARRS web interface gets the username from the web server from configurable PHP variables. It takes the username and calls an API initializing function that sets up your privilege levels. STARRS can get privilege data from one of the following:</p>
+
+<ul>
+<li>Local Tables</li>
+<li>OpenLDAP</li>
+<li>Active Directory</li>
+</ul>
+
+
+<p>Users can be global ADMINs and have RW access to everything in the database. They can be USERs who can create/edit/remove their own stuff, but cannot see certain confidential configuration and cannot edit other peoples stuff. People who are Group Admins can edit other peoples stuff in their group. There is also a PROGRAM user-level that allows external applications Read-Only access to user resources. If you don&#8217;t exist in the privilege source, you will be unable to initialize and do anything in STARRS.</p>
+
+<p>STARRS also has the ability to automatically generate a configuration file for the ISC-DHCPD server based on the resources you configure. It supports key-based DDNS updates to zones, DHCP classes, global/range/subnet/class options, and more. A cronjob runs to periodically generate, download, and reload the server configuration file. Eventually this might change to something more real, but for now this is what works.</p>
+
+<p>Use cases have STARRS working with the following web authentication services:</p>
+
+<ul>
+<li><a href="http://webauth.stanford.edu/">Stanford Webauth</a></li>
+<li><a href="http://httpd.apache.org/docs/2.2/mod/mod_ldap.html">Basic Auth w/ mod_ldap</a></li>
+</ul>
+
+
+<h1>Deployment</h1>
+
+<p>All of the code is available on Github in two repositories:</p>
+
+<ul>
+<li><a href="https://github.com/cohoe/starrs">Core/Database</a></li>
+<li><a href="https://github.com/cohoe/starrs-web">Web</a></li>
+</ul>
+
+
+<p>There is an unofficial and unsupported command-line interface written by a friend of mine (<a href="http://ryansb.com/">Ryan Brown</a>) located <a href="https://github.com/ryansb/ish">Here</a>.</p>
+
+<p>STARRS is licensed under the MIT license.</p>
+
+<h1>Demo</h1>
+
+<p>You can access <a href="http://starrsdemo.grantcohoe.com">the demo by clicking here.</a> Username is &#8216;root&#8217; and password is &#8216;admin&#8217;. The database resets itself every 24 hours at midnight, so don&#8217;t expect long-term persistence of data.</p>
+
+<h1>Who Should Use This</h1>
+
+<p>If you are a service provider to a group of users who consume network resources that you control. You want some way of accounting for what resources are in use and where they are in your network. The use cases of it so far are:</p>
+
+<ul>
+<li>Computer Science House - Dorm of college students (about 350 systems)</li>
+<li>Work - Product developers in 4 sites across 3 countries (1000+ systems)</li>
+<li>Enterprise - My personal VM server (30 systems)</li>
+</ul>
+
+
+<h1>Future</h1>
+
+<p>There are a couple of enhancements on deck for the next release (whever that may be). See the respective Github project issues for details. However STARRS will soon be encompasing libvirt support. When you create a system, you can specify it to be a Virtual Machine living on a Host in one of your datacenters. None of this has been worked on, but the idea is for STARRS to be a complete network management solution. Maybe I&#8217;ll call it CloudSTARRS (like rockstars, but in the cloud haha).</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Grant Cohoe</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-01-01T20:10:00-05:00" pubdate data-updated="true">Jan 1<span>st</span>, 2013</time>
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://www.grantcohoe.com/blog/2013/01/01/system-technology-accounting-and-resource-registration-solution-starrs/" data-via="grantcohoe" data-counturl="http://www.grantcohoe.com/blog/2013/01/01/system-technology-accounting-and-resource-registration-solution-starrs/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+      
+        <a class="basic-alignment right articlenav" href="/blog/2013/01/01/makefile-based-pki-management/" title="Next Post: Makefile-based PKI Management">Makefile-based PKI Management &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Categories</h1>
+  <ul>
+    
+      <li><a class='category' href='/blog/categories/projects/'>Projects</a></li>
+    
+      <li><a class='category' href='/blog/categories/guides/'>Guides</a></li>
+    
+      <li><a class='category' href='/blog/categories/rants/'>Rants</a></li>
+    
+      <li><a class='category' href='/blog/categories/presentations/'>Presentations</a></li>
+    
+  </ul>
+</section>
+<section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2013/04/24/starrs-installation-guide/">STARRS Installation Guide</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/04/19/backups-for-photo-majors/">Backups for Photo Majors</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/04/19/impact-of-disk-alignment-in-virtualized-environments/">Impact of Disk Alignment in Virtualized Environments</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/04/12/csh-wireless-network-deployment/">CSH Wireless Network Deployment</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/02/27/cross-platform-authentication-services/">Cross-Platform Authentication Services</a>
+      </li>
+    
+  </ul>
+</section>
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2013 - Grant Cohoe -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

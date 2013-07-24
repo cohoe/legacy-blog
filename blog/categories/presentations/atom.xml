@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Presentations | Grant Cohoe]]></title>
+  <link href="http://www.grantcohoe.com/blog/categories/presentations/atom.xml" rel="self"/>
+  <link href="http://www.grantcohoe.com/"/>
+  <updated>2013-07-24T11:32:28-04:00</updated>
+  <id>http://www.grantcohoe.com/</id>
+  <author>
+    <name><![CDATA[Grant Cohoe]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Backups for Photo Majors]]></title>
+    <link href="http://www.grantcohoe.com/blog/2013/04/19/backups-for-photo-majors/"/>
+    <updated>2013-04-19T22:38:00-04:00</updated>
+    <id>http://www.grantcohoe.com/blog/2013/04/19/backups-for-photo-majors</id>
+    <content type="html"><![CDATA[<p>Data backups are something every single person should do. This presentation is with specific regard to non-technical users who want a little bit of information and some suggestions on what to do.</p>
+
+<p>This presentation was never given explicitly, but it was used for a Public Speaking class.</p>
+
+<p><a href="https://docs.google.com/presentation/d/1KrbMAtqd_ZyigKV7VY26oJvudbnKTz9vMYqHEB8pkRo/edit?usp=sharing">Slides on Google Drive</a></p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Impact of Disk Alignment in Virtualized Environments]]></title>
+    <link href="http://www.grantcohoe.com/blog/2013/04/19/impact-of-disk-alignment-in-virtualized-environments/"/>
+    <updated>2013-04-19T22:35:00-04:00</updated>
+    <id>http://www.grantcohoe.com/blog/2013/04/19/impact-of-disk-alignment-in-virtualized-environments</id>
+    <content type="html"><![CDATA[<p>This presentation discusses the impact of disk alignment with specific regard to virtual environments. Performance can be greatly hurt by misaligned partitions both on the VM and host and all layers in between.</p>
+
+<p>Presented at <a href="http://barcamproc.org">Barcamp Rochester</a> in Spring 2013</p>
+
+<p><a href="http://archive.grantcohoe.com/presentations/alignment.pptx">Slides Here</a></p>
+]]></content>
+  </entry>
+  
+</feed>

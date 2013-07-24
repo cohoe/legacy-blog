@@ -1,0 +1,901 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>STARRS Installation Guide - Grant Cohoe</title>
+  <meta name="author" content="Grant Cohoe">
+
+  
+  <meta name="description" content="Introduction Purpose The purpose of this guide is to help an IT administrator install and configure the STARRS network asset tracking application for &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://www.grantcohoe.com/blog/2013/04/24/starrs-installation-guide/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/stylesheets/cohoe.css" type="text/css" rel="stylesheet">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="Grant Cohoe" type="application/atom+xml">
+  <link href='http://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-37491721-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <div id="logo">
+  	<div class="clear"></div>
+  </div>
+  <h1><a href="/">Grant Cohoe</a></h1>
+  
+    <h2>Cloud plumber, bit wrangler, solution engineer.</h2>
+  
+  <div class="clear"></div>
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:www.grantcohoe.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/blog/">Blog</a></li>
+  <li><a href="/skills">Skills</a></li>
+  <li><a href="/about">About</a></li>
+ <!-- <li><a href="/blog/archives">Archives</a></li>-->
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      
+        <h1 class="entry-title">STARRS Installation Guide</h1>
+      
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-04-24T11:06:00-04:00" pubdate data-updated="true">Apr 24<span>th</span>, 2013</time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><h1>Introduction</h1>
+
+<h2>Purpose</h2>
+
+<p>The purpose of this guide is to help an IT administrator install and configure the <a href="http://grantcohoe.com/projects/starrs">STARRS</a> network asset tracking application for a basic site.</p>
+
+<h2>Audience</h2>
+
+<p>The intended audience of this guide is IT administrators with Linux experience (specifically Red Hat) and a willingness to use open-source software.</p>
+
+<h2>Commitment</h2>
+
+<p>The install process should take around an hour provided appropriate resources.</p>
+
+<h1>Description</h1>
+
+<h2>Definition</h2>
+
+<p>STARRS is a self-service network resource tracking and registration web application used to monitor resource utilization (such as IP addresses, DNS records, computers, etc). For more details, view the project description <a href="http://grantcohoe.com/projects/starrs">here</a>.</p>
+
+<h2>Physical</h2>
+
+<p>STARRS requires a database host and web server to operate. It is recommended to use a single virtual appliance for all STARRS functionality.</p>
+
+<h2>Process</h2>
+
+<ul>
+<li>The virtual appliance is provisioned (out of scope of this guide)</li>
+<li>Core software is installed</li>
+<li>Dependent software packages are downloaded and installed</li>
+<li>STARRS is acquired, configured, and installed</li>
+<li>The web server is configured to allow access</li>
+</ul>
+
+
+<h1>Installation</h1>
+
+<h2>Virtual Appliance</h2>
+
+<p>STARRS was tested only on RHEL-based Linux distributions. Anything RHEL6.0+ is compatible. There are no major requirements for the virtual appliance and a minimal software install will suffice. In this example we will be using a Scientific Linux 6.4 virtual machine.</p>
+
+<h2>Connectivity</h2>
+
+<p>Ensure that you are able to log into your remote system as any administrative user (in this example, root) and have internet access.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>[root@starrs-test ~]# cat /etc/redhat-release
+</span><span class='line'>Scientific Linux release 6.4 (Carbon)</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>System Security</h2>
+
+<h3>Firewall</h3>
+
+<p>Firewalls can get in the way of allowing web access to the server. Only perform these steps if you have a system firewall installed and intend on using it. In this example we will use the RHEL default <code>iptables</code>.</p>
+
+<ol>
+<li>Add a rule to the system firewall to allow HTTP and HTTPS traffic to the server.</li>
+</ol>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>iptables -I INPUT 1 -p tcp --dport 80 -j ACCEPT
+</span><span class='line'>iptables -I INPUT 1 -p tcp --dport 443 -j ACCEPT</span></code></pre></td></tr></table></div></figure>
+
+
+<ol>
+<li>Save the firewall configuration (no restart required)</li>
+</ol>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>service iptables save</span></code></pre></td></tr></table></div></figure>
+
+
+<p>NOTE: If you have IPv6 enabled on your system, make sure to apply firewall rules to the IPv6 firewall as well.</p>
+
+<h3>SELinux</h3>
+
+<p>Any RHEL administrator has dealt with SELinux at some point in their career. There are system-wide settings that allow/deny actions by programs running on the server. Disabling SELinux is not a solution.</p>
+
+<ol>
+<li>Allow Apache/httpd to connect to database engines</li>
+</ol>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>setsebool -P httpd_can_network_connect=on
+</span><span class='line'>setsebool -P httpd_can_network_connect_db=on</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Core Software</h2>
+
+<p>STARRS heavily depends on the PostgreSQL database engine for operation. PgSQL must be at version 9.0 or higher, which is NOT available from the standard RHELish repositories. PgSQL will also require the PL/Perl and PL/Python support packages (also NOT located in the repos). You will need to add new software repositories to your appliance.</p>
+
+<h3>Utilities</h3>
+
+<p>These programs will be needed at some point or another in the installation process.</p>
+
+<ol>
+<li>Install the following packages through yum.</li>
+</ol>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>yum install cpan wget git make perl-YAML -y</span></code></pre></td></tr></table></div></figure>
+
+
+<ol>
+<li>We will also need the development tools group of packages installed.</li>
+</ol>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>yum groupinstall "Development tools" -y</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>PostgreSQL Database Engine</h3>
+
+<ol>
+<li><p>On your own computer, open up <a href="http://yum.postgresql.org/">yum.postgresql.org</a> and click on the latest available PostgreSQL Release link. In this case we will be using 9.2.</p></li>
+<li><p>Locate the approprate repository link for your operating system (Fedora, CentOS, SL, etc) and architecture (i386, x86_64, etc). In this case we will be using <code>Scientific Linux 6 - i386</code>.</p></li>
+<li><p>Download the package from the link you located onto the virtual appliance into any convenient directory.</p></li>
+</ol>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>wget http://yum.postgresql.org/9.2/redhat/rhel-6-i386/pgdg-sl92-9.2-8.noarch.rpm</span></code></pre></td></tr></table></div></figure>
+
+
+<ol>
+<li>Install the PostgreSQL repository package file that was downloaded with <code>yum</code>. Answer yes if asked for verification.</li>
+</ol>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>yum install pgdg-sl92-9.2-8.noarch.rpm</span></code></pre></td></tr></table></div></figure>
+
+
+<ol>
+<li>You need to ensure that the base PostgreSQL packages are hidden from future package searches and updated. Add an exclude line to your base OS repository file located in <code>/etc/yum.repos.d/</code>. This will prevent any PgSQL packages from being used out of the base packages.</li>
+</ol>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'># This example uses the sl.repo file. This will depend on your variant of OS (CentOS-base.repo for CentOS).
+</span><span class='line'>[sl]
+</span><span class='line'>name=Scientific Linux $releasever - $basearch
+</span><span class='line'>...
+</span><span class='line'>exclude=postgresql*
+</span><span class='line'>
+</span><span class='line'>[sl-security]</span></code></pre></td></tr></table></div></figure>
+
+
+<ol>
+<li>Install the required PgSQL packages using the Yum package manager.</li>
+</ol>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>yum install postgresql92 postgresql92-plperl postgresql92-server</span></code></pre></td></tr></table></div></figure>
+
+
+<ol>
+<li>Initialize the PgSQL database server</li>
+</ol>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>[root@starrs-test ~]# service postgresql-9.2 initdb
+</span><span class='line'>Initializing database:                                     [  OK  ]
+</span><span class='line'>[root@starrs-test ~]#</span></code></pre></td></tr></table></div></figure>
+
+
+<ol>
+<li>Make PgSQL start on system boot</li>
+</ol>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>chkconfig postgresql-9.2 on</span></code></pre></td></tr></table></div></figure>
+
+
+<ol>
+<li>Start the PgSQL service</li>
+</ol>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>[root@starrs-test ~]# service postgresql-9.2 start
+</span><span class='line'>Starting postgresql-9.2 service:                           [  OK  ]
+</span><span class='line'>[root@starrs-test ~]#</span></code></pre></td></tr></table></div></figure>
+
+
+<ol>
+<li><code>su</code> to the Postgres account and assign a password to the postgres user account using the query below. Exit back to root when done. This password should be kept secure!</li>
+</ol>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>[root@starrs-test ~]# su postgres -
+</span><span class='line'>bash-4.1$ psql
+</span><span class='line'>could not change directory to "/root"
+</span><span class='line'>psql (9.2.4)
+</span><span class='line'>Type "help" for help.
+</span><span class='line'>
+</span><span class='line'>postgres=# ALTER USER postgres WITH PASSWORD 'supersecurepasswordhere';
+</span><span class='line'>ALTER ROLE
+</span><span class='line'>postgres=# \q
+</span><span class='line'>bash-4.1$ exit
+</span><span class='line'>exit
+</span><span class='line'>[root@starrs-test ~]#</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The STARRS installer requires passwordless access to the postgres account. This is achievable by creating a <code>.pgpass</code> file in the root home directory.</p>
+
+<ol>
+<li>Create a file at <code>~/.pgpass</code> like such:</li>
+</ol>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>localhost:5432:*:postgres:supersecurepasswordhere
+</span><span class='line'>localhost:5432:*:starrs_admin:adminpass
+</span><span class='line'>localhost:5432:*:starrs_client:clientpass</span></code></pre></td></tr></table></div></figure>
+
+
+<p>You can replace the passwords with whatever you want. Note the passwords for later.</p>
+
+<ol>
+<li>This file should be readable only by the user that created it. Change permissions accordingly.</li>
+</ol>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>chmod 600 .pgpass</span></code></pre></td></tr></table></div></figure>
+
+
+<ol>
+<li>You now need to allow users to login to the database server from the server itself. Open the <code>/var/lib/pgsql/9.2/data/pg_hba.conf</code> and change all methods to <code>md5</code> like so:</li>
+</ol>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'># TYPE  DATABASE        USER            ADDRESS                 METHOD
+</span><span class='line'>
+</span><span class='line'># "local" is for Unix domain socket connections only
+</span><span class='line'>local   all             all                                     md5
+</span><span class='line'># IPv4 local connections:
+</span><span class='line'>host    all             all             127.0.0.1/32            md5
+</span><span class='line'># IPv6 local connections:
+</span><span class='line'>host    all             all             ::1/128                 md5</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This will enable login from Localhost only. If you need remote access, only allow the specific IP addresses or subnets that you need. Security is good.</p>
+
+<ol>
+<li>Reload the postgres service to bring in the changes</li>
+</ol>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>service postgresql-9.2 reload</span></code></pre></td></tr></table></div></figure>
+
+
+<ol>
+<li>Create admin and client accounts for STARRS.</li>
+</ol>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>[root@starrs-test ~]# psql -h localhost -U postgres
+</span><span class='line'>psql (9.2.4)
+</span><span class='line'>Type "help" for help.
+</span><span class='line'>
+</span><span class='line'>postgres=# create user starrs_admin with password 'adminpass';
+</span><span class='line'>CREATE ROLE
+</span><span class='line'>postgres=# create user starrs_client with password 'clientpass';
+</span><span class='line'>CREATE ROLE
+</span><span class='line'>postgres=# \q
+</span><span class='line'>[root@starrs-test ~]#</span></code></pre></td></tr></table></div></figure>
+
+
+<ol>
+<li>Verify that you can log into the database server without being prompted for a password.</li>
+</ol>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>[root@starrs-test ~]# psql -h localhost -U postgres
+</span><span class='line'>psql (9.2.4)
+</span><span class='line'>Type "help" for help.
+</span><span class='line'>
+</span><span class='line'>postgres=# \q
+</span><span class='line'>
+</span><span class='line'>[root@starrs-test ~]#</span></code></pre></td></tr></table></div></figure>
+
+
+<p>If you get prompted for a password, <b>STOP!</b> You need to have this working in order to proceed. Make sure you typed everything in the file correctly and its permissions are set.</p>
+
+<h2>Dependencies</h2>
+
+<p>STARRS has many other software dependencies in order to function. These are mostly Perl modules that extend the capabilities of the language. These modules are (CPAN and package are provided however not all packages may be available):</p>
+
+<ul>
+<li>Net::IP (perl-Net-IP)</li>
+<li>Net::LDAP (perl-LDAP)</li>
+<li>Net::DNS (perl-Net-DNS)</li>
+<li>Net::SNMP (perl-Net-SNMP)</li>
+<li>Net::SMTP (perl-Mail-Sender)</li>
+<li>Crypt::DES (perl-Crypt-DES)</li>
+<li>VMware::vCloud</li>
+<li>Data::Validate::Domain</li>
+</ul>
+
+
+<p>NOTE: The first time you run CPAN you will be asked some basic setup questions. Answering the defaults are fine for most installations.</p>
+
+<ol>
+<li>Install each of these modules. Some of them are available as packages in yum.</li>
+</ol>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>yum install perl-Net-IP perl-LDAP perl-Net-DNS perl-Mail-Sender perl-Net-SNMP perl-Crypt-DES -y
+</span><span class='line'>cpan -i Data::Validate::Domain
+</span><span class='line'>cpan -i VMware::vCloud</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Download/Configure STARRS</h2>
+
+<p>STARRS comes in two parts: The backend (database) and the Web interface. Each one is stored in it&#8217;s own repository on Github. You will need to download both in order to use the application. Right now we will focus on the backend.</p>
+
+<ol>
+<li>You will need a directory to store the downloaded repos in. I recommend using <code>/opt</code>. Clone (download) the current versions of the repositories using Git into that directory.</li>
+</ol>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>[root@starrs-test ~]# cd /opt/
+</span><span class='line'>[root@starrs-test opt]# git clone https://github.com/cohoe/starrs -q
+</span><span class='line'>[root@starrs-test opt]# ls
+</span><span class='line'>starrs
+</span><span class='line'>[root@starrs-test opt]#</span></code></pre></td></tr></table></div></figure>
+
+
+<ol>
+<li>Open the installer file at <code>/opt/starrs/Setup/Installer.pl</code>. You will need to edit the values in the Settings section of the file to match your specific installation. Example:</li>
+</ol>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='perl'><span class='line'><span class="c1"># Settings</span>
+</span><span class='line'><span class="k">my</span> <span class="nv">$dbsuperuser</span> <span class="o">=</span> <span class="s">&quot;postgres&quot;</span><span class="p">;</span>
+</span><span class='line'><span class="k">my</span> <span class="nv">$dbadminuser</span> <span class="o">=</span> <span class="s">&quot;starrs_admin&quot;</span><span class="p">;</span>
+</span><span class='line'><span class="k">my</span> <span class="nv">$dbadminpass</span> <span class="o">=</span> <span class="s">&quot;adminpass&quot;</span><span class="p">;</span>
+</span><span class='line'><span class="k">my</span> <span class="nv">$dbclientuser</span> <span class="o">=</span> <span class="s">&quot;starrs_client&quot;</span><span class="p">;</span>
+</span><span class='line'><span class="k">my</span> <span class="nv">$dbclientpass</span> <span class="o">=</span> <span class="s">&quot;clientpass&quot;</span><span class="p">;</span>
+</span><span class='line'><span class="k">my</span> <span class="nv">$sample</span> <span class="o">=</span> <span class="nb">undef</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">my</span> <span class="nv">$dbhost</span> <span class="o">=</span> <span class="s">&quot;localhost&quot;</span><span class="p">;</span>
+</span><span class='line'><span class="k">my</span> <span class="nv">$dbport</span> <span class="o">=</span> <span class="mi">5432</span><span class="p">;</span>
+</span><span class='line'><span class="k">my</span> <span class="nv">$dbname</span> <span class="o">=</span> <span class="s">&quot;starrs&quot;</span><span class="p">;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>dbsuperuser is the root postgres account (usually just &#8216;postgres&#8217;).
+dbadminuser is the STARRS admin user you created above.
+dbclientuser is the STARRS client user you created above.
+sample will populate sample data into the database. Set to anything other than <code>undef</code> to enable sample content.</p>
+
+<ol>
+<li>Run the install script</li>
+</ol>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='text'><span class='line'>perl /opt/starrs/Setup/Installer.pl
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>A lot of text will flash across the screen. This is expected. If you see errors, then something is wrong and you should revisit the setup instructions.</p>
+
+<p>You can verify that STARRS is functioning by running some simple queries.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+</pre></td><td class='code'><pre><code class='text'><span class='line'>[root@starrs-test starrs]# psql -h localhost -U postgres starrs
+</span><span class='line'>psql (9.2.4)
+</span><span class='line'>Type &quot;help&quot; for help.
+</span><span class='line'>
+</span><span class='line'>starrs=# SELECT api.initialize(&#39;root&#39;);
+</span><span class='line'>NOTICE:  table &quot;user_privileges&quot; does not exist, skipping
+</span><span class='line'>CONTEXT:  SQL statement &quot;DROP TABLE IF EXISTS &quot;user_privileges&quot;&quot;
+</span><span class='line'>PL/pgSQL function api.initialize(text) line 19 at SQL statement
+</span><span class='line'>    initialize
+</span><span class='line'>------------------
+</span><span class='line'> Greetings admin!
+</span><span class='line'>(1 row)
+</span><span class='line'>
+</span><span class='line'>starrs=# SELECT * FROM api.get_systems(NULL);
+</span><span class='line'> system_name | owner | group | comment | date_created | date_modified | type | os_name | last_modifier | platform_name | asset | datacenter | location
+</span><span class='line'>-------------+-------+-------+---------+--------------+---------------+------+---------+---------------+---------------+-------+------------+----------
+</span><span class='line'>(0 rows)
+</span><span class='line'>
+</span><span class='line'>starrs=# \q
+</span><span class='line'>[root@starrs-test starrs]#
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>If you see &#8220;Greetings admin!&#8221; and you can perform the queries without error, then your backend is all set up and is ready for the web interface.</p>
+
+<h3>Apache2/httpd</h3>
+
+<p>The STARRS web interface requires a web server to be installed. Only Apache has been tested. If you have a new system then you might not have Apache (or in RHELish, httpd) installed.</p>
+
+<ol>
+<li>If you do not have Apache/httpd installed, install it.</li>
+</ol>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='text'><span class='line'>yum install httpd php php-pgsql -y
+</span></code></pre></td></tr></table></div></figure>
+
+
+<ol>
+<li><p>Navigate to the <code>/etc/httpd/conf.d</code> directory.</p></li>
+<li><p>Remove the <code>welcome.conf</code> that exists there.</p></li>
+</ol>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='text'><span class='line'>cd /etc/httpd/conf.d/
+</span><span class='line'>rm -rf welcome.conf
+</span></code></pre></td></tr></table></div></figure>
+
+
+<ol>
+<li>Enable httpd to start on boot</li>
+</ol>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='text'><span class='line'>chkconfig httpd on
+</span></code></pre></td></tr></table></div></figure>
+
+
+<ol>
+<li>Start the httpd service. (Warning messages are fine, as long as the service starts you should be fine)</li>
+</ol>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='text'><span class='line'>[root@starrs-test ~]# service httpd start
+</span><span class='line'>Starting httpd: httpd: apr_sockaddr_info_get() failed for starrs-test.grantcohoe.com
+</span><span class='line'>httpd: Could not reliably determine the server&#39;s fully qualified domain name, using 127.0.0.1 for ServerName
+</span><span class='line'>                                                           [  OK  ]
+</span><span class='line'>[root@starrs-test ~]#
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>PHP Configuration</h3>
+
+<p>A minor change to the system PHP configuration allows the use of short tags for cleaner code. This feature must be enabled in the <code>/etc/php.ini</code> file.</p>
+
+<ol>
+<li>In the php.ini file, set <code>short_open_tag = on</code></li>
+</ol>
+
+
+<h3>Web Interface</h3>
+
+<p>You will be cloning the starrs-web into the Apache web root directory to simply deployment.</p>
+
+<ol>
+<li>Change directory to <code>/var/www/html/</code> and clone the repository. <b>Note the . at the end of the clone command.</b></li>
+</ol>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='text'><span class='line'>[root@starrs-test ~]# cd /var/www/html/
+</span><span class='line'>[root@starrs-test html]# git clone https://github.com/cohoe/starrs-web -q .
+</span></code></pre></td></tr></table></div></figure>
+
+
+<ol>
+<li><p>Copy the <code>application/config/database.php.example</code> to <code>application/config/database.php</code></p></li>
+<li><p>Edit the copied/renamed database file and enter your database connection settings. Example:</p></li>
+</ol>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="x">$db[&#39;default&#39;][&#39;hostname&#39;] = &#39;localhost&#39;;</span>
+</span><span class='line'><span class="x">$db[&#39;default&#39;][&#39;username&#39;] = &#39;starrs_admin&#39;;</span>
+</span><span class='line'><span class="x">$db[&#39;default&#39;][&#39;password&#39;] = &#39;adminpass&#39;;</span>
+</span><span class='line'><span class="x">$db[&#39;default&#39;][&#39;database&#39;] = &#39;starrs&#39;;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<ol>
+<li><p>Copy the <code>application/config/impulse.php.example</code> to <code>application/config/impulse.php</code></p></li>
+<li><p>For this web environment, the defaults in this file are fine. In this file you can change which environment variable to get the current user from.</p></li>
+<li><p>Apache needs to be given some special instructions to serve up the application correctly. Create a file at <code>/etc/httpd/conf.d/starrs.conf</code> with the following contents:</p></li>
+</ol>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="x">&lt;Directory &quot;/var/www/html&quot;&gt;</span>
+</span><span class='line'><span class="x">        AllowOverride all</span>
+</span><span class='line'><span class="x">        AuthType basic</span>
+</span><span class='line'><span class="x">        AuthName &quot;STARRS Sample Auth (root:admin)&quot;</span>
+</span><span class='line'><span class="x">        AuthBasicProvider file</span>
+</span><span class='line'><span class="x">        AuthUserFile    &quot;/etc/httpd/conf.d/starrs-auth.db&quot;</span>
+</span><span class='line'><span class="x">        require valid-user</span>
+</span><span class='line'><span class="x">&lt;/Directory&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<ol>
+<li>Since we reference an authenication database, you will need to create this file (<code>starrs-auth.db</code>).</li>
+</ol>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="x">htpasswd -b -c /etc/httpd/conf.d/starrs-auth.db root admin</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<ol>
+<li>Restart Apache to apply the changes. (A reload is not sufficient enough)</li>
+</ol>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="x">service httpd restart</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h1>Testing</h1>
+
+<p>At this point you should have a fully functioning STARRS installation. Navigate to your server in a web browser and you should be prompted for login credentials. As we established in the authentication database file, the username is root and the password is admin. If you get the STARRS main page, then success! Otherwise start looking through log files to figure out what is wrong.</p>
+
+<p>Detailed troubleshooting is out of the scope of this guide. System Administrator cleverness is a rare skill, but is the most useful thing when trying to figure out what happened. Shoot me an email if you really feel something is wrong.</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Grant Cohoe</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-04-24T11:06:00-04:00" pubdate data-updated="true">Apr 24<span>th</span>, 2013</time>
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://www.grantcohoe.com/blog/2013/04/24/starrs-installation-guide/" data-via="grantcohoe" data-counturl="http://www.grantcohoe.com/blog/2013/04/24/starrs-installation-guide/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left articlenav" href="/blog/2013/04/19/backups-for-photo-majors/" title="Previous Post: Backups for Photo Majors">&laquo; Backups for Photo Majors</a>
+      
+      
+    </p>
+  </footer>
+</article>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Categories</h1>
+  <ul>
+    
+      <li><a class='category' href='/blog/categories/projects/'>Projects</a></li>
+    
+      <li><a class='category' href='/blog/categories/guides/'>Guides</a></li>
+    
+      <li><a class='category' href='/blog/categories/rants/'>Rants</a></li>
+    
+      <li><a class='category' href='/blog/categories/presentations/'>Presentations</a></li>
+    
+  </ul>
+</section>
+<section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2013/04/24/starrs-installation-guide/">STARRS Installation Guide</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/04/19/backups-for-photo-majors/">Backups for Photo Majors</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/04/19/impact-of-disk-alignment-in-virtualized-environments/">Impact of Disk Alignment in Virtualized Environments</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/04/12/csh-wireless-network-deployment/">CSH Wireless Network Deployment</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/02/27/cross-platform-authentication-services/">Cross-Platform Authentication Services</a>
+      </li>
+    
+  </ul>
+</section>
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2013 - Grant Cohoe -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

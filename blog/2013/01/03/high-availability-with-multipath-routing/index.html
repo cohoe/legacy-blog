@@ -1,0 +1,377 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>High-Availability with Multipath Routing - Grant Cohoe</title>
+  <meta name="author" content="Grant Cohoe">
+
+  
+  <meta name="description" content="Multipath Routing Multipath routing is when you have a router with multiple equal-cost paths to a single destination. Since each of these routes &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://www.grantcohoe.com/blog/2013/01/03/high-availability-with-multipath-routing/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/stylesheets/cohoe.css" type="text/css" rel="stylesheet">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="Grant Cohoe" type="application/atom+xml">
+  <link href='http://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-37491721-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <div id="logo">
+  	<div class="clear"></div>
+  </div>
+  <h1><a href="/">Grant Cohoe</a></h1>
+  
+    <h2>Cloud plumber, bit wrangler, solution engineer.</h2>
+  
+  <div class="clear"></div>
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:www.grantcohoe.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/blog/">Blog</a></li>
+  <li><a href="/skills">Skills</a></li>
+  <li><a href="/about">About</a></li>
+ <!-- <li><a href="/blog/archives">Archives</a></li>-->
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      
+        <h1 class="entry-title">High-Availability With Multipath Routing</h1>
+      
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-01-03T00:34:00-05:00" pubdate data-updated="true">Jan 3<span>rd</span>, 2013</time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><h1>Multipath Routing</h1>
+
+<p>Multipath routing is when you have a router with multiple equal-cost paths to a single destination. Since each of these routes carries the same weight, the router will distribute traffic across all of them roughly equally. You can read more on this technology on <a href="https://en.wikipedia.org/wiki/Equal-cost_multi-path_routing">Wikipedia</a>. This is more about the implementation of such a topology.</p>
+
+<h1>The Topology</h1>
+
+<p>In my setup, I have three clients on the 192.168.0.0/24 subnet with gateway 192.168.0.254. Likewise I have three servers on the 10.0.0.0/24 subnet with gateway 10.0.0.254. I want my clients to always be able to access a webserver at host 172.16.0.1/32. This is configured as a loopback address on each of the three servers. This is the multipath part of the project. Each of the servers has the same IP address on a loopback interface and will therefore answer on it. However since the shared router between these two networks has no idea the 172.16.0.1/32 network is available via the servers, my clients cannot access it. This is where the routing comes into play. I will be using an OSPF daemon on my servers to send LSA&#8217;s (read up on OSPF if you are not familiar) to the router.
+<img src="http://www.grantcohoe.com/images/blog/multipath.png" alt="" title="" /></p>
+
+<h1>Server Configuration</h1>
+
+<h2>Firewall</h2>
+
+<p>You need to allow OSPF traffic to enter your system. IPtables supports the OSPF transport so you only need a minimum of one rule:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>iptables -I INPUT 1 -p ospf -j ACCEPT</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Save you firewall configuration after changing it.</p>
+
+<h2>Package Installation</h2>
+
+<p>You need to install Quagga, a suite of routing daemons that will be used to talk OSPF with the router. These packages are available in most operating systems.</p>
+
+<h2>Interface Configuration</h2>
+
+<p>Configure your main interface statically as you normally would. You also need to setup a loopback interface for the highly-available host. Procedure for this varies by operating system. Since I am using Scientific Linux, I have a configuration file in <code>/etc/sysconfig/network-scripts/ifcfg-lo:1</code>:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>DEVICE=lo:1
+</span><span class='line'>IPADDR=172.16.0.1
+</span><span class='line'>NETMASK=255.255.255.255
+</span><span class='line'>ONBOOT=yes</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Make sure you restart your network process (or your host) after you do this. I first thought the reason this entire thing wasn&#8217;t working was a Linux-ism as my FreeBSD testing worked fine. I later discovered that it was because hot-adding an interface sometimes doesn&#8217;t add all the data we need to the kernel route table.</p>
+
+<h2>OSPF Configuration</h2>
+
+<p>Quagga&#8217;s ospfd has a single configuration file that is very Cisco-like in syntax. It is located at <code>/etc/quagga/ospfd.conf</code>:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>hostname server1
+</span><span class='line'>interface eth0
+</span><span class='line'>router ospf
+</span><span class='line'>  ospf router-id 10.0.0.1
+</span><span class='line'>  network 10.0.0.0/24 area 0
+</span><span class='line'>  network 172.16.0.1/32 area 0
+</span><span class='line'>log stdout</span></code></pre></td></tr></table></div></figure>
+
+
+<p>ospfd has a partner program called zebra that manages the kernel route table entries learned via OSPF. While we may not necessarily want these, zebra must be running and configured in order for this to work. Edit your <code>/etc/quagga/zebra.conf</code>:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>hostname server1
+</span><span class='line'>interface eth0</span></code></pre></td></tr></table></div></figure>
+
+
+<p>After you are all set, start zebra and ospfd (and make sure they are set to come up on boot).</p>
+
+<h1>Router Configuration</h1>
+
+<p>I am using a virtualized Cisco 7200 router in my testing environment. You may have to modify your interfaces, but otherwise this configuration is generic across all IOS:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>R1&gt;enable
+</span><span class='line'>R1#configure terminal
+</span><span class='line'>Enter configuration commands, one per line.  End with CNTL/Z.
+</span><span class='line'>R1(config)#router ospf 1
+</span><span class='line'>R1(config-router)#network 10.0.0.0 0.0.0.255 area 0
+</span><span class='line'>R1(config-router)#end</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This enables OSPF on the 10.0.0.0/24 network and will start listening for LSAs. When it processes a new one, the route will be inserted into the routing table. After a while, you should see something like this:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>R1#show ip route ospf
+</span><span class='line'>     172.16.0.0/32 is subnetted, 1 subnets
+</span><span class='line'>O       172.16.0.1 [110/11] via 10.0.0.3, 00:04:42, GigabitEthernet1/0
+</span><span class='line'>                   [110/11] via 10.0.0.2, 00:04:42, GigabitEthernet1/0
+</span><span class='line'>                   [110/11] via 10.0.0.1, 00:04:42, GigabitEthernet1/0</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This is multipath routing. The host 172.16.0.1/32 has three equal paths available to get to it.</p>
+
+<h1>Testing</h1>
+
+<p>To verify that my clients were actually getting load-balanced, I threw up an Apache webserver on each server with a static index.html file containing the ID of the server (server 1, server 2, server 3, etc). This way I can curl the highly-available IP address and can see which host I am getting routed to. You should see your clients get distributed out across any combination of the three servers.</p>
+
+<p>Now lets simulate a host being taken offline for maintenance. Rather than having to fail over a bunch of services, all you need to do is stop the ospfd process on the server. After the OSPF dead timer expires, the route will be removed and no more traffic will be routed to it. That host is now available for downtime without affecting any of the others. The router just redistributes the traffic on the remaining routes.</p>
+
+<p>But lets say the host immediately dies. There is no notification to the router that the backend host is no longer responding. The only thing you can do at this point is wait for the OSPF dead timer to expire. You can configure this to be a shorter amount of time, thus making &#8220;failover&#8221; more transparent.</p>
+
+<h1>Summary</h1>
+
+<p>Multipath routing is basically a poor-mans load balancer. It has no checks to see if the services are actually running and responding appropriately. It also does not behave very well with sessions or data that involves lots of writes. However for static web hosting or for caching nameservers (the use that sparked my interest in this technology), it works quite well.</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Grant Cohoe</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-01-03T00:34:00-05:00" pubdate data-updated="true">Jan 3<span>rd</span>, 2013</time>
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://www.grantcohoe.com/blog/2013/01/03/high-availability-with-multipath-routing/" data-via="grantcohoe" data-counturl="http://www.grantcohoe.com/blog/2013/01/03/high-availability-with-multipath-routing/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left articlenav" href="/blog/2013/01/03/secure-openldap-server-with-kerberos-authentication/" title="Previous Post: Secure OpenLDAP Server with Kerberos Authentication">&laquo; Secure OpenLDAP Server with Kerberos Authentication</a>
+      
+      
+        <a class="basic-alignment right articlenav" href="/blog/2013/01/03/kerberos-utilities/" title="Next Post: Kerberos Utilities">Kerberos Utilities &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Categories</h1>
+  <ul>
+    
+      <li><a class='category' href='/blog/categories/projects/'>Projects</a></li>
+    
+      <li><a class='category' href='/blog/categories/guides/'>Guides</a></li>
+    
+      <li><a class='category' href='/blog/categories/rants/'>Rants</a></li>
+    
+      <li><a class='category' href='/blog/categories/presentations/'>Presentations</a></li>
+    
+  </ul>
+</section>
+<section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2013/04/24/starrs-installation-guide/">STARRS Installation Guide</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/04/19/backups-for-photo-majors/">Backups for Photo Majors</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/04/19/impact-of-disk-alignment-in-virtualized-environments/">Impact of Disk Alignment in Virtualized Environments</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/04/12/csh-wireless-network-deployment/">CSH Wireless Network Deployment</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/02/27/cross-platform-authentication-services/">Cross-Platform Authentication Services</a>
+      </li>
+    
+  </ul>
+</section>
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2013 - Grant Cohoe -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

@@ -1,0 +1,808 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Stanford Webauth on Enterprise Linux - Grant Cohoe</title>
+  <meta name="author" content="Grant Cohoe">
+
+  
+  <meta name="description" content="Background Lets say you are in a domain, and you wish to access several different web services. How often do you find you have to enter the same &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://www.grantcohoe.com/blog/2013/02/13/stanford-webauth-on-enterprise-linux/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/stylesheets/cohoe.css" type="text/css" rel="stylesheet">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="Grant Cohoe" type="application/atom+xml">
+  <link href='http://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-37491721-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <div id="logo">
+  	<div class="clear"></div>
+  </div>
+  <h1><a href="/">Grant Cohoe</a></h1>
+  
+    <h2>Cloud plumber, bit wrangler, solution engineer.</h2>
+  
+  <div class="clear"></div>
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:www.grantcohoe.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/blog/">Blog</a></li>
+  <li><a href="/skills">Skills</a></li>
+  <li><a href="/about">About</a></li>
+ <!-- <li><a href="/blog/archives">Archives</a></li>-->
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      
+        <h1 class="entry-title">Stanford Webauth on Enterprise Linux</h1>
+      
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-02-13T12:38:00-05:00" pubdate data-updated="true">Feb 13<span>th</span>, 2013</time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><h2>Background</h2>
+
+<p>Lets say you are in a domain, and you wish to access several different web services. How often do you find you have to enter the same username and password over and over again to get to each website? Wouldn&#8217;t it be nice if you could just enter it once and automagically have access to all the web services you need? Well guess what? You can!</p>
+
+<p>It all works off of MIT Kerberos. Kerberos is a mechanism that centralizes your authentication to one service and allows for Single Sign-On. The concept of SSO is fairly simple: Enter your credentials once and that&#8217;s it. It save you from typing them over and over again and protects against certain attacks.</p>
+
+<p>WebAuth was developed at Stanford University and brings &#8220;kerberization&#8221; to web services. All you need is some modules, a KDC, and a webserver.</p>
+
+<p>In this guide, we will be utilizing the Kerberos realm/domain name of EXAMPLE.COM. We will also be using two servers:</p>
+
+<ul>
+<li>gmcsrvx2.example.com: The Webauth WebKDC</li>
+<li>gmcsrvx3.example.com: A secondary web server</li>
+<li>webauth.example.com: A DNS CNAME to gmcsrvx2.example.com</li>
+</ul>
+
+
+<p>Note that you will need a pre-existing Kerberos KDC in your network.</p>
+
+<p>There are three components of the WebAuth system. WebAuth typically refers to the component that provides authorized access to certain content. The WebKDC is the process that handles communication with the Kerberos KDC and distributes tickets out to the client machines. The WebLogin pages are the login/logoff/password change pages that are presented to the user to enter their credentials. Certain binary packages provided by Stanford do not contain components of the WebAuth system. This is why we are going to build it from source.</p>
+
+<h2>Server Setup</h2>
+
+<h3>Packages</h3>
+
+<p>Each machine you plan to install WebAuth on needs the following packages:</p>
+
+<ul>
+<li>httpd-devel</li>
+<li>krb5-devel</li>
+<li>curl-devel</li>
+<li>mod_ssl</li>
+<li>mod_fcgid</li>
+<li>perl-FCGI</li>
+<li>perl-Template-Toolkit</li>
+<li>perl-Crypt-SSLeay</li>
+<li>cpan</li>
+</ul>
+
+
+<p>Enterprise Linux does not include several required Perl modules for this to work. You are going to need to install them via CPAN. If you have never run CPAN before, do it once just to get the preliminary setup working.</p>
+
+<ul>
+<li>CGI::Application::Plugin::TT</li>
+<li>CGI::Application::Plugin::AutoRunmode</li>
+<li>CGI::Application::Plugin::Forward</li>
+<li>CGI::Application::Plugin::Redirect</li>
+</ul>
+
+
+<p>You also need Remctl, an interface to Kerberos. For EL6 we are using remctl 2.11 available from the Fedora 15 repositories.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>wget http://mirror.rit.edu/fedora/linux/releases/15/Everything/i386/os/Packages/remctl-2.11-12.fc15.i686.rpm
+</span><span class='line'>wget http://mirror.rit.edu/fedora/linux/releases/15/Everything/i386/os/Packages/remctl-devel-2.11-12.fc15.i686.rpm
+</span><span class='line'>yum localinstall remctl*</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>Firewall</h3>
+
+<p>Open up ports 80 (HTTP) and 443 (HTTPS) since we will be doing web stuff.</p>
+
+<h3>NTP</h3>
+
+<p>Since you will be doing Kerberos stuff, you need a synchronized clock. If you do not know how to do this, see my guide on <a href="http://www.grantcohoe.com/guides/system/ntp">Setting up NTP</a>.</p>
+
+<h3>Kerberos</h3>
+
+<p>Your machine needs to be a Kerberos client (meaning valid DNS, krb5.conf, and host prinicpal in its /etc/krb5.keytab). We will be using three keytabs for this application:</p>
+
+<h4>/etc/krb5.keytab</h4>
+
+<ul>
+<li>host/gmcsrvx2.example.com@EXAMPLE.COM</li>
+
+<h4>/etc/webauth/webauth.keytab</h4></li>
+<li>webauth/gmcsrvx2.example.com@EXAMPLE.COM</li>
+
+<h4>/etc/webkdc/webkdc.keytab</h4></li>
+<li>service/webkdc@EXAMPLE.COM</li>
+NOTE: If you wrote these in your home directory and cp&#8217;d them into their respective paths, check your SELinux contexts.</li>
+</ul>
+
+
+<h3>SSL Certificates</h3>
+
+<p>You need an SSL certificate matching the hostname of each server (gmcsrvx2.example.com, gmcsrvx3.example.com, webauth.example.com) avaiable for your Apache configuration.</p>
+
+<p><em>IMPORTANT</em>:You also need to ensure that your CA is trusted by Curl (the system). If in doubt, cat your CA cert into <code>/etc/pki/tls/certs/ca-bundle.crt</code>. You will get really odd errors if you do not do this.</p>
+
+<h3>Shared Libraries</h3>
+
+<p>We will be installing WebAuth into <code>/usr/local</code> and this need its libraries to be linked in the system.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>echo '/usr/local/lib' &gt;&gt; /etc/ld.so.conf.d/locallib.conf</span></code></pre></td></tr></table></div></figure>
+
+
+<p>We will need to run <code>ldconfig</code> to load in the WebAuth libraries later on.</p>
+
+<h2>Compile and Install WebAuth</h2>
+
+<p>The latest version at the time of this writing is webauth-4.1.1 and is avaiable from <a href="http://webauth.stanford.edu/download.html">Stanford University</a>. Grab the source tarball since the packages do not include features that you will need in a brand new installation.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>[root@gmcsrvx2 ~]# tar xfz webauth-4.1.1.tar.gz
+</span><span class='line'>[root@gmcsrvx2 ~]# cd webauth-4.1.1
+</span><span class='line'>[root@gmcsrvx2 webauth-4.1.1]# ./configure --enable-webkdc
+</span><span class='line'>checking for a BSD-compatible install... /usr/bin/install -c
+</span><span class='line'>checking whether build environment is sane... yes
+</span><span class='line'>checking for a thread-safe mkdir -p... /bin/mkdir -p
+</span><span class='line'>....
+</span><span class='line'>....
+</span><span class='line'>config.status: executing depfiles commands
+</span><span class='line'>config.status: executing libtool commands
+</span><span class='line'>config.status: executing include/webauth/defines.h commands
+</span><span class='line'>[root@gmcsrvx2 webauth-4.1.1]# </span></code></pre></td></tr></table></div></figure>
+
+
+<p>Assuming everything is all good, go ahead and build it.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>[root@gmcsrvx2 webauth-4.1.1]# make
+</span><span class='line'>make  all-am
+</span><span class='line'>make[1]: Entering directory `/root/webauth-4.1.1'
+</span><span class='line'>....
+</span><span class='line'>....
+</span><span class='line'>Manifying blib/man3/WebKDC::WebKDCException.3pm
+</span><span class='line'>make[2]: Leaving directory `/root/webauth-4.1.1/perl'
+</span><span class='line'>make[1]: Leaving directory `/root/webauth-4.1.1'
+</span><span class='line'>[root@gmcsrvx2 webauth-4.1.1]# </span></code></pre></td></tr></table></div></figure>
+
+
+<p>And assuming everything is happy, make install:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>[root@gmcsrvx2 webauth-4.1.1]# make install
+</span><span class='line'>make[1]: Entering directory `/root/webauth-4.1.1'
+</span><span class='line'>test -z "/usr/local/lib" || /bin/mkdir -p "/usr/local/lib"
+</span><span class='line'>....
+</span><span class='line'>....
+</span><span class='line'>test -z "/usr/local/include/webauth" || /bin/mkdir -p "/usr/local/include/webauth"
+</span><span class='line'> /usr/bin/install -c -m 644 include/webauth/basic.h include/webauth/keys.h include/webauth/tokens.h include/webauth/util.h include/webauth/webkdc.h '/usr/local/include/webauth'
+</span><span class='line'>make[1]: Leaving directory `/root/webauth-4.1.1'
+</span><span class='line'>[root@gmcsrvx2 webauth-4.1.1]# </span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now ensure that the new libraries get loaded by running <code>ldconfig</code>. This looks at the files in that ld.so.conf.d directory and adds them to the library path. MAKE SURE YOU DO THIS!!!</p>
+
+<p>The Apache modules for WebAuth have been compiled into <code>/usr/local/libexec/apache2/modules</code>:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>[root@gmcsrvx2 ~]# ls /usr/local/libexec/apache2/modules/
+</span><span class='line'>mod_webauth.la  mod_webauthldap.la  mod_webauthldap.so  mod_webauth.so  mod_webkdc.la  mod_webkdc.so</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>mod_webauth Configuration</h2>
+
+<p>Make sure you have the proper keytab set up at <code>/etc/webauth/webauth.keytab</code>. This file can technically be located anywhere as long as you configure the module accordingly.</p>
+
+<p>Next you need to create a local state directory for WebAuth. Usually this is <code>/var/lib/webauth</code>. The path can be changed as long as you set it in the following configuration file.</p>
+
+<p>The Apache module needs a configuration file to be included in the Apache server configuration. On Enterprise Linux, this can be located in <code>/etc/httpd/conf.d/mod_webauth.conf</code>:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'># Load the module that you compiled.
+</span><span class='line'>LoadModule webauth_module     /usr/local/libexec/apache2/modules/mod_webauth.so
+</span><span class='line'>
+</span><span class='line'># Some fancy WebAuth stuff
+</span><span class='line'>WebAuthKeyRingAutoUpdate      on
+</span><span class='line'>WebAuthKeyringKeyLifetime     30d
+</span><span class='line'>
+</span><span class='line'># The path to some critical files. These should be secured. 
+</span><span class='line'>WebAuthKeyring                /var/lib/webauth/keyring
+</span><span class='line'>WebAuthServiceTokenCache      /var/lib/webauth/service_token_cache
+</span><span class='line'>WebAuthCredCacheDir           /var/lib/webauth/cred_cache
+</span><span class='line'>
+</span><span class='line'># The path to the keytab that webauth will use to authenticate with your KDC
+</span><span class='line'>WebAuthKeytab                 /etc/webauth/webauth.keytab
+</span><span class='line'>
+</span><span class='line'># The URL to point to if you need to login. MAKE SURE THIS IS CORRECT!
+</span><span class='line'>WebAuthLoginURL               "https://webauth.example.com/login"
+</span><span class='line'>WebAuthWebKdcURL              "https://webauth.example.com/webkdc-service/"
+</span><span class='line'>
+</span><span class='line'># The Kerberos principal to use when authenticating with the keytab above
+</span><span class='line'>WebAuthWebKdcPrincipal        service/webkdc
+</span><span class='line'>
+</span><span class='line'># SSL is a good thing. Plaintext passwords are bad. Secure this server.
+</span><span class='line'>WebAuthSSLRedirect            On
+</span><span class='line'>WebAuthWebKdcSSLCertFile      /etc/pki/example.com/example-ca.crt</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Again, adjust paths to suit your tastes. The <code>WebAuthWebKdcSSLCertFile</code> should be your public CA certificate that you probably cat&#8217;d earlier.</p>
+
+<h2>mod_webkdc Configuration</h2>
+
+<p>Make sure you have the proper keytab set up at <code>/etc/webkdc/webkdc.keytab</code>. This file can technically be located anywhere as long as you configure the module accordingly.</p>
+
+<p>Next you need to create a local state directory for the WebKDC. Usually this is <code>/var/lib/webkdc</code>. The path can be changed as long as you set it in the configuration files.</p>
+
+<p>The WebKDC utilizes an ACL to allow only certain hosts to get tickets. This goes in <code>/etc/webkdc/token.acl</code>:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'># These lines allow all principals that under the webauth service to generate a token
+</span><span class='line'>krb5:webauth/*@EXAMPLE.COM id
+</span><span class='line'>krb5:webauth/gmcsrvx2.example.com@EXAMPLE.COM cred krb5 krbtgt/EXAMPLE.COM@EXAMPLE.COM</span></code></pre></td></tr></table></div></figure>
+
+
+<p>For the WebLogin pages, another configuration file is used to specify the information for it (in <code>/etc/webkdc/webkdc.conf</code>). This is seperate from the Apache module configuration loaded by the webserver.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='perl'><span class='line'><span class="c1"># The KEYRING_PATH should match what you put in your httpd config</span>
+</span><span class='line'><span class="nv">$KEYRING_PATH</span> <span class="o">=</span> <span class="s">&quot;/var/lib/webkdc/keyring&quot;</span><span class="p">;</span>
+</span><span class='line'><span class="nv">$URL</span> <span class="o">=</span> <span class="s">&quot;https://webauth.example.com/webkdc-service/&quot;</span><span class="p">;</span>
+</span><span class='line'><span class="c1"># You can make custom skins for the weblogin page. Change the path here</span>
+</span><span class='line'><span class="nv">$TEMPLATE_PATH</span> <span class="o">=</span> <span class="s">&quot;./generic/templates&quot;</span><span class="p">;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>NOTE: You CANNOT change the location of this file or the WebKDC module will freak out.</p>
+
+<p>Note that certain directives must match the Apache configuration. We will make that now in <code>/etc/httpd/conf.d/mod_webkdc.conf</code>:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+</pre></td><td class='code'><pre><code class='text'><span class='line'># Load the module that you compiled.
+</span><span class='line'>LoadModule webkdc_module /usr/local/libexec/apache2/modules/mod_webkdc.so
+</span><span class='line'>
+</span><span class='line'># Some fancy WebKdc stuff
+</span><span class='line'>WebKdcServiceTokenLifetime    30d
+</span><span class='line'>
+</span><span class='line'># The path to some critical files. These should be secured.
+</span><span class='line'>WebKdcKeyring                 /var/lib/webkdc/keyring
+</span><span class='line'>
+</span><span class='line'># The path to the keytab and access control list that the webkdc will use to authenticate with your KDC
+</span><span class='line'>WebKdcKeytab                  /etc/webkdc/webkdc.keytab
+</span><span class='line'>WebKdcTokenAcl                /etc/webkdc/token.acl
+</span><span class='line'>
+</span><span class='line'># Debugging information is wonderful. Turn this off when you get everything working.
+</span><span class='line'>WebKdcDebug                   On
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Ensure that your paths match what you set up earlier.</p>
+
+<h2>mod_webauthldap Configuration</h2>
+
+<p>This step should only be done if you have an LDAP server operating in your network and can accept SASL binds. You can make certain LDAP attributes available in the web environment as server variables for your web applications. This is configured in <code>/etc/httpd/conf.d/mod_webauthldap.conf</code>:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+</pre></td><td class='code'><pre><code class='text'><span class='line'># Load the module that you compiled
+</span><span class='line'>LoadModule webauthldap_module /usr/local/libexec/apache2/modules/mod_webauthldap.so
+</span><span class='line'>
+</span><span class='line'># Webauth Keytab &amp; credential cache file
+</span><span class='line'>WebAuthLdapKeytab /etc/webauth/webauth.keytab
+</span><span class='line'>WebAuthLdapTktCache /var/lib/webauth/krb5cc_ldap
+</span><span class='line'>
+</span><span class='line'># LDAP Host Information
+</span><span class='line'>WebAuthLdapHost ldap.example.com
+</span><span class='line'>WebAuthLdapBase ou=users,dc=example,dc=com
+</span><span class='line'>WebAuthLdapAuthorizationAttribute privilegeAttribute
+</span><span class='line'>WebAuthLdapDebug on
+</span><span class='line'>
+</span><span class='line'>&lt;Location /&gt;
+</span><span class='line'>        WebAuthLdapAttribute givenName
+</span><span class='line'>        WebAuthLdapAttribute sn
+</span><span class='line'>        WebAuthLdapAttribute cn
+</span><span class='line'>        WebAuthLdapAttribute mail
+</span><span class='line'>&lt;/Location&gt;
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Misc Permissions</h2>
+
+<p>Most of the files that you created do not have the appropriate permissions to be read/written by the webserver. Lets fix that.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='text'><span class='line'>[root@gmcsrvx2 ~ ]# chcon -t bin_t /usr/local/share/weblogin/*.fcgi
+</span><span class='line'>[root@gmcsrvx2 ~ ]# chown -R apache:apache /usr/local/share/weblogin
+</span><span class='line'>[root@gmcsrvx2 ~ ]# chcon -R -t httpd_sys_rw_content_t /usr/local/share/weblogin/generic
+</span><span class='line'>[root@gmcsrvx2 ~ ]# chown root:apache /etc/webkdc/webkdc.keytab
+</span><span class='line'>[root@gmcsrvx2 ~ ]# chmod 640 /etc/webkdc/webkdc.keytab
+</span><span class='line'>[root@gmcsrvx2 ~ ]# chown root:apache /etc/webauth/webauth.keytab
+</span><span class='line'>[root@gmcsrvx2 ~ ]# chmod 640 /etc/webauth/webauth.keytab
+</span><span class='line'>[root@gmcsrvx2 ~ ]# chown -R apache:apache /var/lib/webkdc
+</span><span class='line'>[root@gmcsrvx2 ~ ]# chown -R apache:apache /var/lib/webauth
+</span><span class='line'>[root@gmcsrvx2 ~ ]# chmod 700 /var/lib/webkdc
+</span><span class='line'>[root@gmcsrvx2 ~ ]# chmod 700 /var/lib/webauth
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Apache VHosts</h2>
+
+<p>I created a VHost for both &#8220;webauth.example.com&#8221; and &#8220;gmcsrvx2.example.com&#8221;, with the latter requiring user authentication to view. I name these after the hostname they are serving in <code>/etc/httpd/conf.d/webauth.conf</code>, Just throw a simple Hello World into the DocumentRoot that you configure for your testing host. Note that you must have NameVirtualHost-ing setup for both ports 80 and 443.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+</pre></td><td class='code'><pre><code class='text'><span class='line'>&lt;VirtualHost *:80&gt;
+</span><span class='line'>  ServerName webauth.example.com
+</span><span class='line'>  ServerAlias webauth
+</span><span class='line'>  # Send them to somewhere useful if they request the root of this VHost
+</span><span class='line'>  RedirectMatch   permanent ^/$ https://gmcsrvx2.example.com/
+</span><span class='line'>  # Send non-HTTPS traffic to HTTPS since we are dealing with passwords
+</span><span class='line'>  RedirectMatch   permanent ^/(.+)$ https://webauth.example.com/$1
+</span><span class='line'>&lt;/VirtualHost&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;VirtualHost *:443&gt;
+</span><span class='line'>  # Name to respond to
+</span><span class='line'>  ServerName webauth.example.com
+</span><span class='line'>  ServerAlias webauth
+</span><span class='line'>
+</span><span class='line'>  # Root directory
+</span><span class='line'>  DocumentRoot /usr/local/share/weblogin
+</span><span class='line'>
+</span><span class='line'>  # SSL
+</span><span class='line'>  SSLEngine On
+</span><span class='line'>  SSLCertificateFile /etc/pki/example.com/webauth/host-cert.pem
+</span><span class='line'>  SSLCertificateKeyFile /etc/pki/example.com/webauth/host-key.pem
+</span><span class='line'>  SSLCACertificateFile /etc/pki/example.com/example-ca.crt
+</span><span class='line'>
+</span><span class='line'>  # Web Login directory needs some special love
+</span><span class='line'>  &lt;Directory &quot;/usr/local/share/weblogin&quot;&gt;
+</span><span class='line'>          AllowOverride none
+</span><span class='line'>          Options ExecCGI
+</span><span class='line'>          AddHandler fcgid-script .fcgi
+</span><span class='line'>          Order allow,deny
+</span><span class='line'>          Allow from all
+</span><span class='line'>  &lt;/Directory&gt;
+</span><span class='line'>
+</span><span class='line'>  # This allows you to not need to put the file extension on the scripts
+</span><span class='line'>  ScriptAlias /login &quot;/usr/local/share/weblogin/login.fcgi&quot;
+</span><span class='line'>  ScriptAlias /logout &quot;/usr/local/share/weblogin/logout.fcgi&quot;
+</span><span class='line'>  ScriptAlias /pwchange &quot;/usr/local/share/weblogin/pwchange.fcgi&quot;
+</span><span class='line'>
+</span><span class='line'>  # More special options to make things load right based on your template
+</span><span class='line'>  Alias /images &quot;/usr/local/share/weblogin/generic/images&quot;
+</span><span class='line'>  Alias /help.html &quot;/usr/local/share/weblogin/generic/help.heml&quot;
+</span><span class='line'>  Alias /style.css &quot;/usr/local/share/weblogin/generic/style.css&quot;
+</span><span class='line'>
+</span><span class='line'>  # This is the actual web KDC
+</span><span class='line'>  &lt;Location /webkdc-service&gt;
+</span><span class='line'>          SetHandler webkdc
+</span><span class='line'>  &lt;/Location&gt;
+</span><span class='line'>&lt;/VirtualHost&gt;
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>And the host file at <code>/etc/httpd/conf.d/gmcsrvx2.conf</code>:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+</pre></td><td class='code'><pre><code class='text'><span class='line'>&lt;VirtualHost *:80&gt;
+</span><span class='line'>  ServerName gmcsrvx2.example.com
+</span><span class='line'>  ServerAlias gmcsrvx2
+</span><span class='line'>  DocumentRoot /var/www/html
+</span><span class='line'>  RedirectMatch   permanent ^/(.+)$ https://gmcsrvx2.example.com/$1
+</span><span class='line'>&lt;/VirtualHost&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;VirtualHost *:443&gt;
+</span><span class='line'>  ServerName gmcsrvx2.example.com
+</span><span class='line'>  ServerAlias gmcsrvx2
+</span><span class='line'>  DocumentRoot /var/www/gmcsrvx2
+</span><span class='line'>  SSLEngine On
+</span><span class='line'>  SSLCertificateFile /etc/pki/example.com/gmcsrvx2/host-cert.pem
+</span><span class='line'>  SSLCertificateKeyFile /etc/pki/example.com/gmcsrvx2/host-key.pem
+</span><span class='line'>  SSLCACertificateFile /etc/pki/example.com/example-ca.crt
+</span><span class='line'>
+</span><span class='line'>  # Require a webauth valid user to access this directory
+</span><span class='line'>  &lt;Directory &quot;/var/www/gmcsrvx2&quot;&gt;
+</span><span class='line'>          AuthType WebAuth
+</span><span class='line'>          Require valid-user
+</span><span class='line'>  &lt;/Directory&gt;
+</span><span class='line'>&lt;/VirtualHost&gt;
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Once you are all set, start Apache. Then navigate your web browser to the host (http://gmcsrvx2.example.com). This should first redirect you to HTTPS, then bounce you to the WebLogin pages. After authenticating, you should be able to access the server.</p>
+
+<h2>Conclusion</h2>
+
+<p>This is by no means a simple thing to get set up. An intimate knowlege how how Kerberos, Apache, and LDAP work is crucial to debugging issues relating to WebAuth. All of my sample configuration files can be found in the <a href="http://archive.grantcohoe.com/projects/webauth/">Archive</a>.</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Grant Cohoe</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-02-13T12:38:00-05:00" pubdate data-updated="true">Feb 13<span>th</span>, 2013</time>
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://www.grantcohoe.com/blog/2013/02/13/stanford-webauth-on-enterprise-linux/" data-via="grantcohoe" data-counturl="http://www.grantcohoe.com/blog/2013/02/13/stanford-webauth-on-enterprise-linux/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left articlenav" href="/blog/2013/01/03/ip-over-dns-exploit/" title="Previous Post: IP over DNS Exploit">&laquo; IP over DNS Exploit</a>
+      
+      
+        <a class="basic-alignment right articlenav" href="/blog/2013/02/27/cross-platform-authentication-services/" title="Next Post: Cross-Platform Authentication Services">Cross-Platform Authentication Services &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Categories</h1>
+  <ul>
+    
+      <li><a class='category' href='/blog/categories/projects/'>Projects</a></li>
+    
+      <li><a class='category' href='/blog/categories/guides/'>Guides</a></li>
+    
+      <li><a class='category' href='/blog/categories/rants/'>Rants</a></li>
+    
+      <li><a class='category' href='/blog/categories/presentations/'>Presentations</a></li>
+    
+  </ul>
+</section>
+<section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2013/04/24/starrs-installation-guide/">STARRS Installation Guide</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/04/19/backups-for-photo-majors/">Backups for Photo Majors</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/04/19/impact-of-disk-alignment-in-virtualized-environments/">Impact of Disk Alignment in Virtualized Environments</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/04/12/csh-wireless-network-deployment/">CSH Wireless Network Deployment</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/02/27/cross-platform-authentication-services/">Cross-Platform Authentication Services</a>
+      </li>
+    
+  </ul>
+</section>
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2013 - Grant Cohoe -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

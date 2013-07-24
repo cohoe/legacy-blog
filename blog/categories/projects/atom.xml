@@ -1,0 +1,466 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Projects | Grant Cohoe]]></title>
+  <link href="http://www.grantcohoe.com/blog/categories/projects/atom.xml" rel="self"/>
+  <link href="http://www.grantcohoe.com/"/>
+  <updated>2013-07-24T11:32:28-04:00</updated>
+  <id>http://www.grantcohoe.com/</id>
+  <author>
+    <name><![CDATA[Grant Cohoe]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[CSH Wireless Network Deployment]]></title>
+    <link href="http://www.grantcohoe.com/blog/2013/04/12/csh-wireless-network-deployment/"/>
+    <updated>2013-04-12T17:58:00-04:00</updated>
+    <id>http://www.grantcohoe.com/blog/2013/04/12/csh-wireless-network-deployment</id>
+    <content type="html"><![CDATA[<p>We wanted to deploy our own wireless network across the floor. I decided to make the project happen.</p>
+
+<h1>Requirements</h1>
+
+<h2>Spectrum Use</h2>
+
+<p><strong>We can only use three channels in the 5 GHz spectrum.</strong> RIT has a massive unified wireless deployment across all of campus. Policy states that third-parties (students, staff, etc) cannot operate wireless access points within range of the RIT network to prevent signal overlap and interference. This is not an issue in the 5 GHz spectrum, where there are many more non-overlaping channels. This limits potential clients to only those with dual-band wireless radios.</p>
+
+<h2>Authentication</h2>
+
+<p><strong>No client-side software can be required.</strong> This is a requirement set by us to allow ease of access by users. Most operating systems support PEAP/MsCHAPv2 (via RADIUS) out of the box and require no extra configuration to make them work. Unfortunately this requires a bit more system infrastructure to make it work. Our authentication backend (MIT Kerberos) does not support this type of user authentication so we need to do some hax to make it.</p>
+
+<h2>Speed</h2>
+
+<p><strong>We need to be faster than RIT.</strong> There is absolutely no reason to use CSH wireless over RITs unless we can be faster. By using Channel Bonding in two key areas, we can achieve this requirement and double the speed of RIT wireless. We also need to be able to do fast-reassociation between access points so that users can walk up and down floor and not lose connectivity.</p>
+
+<h1>Setup</h1>
+
+<h2>Access Points</h2>
+
+<p>First we had to figure out where and how to deploy our range of APs. Since we have relatively few resources we used a combination of what we had lying around, purchased, and donated harware.</p>
+
+<ul>
+<li>3x Cisco 1230</li>
+<li>1x Cisco 1142</li>
+<li>1x Cisco 1131</li>
+<li>1x Cisco 1252</li>
+</ul>
+
+
+<p>Looking at the map of the floor, I wanted to place the channel-bonded APs in the areas with the largest concentration of users (the Lounge and the User Center). The others would be dispersed across the other public rooms on floor.</p>
+
+<p>[[ IMAGE HERE ]]</p>
+
+<h2>Wireless Domain Services</h2>
+
+<p>Cisco WDS is essentially a poor-mans controller. WDS allows you to do authentication once across your wireless domain and do relatively seamless handoff between access points. I had an extra 1230 laying around without antennas so I parked it in my server room and configured it to act as the WDS master. When a client attempts to authenticate to an AP, the auth data is sent to the WDS server where it is then processed and a response sent to the AP to let them in or not. If the client roams to another AP then the WDS server promises the new AP that the client is OK and skips the authentication phase.</p>
+
+<p>This is the only device that will ever talk to the RADIUS server, so all of the configuration for that is only needed once.</p>
+
+<p>NOTE: In this example the WDS server is at IP address 192.168.0.250 and the RADIUS server is at 192.168.0.100.</p>
+
+<p><code>
+aaa new-model
+!
+!
+aaa group server radius rad_local
+ server 192.168.0.250 auth-port 1812 acct-port 1813
+!
+aaa group server radius rad_eap
+ server 192.168.0.100 auth-port 1812 acct-port 1813
+!
+aaa authentication login eap_local group rad_local
+aaa authentication login eap_methods group rad_eap
+!
+radius-server local
+  no authentication mac
+  nas 192.168.0.250 key 7 SUPERSECRETKEYHERE
+  user wds-authman nthash 7 AUTHMANPASS
+!
+radius-server host 192.168.0.250 auth-port 1812 acct-port 1813 key 7 SUPERSECRETRADIUSKEYHERE
+radius-server host 192.168.0.100 auth-port 1812 acct-port 1813 key 7 SUPERSECRETRADIUSOTHERKEYHERE
+!
+!
+wlccp ap username wds-authman password 7 AUTHMANPASS
+wlccp authentication-server infrastructure eap_local
+wlccp authentication-server client eap eap_methods
+  ssid prettyflyforawifi
+wlccp authentication-server client leap eap_local
+  ssid prettyflyforawifi
+wlccp wds mode wds-only
+wlccp wds priority 255 interface BVI1
+</code></p>
+
+<p>The access points need to use the AP username defined above to talk to the WDS server. RADIUS configuration here should be optional.
+<code>
+aaa new-model
+!
+aaa group server radius rad_eap
+ server 192.168.0.100 auth-port 1812 acct-port 1813
+!
+aaa authentication login default local
+aaa authentication login eap_methods group rad_eap
+dot11 ssid prettyflyforawifi
+   authentication open eap eap_methods
+   authentication network-eap eap_methods
+   authentication key-management wpa
+   guest-mode
+!
+radius-server host 192.168.0.100 auth-port 1812 acct-port 1813 key 7 SUPERSECRETRADIUSKEY
+!
+wlccp ap username wds-authman password 7 AUTHMANPASS
+wlccp ap wds ip address 192.168.0.250
+</code></p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Cross-Platform Authentication Services]]></title>
+    <link href="http://www.grantcohoe.com/blog/2013/02/27/cross-platform-authentication-services/"/>
+    <updated>2013-02-27T22:47:00-05:00</updated>
+    <id>http://www.grantcohoe.com/blog/2013/02/27/cross-platform-authentication-services</id>
+    <content type="html"><![CDATA[<p>You are a nerd. You like doing nerd-y things. You run an entirely *nix-based network. But like all nerds, you have that one pesky Windows machine that you want to have available for your users. Or you just want the same SSO password from your Kerberos KDC. Regardless, you want Windows to talk to MIT Kerberos. Believe it or not, this is SUPPORTED!</p>
+
+<h2>Process Overview</h2>
+
+<p><img src="http://www.grantcohoe.com/images/blog/cross-auth-process.png" alt="" title=""  /></p>
+
+<br>
+
+
+<p>We start with the user entering their credentials. These are entered in the standard Windows logon screen (which I dearly miss from Windows 2003). From there, the client is configured to have it's default domain (realm in this case) to be the MIT Kerberos realm that your machine is a member of. This would be the equivalent of an Active Directory domain.</p>
+
+<p>From here, your workstation acts just like any other Kerberized host. It uses it's host principal (derived from what it thinks its hostname is) and configured password to authenticate to the KDC. Once it has verified it's identity, it then goes to authenticate you. And if your password is correct, Windows lets you in!</p>
+
+<p>The question is: who does it let you in as? A Kerberos principal is nothing more than a name. It is not an account, or any object that actually contains information for the system. You must map Kerberos principals to accounts. These accounts are created in Windows as either local users or via Active Directory (a whole other can of worms). Usually, you will want to create a one-to-one mapping between principal and account (<code>grant@GRANTCOHOE.COM</code> principal = Windows account "grant").</p>
+
+<h2>KDC Setup</h2>
+
+<p>On your KDC, open up <code>kadmin</code> with your administrative principal and create a host principal for the new machine. It needs to have a password that you know, so use your favorite password generating source.</p>
+
+<p><code>
+miranda ~ # kadmin -p cohoe/admin
+Authenticating as principal cohoe/admin with password.
+Password for cohoe/admin@GRANTCOHOE.COM:
+kadmin:  ank host/caprica.grantcohoe.com@GRANTCOHOE.COM
+WARNING: no policy specified for host/caprica.grantcohoe.com@GRANTCOHOE.COM; defaulting to no policy
+Enter password for principal "host/caprica.grantcohoe.com@GRANTCOHOE.COM":
+Re-enter password for principal "host/caprica.grantcohoe.com@GRANTCOHOE.COM":
+Principal "host/caprica.grantcohoe.com@GRANTCOHOE.COM" created.
+kadmin:  quit
+miranda ~ #
+</code></p>
+
+<p>That's it for the KDC. On to the Windows machine!</p>
+
+<h2>Windows 7 Client</h2>
+
+<p>Windows 7 (as well as Server 2008 I believe) include the basic utilities required to support MIT Kerberos. This was available for XP and Server 2003 as "Microsoft Support Tools". The utility we will be using is called <code>ksetup</code>. It allows for configuration of foreign-realm authentication systems.</p>
+
+<p>So to set your machine to authenticate to your already existing MIT Kerberos KDC, open up a command prompt and do the following:
+<code>
+ksetup /setdomain GRANTCOHOE.COM
+ksetup /addkdc GRANTCOHOE.COM kerberos.grantcohoe.com
+ksetup /setmachpassword passwordfromearlier
+ksetup /mapuser * *
+</code></p>
+
+<p>After that, you need to set a Group Policy setting to automatically pick the right domain for you to login to. Open up the Group Policy Editor (gpedit.msc) and navigate to Local Computer Policy->Computer Configuration->Administrative Templates->System->Login->Assign a default domain for logon. Set this to your realm (GRANTCOHOE.COM in my case).</p>
+
+<p>Do a nice reboot of your system, and you should be ready to go!</p>
+
+<h2>Active Directory</h2>
+
+<p>Active Directory can be configured to trust a foreign Kerberos realm. It will NOT synchronize information with anything, but if you just need a bunch of users to log into something and no data with it, the process is not too terrible. Rather than duplicate the information, you can find the guide that I used here: <a href="http://pig.made-it.com/kerberos-trust.html">Microsoft trusting MIT Kerberos</a></p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Dynamic Dual-Home Linux Server]]></title>
+    <link href="http://www.grantcohoe.com/blog/2013/01/03/dynamic-dual-home-linux-server/"/>
+    <updated>2013-01-03T01:15:00-05:00</updated>
+    <id>http://www.grantcohoe.com/blog/2013/01/03/dynamic-dual-home-linux-server</id>
+    <content type="html"><![CDATA[<h1>Requirements</h1>
+
+<p>I have a shiny new VM server sitting in my dorm room. I have access to two networks, one operated by my dorm organization and the other provided to me by RIT. Both get me to the internet, but do so through different paths/SLAs. I want my server to be accessible from both networks. I also want to be able to attach VM hosts to NAT'd networks behind each respective network. This gives me a total of four possible VM networks (primary-external, primary-internal, secondary-external, secondary-internal). I have a Hurricane Electric IPv6 tunnel endpoint configured on the server, and want IPv6 connectivity available on ALL networks regardless of being external or internal. And to complicate matters, my external IP addresses are given to me via DHCP so I cannot set anything statically. Make it so.</p>
+
+<h1>Dependencies</h1>
+
+<ul>
+<li>IPTables</li>
+<li>EBTables</li>
+<li>Kernel 2.6 or newer</li>
+<li>IPCalc
+You also need access to two networks.</li>
+</ul>
+
+
+<h1>Script Setup</h1>
+
+<p>First, like any good shell script, we should define our command paths:
+<code>
+SERVICE=/sbin/service
+IPTABLES=/sbin/iptables
+IP6TABLES=/sbin/ip6tables
+EBTABLES=/sbin/ebtables
+IPCALC=/bin/ipcalc
+</code></p>
+
+<p>Next we'll define the interface names that we are going to use. These should already be pre-configured and have their appropriate IP information.
+<code>
+PRIMARY_EXTERNAL_INTERFACE="primary-net"
+PRIMARY_INTERNAL_INTERFACE="primary-nat"
+SECONDARY_EXTERNAL_INTERFACE="secondary-net"
+SECONDARY_INTERNAL_INTERFACE="secondary-nat"
+IPV6_TUNNEL_INTERFACE="he-ipv6"
+</code></p>
+
+<h1>Subnet Information</h1>
+
+<p>Now we need to load in the relevant subnet layouts. In an ideal world this would be set statically. However due to the nature of the environment I am in, both of my networks serve me my address via DHCP and is subject to change. This is very dirty and not very efficient, but it works:
+```</p>
+
+<h1>Here we will get the subnet information for the primary network</h1>
+
+<p>PRIMARY_EXTERNAL_NETWORK=<code>$IPCALC -n $(ip -4 addr show dev $PRIMARY_EXTERNAL_INTERFACE | grep "inet" | cut -d ' ' -f 6) | cut -d = -f 2</code>
+PRIMARY_EXTERNAL_PREFIX=<code>$IPCALC -p $(ip -4 addr show dev $PRIMARY_EXTERNAL_INTERFACE | grep "inet" | cut -d ' ' -f 6) | cut -d = -f 2</code>
+PRIMARY_EXTERNAL_NETWORK="$PRIMARY_EXTERNAL_NETWORK/$PRIMARY_EXTERNAL_PREFIX"</p>
+
+<h1>Then the NAT'd network behind the primary</h1>
+
+<p>PRIMARY_INTERNAL_NETWORK=<code>ip -4 addr show dev $PRIMARY_INTERNAL_INTERFACE | grep "inet" | cut -d ' ' -f 6 | sed "s/[0-9]\+\//0\//"</code></p>
+
+<h1>Now the subnet information for the secondary network</h1>
+
+<p>SECONDARY_EXTERNAL_NETWORK=<code>$IPCALC -n $(ip -4 addr show dev $SECONDARY_EXTERNAL_INTERFACE | grep "inet" | cut -d ' ' -f 6) | cut -d = -f 2</code>
+SECONDARY_EXTERNAL_PREFIX=<code>$IPCALC -p $(ip -4 addr show dev $SECONDARY_EXTERNAL_INTERFACE | grep "inet" | cut -d ' ' -f 6) | cut -d = -f 2</code>
+SECONDARY_EXTERNAL_NETWORK="$SECONDARY_EXTERNAL_NETWORK/$SECONDARY_EXTERNAL_PREFIX"</p>
+
+<h1>And it's NAT'd network.</h1>
+
+<p>SECONDARY_INTERNAL_NETWORK=<code>ip -4 addr show dev $SECONDARY_INTERNAL_INTERFACE | grep "inet" | cut -d ' ' -f 6 | sed "s/[0-9]\+\//0\//"</code></p>
+
+<h1>This is where we load in the IP addresses of the interfaces</h1>
+
+<p>PRIMARY_EXTERNAL_IP=<code>ip -4 addr show dev $PRIMARY_EXTERNAL_INTERFACE | grep inet | cut -d ' ' -f 6 | sed "s/\/[0-9]\+$//"</code>
+PRIMARY_INTERNAL_IP=<code>ip -4 addr show dev $PRIMARY_INTERNAL_INTERFACE | grep inet | cut -d ' ' -f 6 | sed "s/\/[0-9]\+$//"</code>
+SECONDARY_EXTERNAL_IP=<code>ip -4 addr show dev $SECONDARY_EXTERNAL_INTERFACE | grep inet | cut -d ' ' -f 6 | sed "s/\/[0-9]\+$//"</code>
+SECONDARY_INTERNAL_IP=<code>ip -4 addr show dev $SECONDARY_INTERNAL_INTERFACE | grep inet | cut -d ' ' -f 6 | sed "s/\/[0-9]\+$//"</code></p>
+
+<h1>We get the gateways by pinging once out of the appropriate interface to the multicast address of All Routers on the network.</h1>
+
+<p>PRIMARY_GATEWAY_IP=<code>ping -I $PRIMARY_EXTERNAL_IP 224.0.0.2 -c 1 | grep "icmp_seq" | cut -d : -f 1 | awk '{print $4}'</code>
+SECONDARY_GATEWAY_IP=<code>ping -I $SECONDARY_EXTERNAL_IP 224.0.0.2 -c 1 | grep "icmp_seq" | cut -d : -f 1 | awk '{print $4}'</code>
+```</p>
+
+<h1>System Configuration</h1>
+
+<p>In order to get most of these features working, we need to enable IP forwarding in the kernel.
+<code>
+echo "Enabling IP forwarding..."
+sysctl -w net.ipv4.ip_forward=1
+sysctl -w net.ipv6.conf.all.forwarding=1
+</code></p>
+
+<h1>Routes</h1>
+
+<p>The routes are the most critical part of making this whole system work. We use two cool features of the linux networking stack, Route Tables and Route Rules. Route Tables are similar to your VRF tables in Cisco-land. Basically you maintain several different routing tables on a single system in addition to the main one. In order to specify what table a packet should use, you configure Route Rules. A rule basically says "Packets that match this rule should use table A". In this system I use rules to force a packet to use a route table based on its source address.
+```</p>
+
+<h1>Kernel IP Routes</h1>
+
+<p>echo "Setting system default gateways"
+ip route del default
+ip route add default via $PRIMARY_GATEWAY_IP
+ip -6 route add ::/0 dev $IPV6_TUNNEL_INTERFACE</p>
+
+<p>echo "Adding default routes for primary external network..."
+ip route flush table $PRIMARY_EXTERNAL_INTERFACE-routes
+ip route add $PRIMARY_EXTERNAL_NETWORK dev $PRIMARY_EXTERNAL_INTERFACE src $PRIMARY_EXTERNAL_IP table $PRIMARY_EXTERNAL_INTERFACE-routes
+ip route add default via $PRIMARY_GATEWAY_IP table $PRIMARY_EXTERNAL_INTERFACE-routes</p>
+
+<p>echo "Adding default routes for secondary external network..."
+ip route flush table $SECONDARY_EXTERNAL_INTERFACE-routes
+ip route add $SECONDARY_EXTERNAL_NETWORK dev $SECONDARY_EXTERNAL_INTERFACE src $SECONDARY_EXTERNAL_IP table $SECONDARY_EXTERNAL_INTERFACE-routes
+ip route add default via $SECONDARY_GATEWAY_IP table $SECONDARY_EXTERNAL_INTERFACE-routes</p>
+
+<p>echo "Creating routes for primary internal network..."
+ip route flush table $PRIMARY_INTERNAL_INTERFACE-routes
+ip route add $PRIMARY_INTERNAL_NETWORK dev $PRIMARY_INTERNAL_INTERFACE table $PRIMARY_INTERNAL_INTERFACE-routes
+ip route add default via $PRIMARY_GATEWAY_IP table $PRIMARY_INTERNAL_INTERFACE-routes</p>
+
+<p>echo "Creating routes for secondary internal network..."
+ip route flush table $SECONDARY_INTERNAL_INTERFACE-routes
+ip route add $SECONDARY_INTERNAL_NETWORK dev $SECONDARY_INTERNAL_INTERFACE table $SECONDARY_INTERNAL_INTERFACE-routes
+ip route add default via $SECONDARY_GATEWAY_IP table $SECONDARY_INTERNAL_INTERFACE-routes</p>
+
+<p>echo "Creating route rules for primary external network..."
+ip rule del from $PRIMARY_EXTERNAL_IP
+ip rule add from $PRIMARY_EXTERNAL_IP table $PRIMARY_EXTERNAL_INTERFACE-routes</p>
+
+<p>echo "Creating route rules for secondary external network..."
+ip rule del from $SECONDARY_EXTERNAL_IP
+ip rule add from $SECONDARY_EXTERNAL_IP table $SECONDARY_EXTERNAL_INTERFACE-routes</p>
+
+<p>echo "Creating route rules for primary internal network..."
+ip rule del from $PRIMARY_INTERNAL_NETWORK
+ip rule add from $PRIMARY_INTERNAL_NETWORK lookup $PRIMARY_INTERNAL_INTERFACE-routes</p>
+
+<p>echo "Creating route rules for secondary internal network..."
+ip rule del from $SECONDARY_INTERNAL_NETWORK
+ip rule add from $SECONDARY_INTERNAL_NETWORK lookup $SECONDARY_INTERNAL_INTERFACE-routes
+```</p>
+
+<h1>Firewall</h1>
+
+<p>My script also maintains the host firewall rules, so we'll enable those:
+```
+echo "Reseting firewall rules..."
+$SERVICE iptables restart
+$SERVICE ip6tables restart</p>
+
+<p>echo "Setting up IPv4 firewall rules..."
+$IPTABLES -A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
+$IPTABLES -A INPUT -p ipv6 -j ACCEPT
+$IPTABLES -A INPUT -p icmp -j ACCEPT
+$IPTABLES -A INPUT -i lo -j ACCEPT
+$IPTABLES -A INPUT -s mason.csh.rit.edu -p tcp --dport 5666 -j ACCEPT
+$IPTABLES -A INPUT -p tcp --dport 53 -j ACCEPT
+$IPTABLES -A INPUT -p udp --dport 53 -j ACCEPT
+$IPTABLES -A INPUT -p tcp -m tcp --dport 80 -j ACCEPT
+$IPTABLES -A INPUT -p tcp -m tcp --dport 22 -j ACCEPT
+$IPTABLES -A INPUT -j REJECT --reject-with icmp-host-prohibited</p>
+
+<p>echo "Setting up IPv6 firewall rules..."
+$IP6TABLES -A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
+$IP6TABLES -A INPUT -p ipv6-icmp -j ACCEPT
+$IP6TABLES -A INPUT -i lo -j ACCEPT
+$IP6TABLES -A INPUT -p tcp  --dport 53 -j ACCEPT
+$IP6TABLES -A INPUT -p udp  --dport 53 -j ACCEPT
+$IP6TABLES -A INPUT -p tcp -m tcp --dport 22 -j ACCEPT
+$IP6TABLES -A INPUT -j REJECT --reject-with icmp6-adm-prohibited</p>
+
+<p>echo "Setting up firewall rules for primary internal network..."
+$IPTABLES -A FORWARD -s $PRIMARY_INTERNAL_NETWORK -j ACCEPT
+$IPTABLES -t nat -A POSTROUTING -s $PRIMARY_INTERNAL_NETWORK -j SNAT --to-source $PRIMARY_EXTERNAL_IP</p>
+
+<p>echo "Setting up firewall rules for secondary internal network..."
+$IPTABLES -A FORWARD -s $SECONDARY_INTERNAL_NETWORK -j ACCEPT
+$IPTABLES -t nat -A POSTROUTING -s $SECONDARY_INTERNAL_NETWORK -j SNAT --to-source $SECONDARY_EXTERNAL_IP</p>
+
+<p>echo "Setting up default firewall actions..."
+$IPTABLES -A FORWARD -m state --state RELATED,ESTABLISHED -j ACCEPT
+$IPTABLES -A FORWARD -j REJECT --reject-with icmp-port-unreachable
+```</p>
+
+<h1>Router Advertisements</h1>
+
+<p>One of the features of my networking setup is that all networks, no matter internal or external have IPv6 connectivity. This is achieved by sending Router Advertisements out all interfaces. This is all well and good for the VMs that I am hosting, but these advertisements travel out of the physical interfaces to other hosts on the network! This is not good in that I am allowing other users to use my IPv6 tunnel interface. This puzzled me for a long time until I discovered a handy little program called "ebtables". Ebtables is basically iptables for layer 2. As such, I was able to filter all router advertisement broadcasts out of the physical interfaces.
+<code>
+echo "Blocking IPv6 router advertisement to the world..."
+$SERVICE radvd stop
+$SERVICE ebtables restart
+$EBTABLES -A OUTPUT -d 33:33:0:0:0:1 -o eth1 -j DROP
+$EBTABLES -A OUTPUT -d 33:33:0:0:0:1 -o eth0 -j DROP
+$SERVICE radvd start
+</code></p>
+
+<h1>End Result</h1>
+
+<p>You now have a dual-homed server with two external networks, two internal networks, and IPv6 connectivity to all. Both external networks can receive their configuration via DHCP and will dynamically adjust their routing accordingly.</p>
+
+<p><img src="http://www.grantcohoe.com/images/blog/enterprise-diagram.png" width="662" height="457" alt="" title="" /></p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[System Technology Accounting and Resource Registration Solution (STARRS)]]></title>
+    <link href="http://www.grantcohoe.com/blog/2013/01/01/system-technology-accounting-and-resource-registration-solution-starrs/"/>
+    <updated>2013-01-01T20:10:00-05:00</updated>
+    <id>http://www.grantcohoe.com/blog/2013/01/01/system-technology-accounting-and-resource-registration-solution-starrs</id>
+    <content type="html"><![CDATA[<h1>Background</h1>
+
+<p>Like most of my projects, it all started with CSH. RIT allocates us two /24 public-facing networks to distribute out to our users. These resources need to have some degree of accounting in the event a user does something stupid (piracy, kiddie-pr0n, etc). RIT handles this with their own internal application, referred to as "start.rit.edu". <em>Fun aside, Start.RIT was coded by an old CSHer, now RIT employee and CSH advisor. He still maintains portions of it today.</em> When the CSH network got to the point of needing our own internal application, a member (<a href="http://www.csh.rit.edu/~sunday/">Joe Sunday</a>) created "start.csh.rit.edu". Similar to it's RIT counterpart, start.csh allowed administrators to register machines and distribute resources on the network. Start.csh also allowed for users to manage firewall rules for their hosts at the border firewall systems. On the backend, it had a script that would automatically generate an ISC-DHCPD config file and load it into the server.</p>
+
+<p>Unfortunately over time, bits of Start began to break. The fact that users could not register their own machines was a major source of irritation for the RTPs (Root-Type-Persons, or Sysadmins). When the network topology was shifted to accomodate some reorganization within RIT, the firewall rule system broke completely. There was no way to clear out old hosts that havent been on the network in years. And after the house DHCP server was compromised (then obliterated by the RTPs for security), the automatic DHCP generation was completely gone. We needed something new.</p>
+
+<p>Starting in the Spring of 2011 I starting to architect a new application to encoumpase the previous functionality and add a lot of new features and enhancements that would benefit us for years to come. Going into the projects, I knew one thing: It had to be based in PostgreSQL. Pg has native datatypes for IP addresses, subnets, and MAC addresses. I know that this would be invaluable to have later on in the project. I also knew that I didnt want to write a daemon that ran on some server imposing application logic.</p>
+
+<h1>Development</h1>
+
+<p>At this point in my career, I didn't have a whole lot of database architecting experience. I began to search for a schema creation application to help me architect what I knew was going to be a complex schema. I ran across a service called <a href="http://www.schemabank.com">SchemaBank</a>. (SB is now defunct) It was a schema design webapp that supported Postgres. It also introduced me to two things that would change the course of the application forever: Triggers and Functions. I realized that I could use Pg as the backend daemon to the entire application. For client interaction with the application, I started to develop a set of wrapper API functions that would help impose the application logic on the stored data. While most of this was taken care of in the relations between entities, there were some that could not be expressed as a relation. Fast forward two months, and I had a first revision of the database and the API to start writing an interface for.</p>
+
+<p>At this point I didn't know any sort of web languages other than HTML and CSS either. So using a book I won at BarCampRoc on <a href="http://shop.oreilly.com/product/9780596157142.do">PHP, MySQL, and Javascript</a> (a very good book by the way), I started to learn PHP. Originally I was going to go with a purely non-OOP model for the webapp, however after consulting one of my web-dev friends (<a href="http://iota.csh.rit.edu/">Ben Russell</a>), he suggested that I go with an OOP model and to use some sort of framework to avoid having to write a ton of extra code. At this point I went with one that another one of my web-dev friends had used, <a href="http://ellislab.com/codeigniter">Codeigniter</a>. So I set to work and started writing classes. During this time, I knew that I needed a new a new dhcpd.conf generation function. One of my friends (<a href="http://blog.agargiulo.com/">Anthony Gargiulo</a>) expressed an interest in helping out with the project, so I tasked him with writing a generation function in Perl. Four months later, I had a working PHP web interface (and he had a working dhcpd.conf generator). At this point, I had everything except a name. I dont really remember a lot about how it came about, but I think I took the first cool-sounding word that came to my head. I was in a Quake 3 Arena mood that day and remembered an old console command (impulse). I took that word and backronymed it to the IP Management Program for Use in Local Server Environments.</p>
+
+<h1>Initial Implementation</h1>
+
+<p>When we returned to RIT in the Fall, I set to work deploying IMPULSE. After a few hickups here and there, everything was in place and in use. Users were fairly receptive to it, mainly that they could register their devices themselves. However after some time, a few problems emerged. The web interface became terribly slow with all of the data that people had entered. It wasnt very efficient at allowing users to complete basic tasks and had a few bugs. Clearly some changes needed to occur, but during the course of the year I didn't want to touch it. I spent 6 months writing code on this project, and I really didnt want to work on it again.</p>
+
+<h1>Refresh</h1>
+
+<p>My latest co-op offerred me a chance to take to the code once again, this time with a new use case in mind. They wanted something that could manage network registrations for developers in a complex environment, but there were a few major additions that needed to happen. IMPULSE needed to go global. It needeed more specific access control. It needed better device integration. And most importantly, it also needed a new interface. Armed with all the knowlege I have gained over the last year, I set out to work. 2 months later I had a new web interface and a lot of new fixes and enhancements to the core. However the name IMPULSE no longer applied. So I cooked up a new one: STARRS (System Technology Accounting and Resource Registration Solution). And that's presumably what you actually care about.</p>
+
+<h1>Features</h1>
+
+<p>STARRS starts off with Datacenters, which correspond to your physical locations. Each datacenter contains Subnets and VLANs. Each datacenter then contains one or more Availability Zones, which are logical partitions of resources within the datacenter. AZs contain ranges of your subnets.</p>
+
+<p>Within datacenters are Systems. A system is a computer, based on a hardware Platform (usually Custom though). A system can have Interfaces which attach to your network. On each interface can be Addresses that are assigned from your Availability Zones. You can get your addresses in a variety of ways (depending on family). DHCP and Static for IPv4, and Autoconf, DHCPv6, and Static for IPv6. (Oh yeah, STARRS does both IPv4 and IPv6). Your addresses are given to you with a set expiration date. If you dont renew before that date (You will get email notifications), it will be automatically deleted. On your addresses, you can create a variety of DNS Records that can be added into managed DNS Zones. Zone DDNS updates are done with Keys that are stored within STARRS. If your address is configured with DHCP, you can be a member of a DHCP Class. Classes, Ranges, and Subnets all have a variety of configuration options that can be set. You can also set options globally. For network systems, you can store SNMP Credentials that STARRS can use to look up Switchport and CAM Table data. Using this you can easily locate your system interfaces in your infrastructure. And of course, you can search for systems that you have configured.</p>
+
+<p>STARRS depends on your existing authentication infrastructure for its user data. It does not track credentials within itself, but relies on the client to provide the user and external sources for privileging. The STARRS web interface gets the username from the web server from configurable PHP variables. It takes the username and calls an API initializing function that sets up your privilege levels. STARRS can get privilege data from one of the following:</p>
+
+<ul>
+<li>Local Tables</li>
+<li>OpenLDAP</li>
+<li>Active Directory</li>
+</ul>
+
+
+<p>Users can be global ADMINs and have RW access to everything in the database. They can be USERs who can create/edit/remove their own stuff, but cannot see certain confidential configuration and cannot edit other peoples stuff. People who are Group Admins can edit other peoples stuff in their group. There is also a PROGRAM user-level that allows external applications Read-Only access to user resources. If you don't exist in the privilege source, you will be unable to initialize and do anything in STARRS.</p>
+
+<p>STARRS also has the ability to automatically generate a configuration file for the ISC-DHCPD server based on the resources you configure. It supports key-based DDNS updates to zones, DHCP classes, global/range/subnet/class options, and more. A cronjob runs to periodically generate, download, and reload the server configuration file. Eventually this might change to something more real, but for now this is what works.</p>
+
+<p>Use cases have STARRS working with the following web authentication services:</p>
+
+<ul>
+<li><a href="http://webauth.stanford.edu/">Stanford Webauth</a></li>
+<li><a href="http://httpd.apache.org/docs/2.2/mod/mod_ldap.html">Basic Auth w/ mod_ldap</a></li>
+</ul>
+
+
+<h1>Deployment</h1>
+
+<p>All of the code is available on Github in two repositories:</p>
+
+<ul>
+<li><a href="https://github.com/cohoe/starrs">Core/Database</a></li>
+<li><a href="https://github.com/cohoe/starrs-web">Web</a></li>
+</ul>
+
+
+<p>There is an unofficial and unsupported command-line interface written by a friend of mine (<a href="http://ryansb.com/">Ryan Brown</a>) located <a href="https://github.com/ryansb/ish">Here</a>.</p>
+
+<p>STARRS is licensed under the MIT license.</p>
+
+<h1>Demo</h1>
+
+<p>You can access <a href="http://starrsdemo.grantcohoe.com">the demo by clicking here.</a> Username is 'root' and password is 'admin'. The database resets itself every 24 hours at midnight, so don't expect long-term persistence of data.</p>
+
+<h1>Who Should Use This</h1>
+
+<p>If you are a service provider to a group of users who consume network resources that you control. You want some way of accounting for what resources are in use and where they are in your network. The use cases of it so far are:</p>
+
+<ul>
+<li>Computer Science House - Dorm of college students (about 350 systems)</li>
+<li>Work - Product developers in 4 sites across 3 countries (1000+ systems)</li>
+<li>Enterprise - My personal VM server (30 systems)</li>
+</ul>
+
+
+<h1>Future</h1>
+
+<p>There are a couple of enhancements on deck for the next release (whever that may be). See the respective Github project issues for details. However STARRS will soon be encompasing libvirt support. When you create a system, you can specify it to be a Virtual Machine living on a Host in one of your datacenters. None of this has been worked on, but the idea is for STARRS to be a complete network management solution. Maybe I'll call it CloudSTARRS (like rockstars, but in the cloud haha).</p>
+]]></content>
+  </entry>
+  
+</feed>
