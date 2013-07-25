@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Guides | Grant Cohoe]]></title>
   <link href="http://cohoe.github.com/blog/categories/guides/atom.xml" rel="self"/>
   <link href="http://cohoe.github.com/"/>
-  <updated>2013-07-24T14:20:53-04:00</updated>
+  <updated>2013-07-25T15:39:16-04:00</updated>
   <id>http://cohoe.github.com/</id>
   <author>
     <name><![CDATA[Grant Cohoe]]></name>
@@ -457,7 +457,23 @@ service httpd restart
 
 <p>At this point you should have a fully functioning STARRS installation. Navigate to your server in a web browser and you should be prompted for login credentials. As we established in the authentication database file, the username is root and the password is admin. If you get the STARRS main page, then success! Otherwise start looking through log files to figure out what is wrong.</p>
 
-<p>Detailed troubleshooting is out of the scope of this guide. System Administrator cleverness is a rare skill, but is the most useful thing when trying to figure out what happened. Shoot me an email if you really feel something is wrong.</p>
+<p>Detailed troubleshooting is out of the scope of this guide. System Administrator cleverness is a rare skill, but is the most useful thing when trying to figure out what happened. Shoot me an email if you really feel something is wrong. I have included a few common errors here that I have run into when I don't follow my own instructions.</p>
+
+<h2>PHP DB Error</h2>
+
+<p>If you see this render
+<code>
+pg_last_error() expects parameter 1 to be resource, boolean given
+</code>
+It probably means your DB credentials in <code>application/config/database.php</code> are not correct.</p>
+
+<h2>Blank Page</h2>
+
+<p>If you see a blank page in the browser and something like this in the log file:
+<code>
+syntax error, unexpected end of file in /var/www/html/starrs-web/application/views/core/navbar.php
+</code>
+It probably means that PHP <code>short_open_tag</code> is not On in <code>/etc/php.ini</code>.</p>
 ]]></content>
   </entry>
   

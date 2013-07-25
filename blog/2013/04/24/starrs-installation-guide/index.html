@@ -753,7 +753,29 @@ sample will populate sample data into the database. Set to anything other than <
 
 <p>At this point you should have a fully functioning STARRS installation. Navigate to your server in a web browser and you should be prompted for login credentials. As we established in the authentication database file, the username is root and the password is admin. If you get the STARRS main page, then success! Otherwise start looking through log files to figure out what is wrong.</p>
 
-<p>Detailed troubleshooting is out of the scope of this guide. System Administrator cleverness is a rare skill, but is the most useful thing when trying to figure out what happened. Shoot me an email if you really feel something is wrong.</p>
+<p>Detailed troubleshooting is out of the scope of this guide. System Administrator cleverness is a rare skill, but is the most useful thing when trying to figure out what happened. Shoot me an email if you really feel something is wrong. I have included a few common errors here that I have run into when I don&#8217;t follow my own instructions.</p>
+
+<h2>PHP DB Error</h2>
+
+<p>If you see this render</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="x">pg_last_error() expects parameter 1 to be resource, boolean given</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>It probably means your DB credentials in <code>application/config/database.php</code> are not correct.</p>
+
+<h2>Blank Page</h2>
+
+<p>If you see a blank page in the browser and something like this in the log file:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="x">syntax error, unexpected end of file in /var/www/html/starrs-web/application/views/core/navbar.php</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>It probably means that PHP <code>short_open_tag</code> is not On in <code>/etc/php.ini</code>.</p>
 </div>
 
 
