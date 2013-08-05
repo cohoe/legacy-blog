@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Projects | Grant Cohoe]]></title>
   <link href="http://cohoe.github.com/blog/categories/projects/atom.xml" rel="self"/>
   <link href="http://cohoe.github.com/"/>
-  <updated>2013-08-05T15:55:27-04:00</updated>
+  <updated>2013-08-05T16:33:00-04:00</updated>
   <id>http://cohoe.github.com/</id>
   <author>
     <name><![CDATA[Grant Cohoe]]></name>
@@ -32,9 +32,13 @@
 
 <h3>Core Functionality</h3>
 
-<p>Twilio opened up interesting new features that add to the coolness of this project.
-* Call routing to multiple pickup stations (users)
-* Menu-based access code entry to allow pre-authorized users to enter a code and automatically open the door.</p>
+<p>Twilio opened up interesting new features that add to the coolness of this project.</p>
+
+<ul>
+<li>Call routing to multiple pickup stations (users)</li>
+<li>Menu-based access code entry to allow pre-authorized users to enter a code and automatically open the door.</li>
+</ul>
+
 
 <h3>Hosting</h3>
 
@@ -42,10 +46,14 @@
 
 <h3>Components</h3>
 
-<p>There are three major components to the Cloudbell system:
-* Intercom - The unit in the entry of the building that can place outgoing calls to people, who can then hit a key and unlock the door.
-* Twilio Engine - The call management system that handles call flow from the Intercom to the Pickup Stations.
-* Pickup Stations - Peoples phones (mine and my roommmates) who answer calls and hit keys.</p>
+<p>There are three major components to the Cloudbell system:</p>
+
+<ul>
+<li>Intercom - The unit in the entry of the building that can place outgoing calls to people, who can then hit a key and unlock the door.</li>
+<li>Twilio Engine - The call management system that handles call flow from the Intercom to the Pickup Stations.</li>
+<li>Pickup Stations - Peoples phones (mine and my roommmates) who answer calls and hit keys.</li>
+</ul>
+
 
 <h3>Call Flow</h3>
 
@@ -91,7 +99,7 @@ Here the system announces "Connecting" (</code><Say>```) and dials two numbers (
 
 <p>The <code>&lt;Dial&gt;</code> action has also been configured with a failure URL (<code>FailUrl</code>), which is a bit of code to call when no one picks up. This occurs after 10 seconds (<code>timeout="10"</code>).</p>
 
-<p><code>fail.xml</code> is pretty simple:
+<p>fail.xml is pretty simple:
 ```xml
 <Response></p>
 

@@ -126,9 +126,13 @@
 
 <h3>Core Functionality</h3>
 
-<p>Twilio opened up interesting new features that add to the coolness of this project.
-* Call routing to multiple pickup stations (users)
-* Menu-based access code entry to allow pre-authorized users to enter a code and automatically open the door.</p>
+<p>Twilio opened up interesting new features that add to the coolness of this project.</p>
+
+<ul>
+<li>Call routing to multiple pickup stations (users)</li>
+<li>Menu-based access code entry to allow pre-authorized users to enter a code and automatically open the door.</li>
+</ul>
+
 
 <h3>Hosting</h3>
 
@@ -136,10 +140,14 @@
 
 <h3>Components</h3>
 
-<p>There are three major components to the Cloudbell system:
-* Intercom - The unit in the entry of the building that can place outgoing calls to people, who can then hit a key and unlock the door.
-* Twilio Engine - The call management system that handles call flow from the Intercom to the Pickup Stations.
-* Pickup Stations - Peoples phones (mine and my roommmates) who answer calls and hit keys.</p>
+<p>There are three major components to the Cloudbell system:</p>
+
+<ul>
+<li>Intercom - The unit in the entry of the building that can place outgoing calls to people, who can then hit a key and unlock the door.</li>
+<li>Twilio Engine - The call management system that handles call flow from the Intercom to the Pickup Stations.</li>
+<li>Pickup Stations - Peoples phones (mine and my roommmates) who answer calls and hit keys.</li>
+</ul>
+
 
 <h3>Call Flow</h3>
 
@@ -177,7 +185,7 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>Here we can see that when the user presses 1 the application will call another bit of XML located at <a href="#">connect.xml</a>. Likewise when the user enters 2222 a similar bit of XML will be called at <a href="#">letthemin.xml</a>. These are usually fully-qualified URLs.</p>
+<p>Here we can see that when the user presses 1 the application will call another bit of XML located at <code>connect.xml</code>. Likewise when the user enters 2222 a similar bit of XML will be called at <code>letthemin.xml</code>. These are usually fully-qualified URLs.</p>
 
 <p>Lets look at what happens when they hit 1.</p>
 
@@ -202,7 +210,7 @@
 
 <p>The <code>&lt;Dial&gt;</code> action has also been configured with a failure URL (<code>FailUrl</code>), which is a bit of code to call when no one picks up. This occurs after 10 seconds (<code>timeout="10"</code>).</p>
 
-<p>Fail.xml is pretty simple:</p>
+<p>fail.xml is pretty simple:</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -215,7 +223,7 @@
 
 <p>After this the call is terminated.</p>
 
-<p>Now lets go back and look at the code when then user entered the correct access code (2222). In this case a new file is called located at letthemin.xml.</p>
+<p>Now lets go back and look at the code when then user entered the correct access code (2222). In this case a new file is called located at <code>letthemin.xml</code>.</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -228,7 +236,7 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>This code says &#8220;Access granted&#8221; then plays an audio file that has been pre-generated. In this case it is the DTMF tone for 9. I generated my file from here: http://www.dialabc.com/sound/generate/</p>
+<p>This code says &#8220;Access granted&#8221; then plays an audio file that has been pre-generated. In this case it is the DTMF tone for 9. I generated my file at <a href="http://www.dialabc.com/sound/generate/">DialABC</a>.</p>
 
 <p>By playing the tone, the intercom unlocks the door and terminates the call.</p>
 
