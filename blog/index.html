@@ -9,7 +9,7 @@
   <meta name="author" content="Grant Cohoe">
 
   
-  <meta name="description" content="Introduction Purpose The purpose of this guide is to help an IT administrator install and configure the STARRS network asset tracking application for &hellip;">
+  <meta name="description" content="I recently moved into a condo building with one of my college friends. The building has an intercom that allows residents to &#8220;buzz&#8221; &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -84,6 +84,166 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <!-- Now we're back to normal posts. Note the links used under href in both headers.-->
+        <h1 class="entry-title"><a href="/blog/2013/08/05/cloudbell-cloud-based-doorbell-service/">Cloudbell: Cloud-based Doorbell Service</a></h1>
+      
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-08-05T14:40:00-04:00" pubdate data-updated="true">Aug 5<span>th</span>, 2013</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>I recently moved into a condo building with one of my college friends. The building has an intercom that allows residents to &#8220;buzz&#8221; visitors in. Usually this is done with a simple panel on the wall in the apartment. However this one is slightly more advanced. The administrator programs in a phone number to dial when a visitor rings the apartment. Whoever picks up then just has to press a button (9) and the intercom unlocks the door and ends the call. This is all well and good, if you only have one phone to pick up from. However this is the 21st century. We don&#8217;t have landlines or shared phones. We all have our own cell phones or other voice provider services. What if I want the intercom to ring multiple phones? &#8220;Nope. &#8220;Can&#8217;t do.&#8221; said the administrator. I don&#8217;t believe in &#8220;Nope. Can&#8217;t be done.&#8221; so I set to work researching solutions.</p>
+
+<h2>Google Voice</h2>
+
+<p>I love Google Voice. I&#8217;ve used it as my primary phone provider since 2008 (back when it was super-invite-beta). One of GV&#8217;s advertised features was ringing multiple phones at once. This would be perfect for what I wanted to do. Unfortunately, GV only lets you have a mobile phone associated with one account. So I would have to sacrifice my mobile phone away from my primary account and put it on the shared one. My roommate would have to do the same thing. This was not an ideal solution.</p>
+
+<h2>Twilio</h2>
+
+<p>This is a newer service that one of my friends had played with before. I looked into what it had to offer feature-wise and quickly realized that it would do not only what I wanted, but &#8220;would-be-nice&#8221; features as well! Twilio does cost money, but not a lot of it. It&#8217;s $1/mo for a phone number, $.01/min for incoming calls, and $.02/min for outgoing calls. Plenty reasonable for this project.</p>
+
+<h2>System Overview</h2>
+
+<h3>Core Functionality</h3>
+
+<p>Twilio opened up interesting new features that add to the coolness of this project.
+* Call routing to multiple pickup stations (users)
+* Menu-based access code entry to allow pre-authorized users to enter a code and automatically open the door.</p>
+
+<h3>Hosting</h3>
+
+<p>Twilio itself runs on their own cloud infrastructure. I use one of my Amazon S3 buckets to host the static XML files that drive the logic and flow of the project. However call menus require a dynamic web server (in this case PHP). Twilio operates some of these for free, known as Twimlets. They are simple little Twilio apps that can provide a wide variety of call functionality.</p>
+
+<h3>Components</h3>
+
+<p>There are three major components to the Cloudbell system:
+* Intercom - The unit in the entry of the building that can place outgoing calls to people, who can then hit a key and unlock the door.
+* Twilio Engine - The call management system that handles call flow from the Intercom to the Pickup Stations.
+* Pickup Stations - Peoples phones (mine and my roommmates) who answer calls and hit keys.</p>
+
+<h3>Call Flow</h3>
+
+<p>A visitor walks up to the intercom and enters the apartment number (111#). The intercom has been programmed with my Twilio phone number (222-333-4444). The intercom dials the phone number.</p>
+
+<p>Twilio is configured with a URL to GET when an incoming call is received. That URL is an XML file like this:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;Response&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;Gather</span> <span class="na">numDigits=</span><span class="s">&quot;4&quot;</span> <span class="na">action=</span><span class="s">&quot;http://twimlets.com/menu?Message=Enter%20access%20code%20or%20press%201%20to%20be%20connected.&amp;Options%5B1%5D=connect.xml&amp;Options%5B2222%5D=letthemin.xml&amp;&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>      <span class="nt">&lt;Say&gt;</span>Enter access code or press 1 to be connected.<span class="nt">&lt;/Say&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;/Gather&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;Redirect/&gt;</span>
+</span><span class='line'><span class="nt">&lt;/Response&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Generated at https://www.twilio.com/labs/twimlets/menu</p>
+
+<p>This code will prompt the user (<code>&lt;Say&gt;</code>) to enter 4 digits (<code>numDigits="4"</code>) and POST the values to a URL (<code>action="http://"</code>). Lets look at the decoded URL:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'>http://twimlets.com/menu
+</span><span class='line'>$Message=&quot;Enter access code or press 1 to be connected.&quot;
+</span><span class='line'>$Options[1]=connect.xml
+</span><span class='line'>$Options[2222]=letthemin.xml
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Here we can see that when the user presses 1 the application will call another bit of XML located at <a href="#">connect.xml</a>. Likewise when the user enters 2222 a similar bit of XML will be called (<a href="#">letthemin.xml). These are usually fully-qualified URLs.</p>
+
+<p>Lets look at what happens when they hit 1.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;Response&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;Say&gt;</span>Connecting<span class="nt">&lt;/Say&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;Dial</span> <span class="na">action=</span><span class="s">&quot;http://twimlets.com/simulring?Dial=true&amp;FailUrl=fail.xml&amp;&quot;</span> <span class="na">timeout=</span><span class="s">&quot;10&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>      <span class="nt">&lt;Number</span> <span class="na">url=</span><span class="s">&quot;http://twimlets.com/whisper?Message=Someone+is+at+the+door.+Press+any+key+to+answer+and+9+to+let+them+in&quot;</span><span class="nt">&gt;</span>111-111-1111<span class="nt">&lt;/Number&gt;</span>
+</span><span class='line'>      <span class="nt">&lt;Number</span> <span class="na">url=</span><span class="s">&quot;http://twimlets.com/whisper?Message=Someone+is+at+the+door.+Press+any+key+to+answer+and+9+to+let+them+in&quot;</span><span class="nt">&gt;</span>222-222-2222<span class="nt">&lt;/Number&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;/Dial&gt;</span>
+</span><span class='line'><span class="nt">&lt;/Response&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Here the system announces &#8220;Connecting&#8221; (<code>&lt;Say&gt;</code>) and dials two numbers (111-111-1111 and 222-222-2222). Whoever picks up first gets the call and a message is played: &#8220;Press any key to answer and 9 to let them in&#8221;. Simulring wants the receiver to accept the call before it is connected (hence the &#8220;press any key&#8221; part). 9 is the key that tells the intercom to unlock the door.</p>
+
+<p>The <code>&lt;Dial&gt;</code> action has also been configured with a failure URL (<code>FailUrl</code>), which is a bit of code to call when no one picks up. This occurs after 10 seconds (<code>timeout="10"</code>).</p>
+
+<p>Fail.xml is pretty simple:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;Response&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;Say&gt;</span>No one is available at this time. Please try again later.<span class="nt">&lt;/Say&gt;</span>
+</span><span class='line'><span class="nt">&lt;/Response&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>After this the call is terminated.</p>
+
+<p>Now lets go back and look at the code when then user entered the correct access code (2222). In this case a new file is called located at letthemin.xml.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;Response&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;Say&gt;</span>Access granted<span class="nt">&lt;/Say&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;Play&gt;</span>access.wav<span class="nt">&lt;/Play&gt;</span>
+</span><span class='line'><span class="nt">&lt;/Response&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This code says &#8220;Access granted&#8221; then plays an audio file that has been pre-generated. In this case it is the DTMF tone for 9. I generated my file from here: http://www.dialabc.com/sound/generate/</p>
+
+<p>By playing the tone, the intercom unlocks the door and terminates the call.</p>
+
+<h2>Conclusion</h2>
+
+<p>This system has worked pretty well thus far. I can give my friends the access code and they can let themselves into the building without myself or my roommate doing any work. Hosting it completely in the cloud also permits a certain degree of reliability in the system.</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -2193,491 +2353,6 @@ You also need access to two networks.</li>
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <!-- Now we're back to normal posts. Note the links used under href in both headers.-->
-        <h1 class="entry-title"><a href="/blog/2013/01/03/secure-mirroring-highly-available-openldap-cluster/">Secure Mirroring Highly-Available OpenLDAP Cluster</a></h1>
-      
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2013-01-03T00:41:00-05:00" pubdate data-updated="true">Jan 3<span>rd</span>, 2013</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h1>Background</h1>
-
-<p>My organization stores user information in an OpenLDAP directory server. This includes contact information, shell preferences, iButton IDs, etc. The directory server does not store the users password and relies on a Kerberos KDC to provide authentication via SASL. This is a widely supported configuration and is popular because you can achieve SSO (Single Sign-On) and keep passwords out of your directory. Our shell access machines are configured to do LDAP authentication of users which basically instructs PAM to do a bind to the LDAP server using the credentials provided by the user. If the bind is successful, the user logs in. If not, well sucks to be them. Before this project we had a single server handling the directory running CentOS 5.8/OpenLDAP 2.3. If this server went poof, then all userdata is lost and no one could log into any other servers (or websites if configured with Stanford Webauth. See the guide for more on this). Obviously this is a problem that needed correcting.</p>
-
-<h1>Technology</h1>
-
-<h2>LDAP Synchronization</h2>
-
-<p>OpenLDAP 2.4 introduced a method of replication called &#8220;mirrormode&#8221;. This allows you to use their already existing syncrepl protocol to synchronize data between multiple servers. Previously (OpenLDAP &lt;= 2.3) only allowed you to do a master-slave style of replication where the slaves are read-only and would be unwilling to perform changes. Obviously this has some limitations in that if your master (or &#8220;provider&#8221; in OpenLDAP-ish) were to die, then your users cannot do any changes until you get it back online. Using MirrorMode, you can create an &#8220;N-way Multi-Master&#8221; topology that allows all servers to be read/write and instantly replicate their changes to the others.</p>
-
-<h2>High Availability</h2>
-
-<p>To enable users to have LDAP access even if one of the servers dies, we need a way to keep the packets flowing and automatically failover to the secondary servers. Linux has a package called &#8220;Heartbeat&#8221; that allows this sort of functionality. If you are familiar with Cisco HSRP or the open-source VRRP, it works the same way. Server A is assigned an IP address (lets say 10.0.0.1) and Server B is assigned a different address (lets say 10.0.0.2). Heartbeat is configured to provide a third IP address (10.0.0.3) that will always be available between the two. On the primary server, an ethernet alias is created with the virtualized IP address. Periodic heartbeats (keep-alive packets) are sent out to the other servers to indicate &#8220;I&#8217;m still here!&#8221;. Should these messages start disappearing (like when the server dies), the secondary will notice the lack of updates and automatically create a similar alias interface on itself and assign that virtualized IP. This allows you to give your clients one host, but have it seemlessly float between several real ones.</p>
-
-<h2>SASL Authentication</h2>
-
-<p>The easy way of configuring MirrorMode requires you to store your replication DN&#8217;s credentials in plaintext in the config file. Obviously this is not very secure since you are storing passwords in plaintext. As such we can use the hosts Kerberos principal to bind to the LDAP server as the replication DN and perform all of the tasks we need to do. This is much better than plaintext!</p>
-
-<h2>SSL</h2>
-
-<p>Since we like being secure, we should really be using LDAPS (LDAP + SSL) to get our data. We will be setting this up too using our PKI. We will save this for the end since we want to ensure that our core functionality actually works first.</p>
-
-<h1>New Servers</h1>
-
-<p>I spun up two new machines, lets call them &#8220;warlock.example.com&#8221; and &#8220;ldap2.example.com&#8221;. Each of them runs my favorite Scientific Linux 6.2 but with OpenLDAP 2.4. You cannot do MirrorMode between 2.3 and 2.4.</p>
-
-<p><img src="/sites/default/files/styles/medium/public/ldaptopo.PNG" alt="" title="" class="image-medium" /></p>
-
-<h1>Configuration</h1>
-
-<h2>Packages</h2>
-
-<p>First we need to install the required packages for all of this nonsense to work.</p>
-
-<ul>
-<li>openldap (LDAP libraries)</li>
-<li>openldap-servers (Server)</li>
-<li>openldap-clients (Client utilities)</li>
-<li>cyrus-sasl (SASL daemon)</li>
-<li>cyrus-sasl-ldap (LDAP authentication for SASL)</li>
-<li>cyrus-sasl-gssapi (Kerberos authentication for SASL)</li>
-<li>krb5-workstation (Kerberos client utilities)</li>
-<li>heartbeat (Failover)</li>
-</ul>
-
-
-<p>If you are coming off of a fresh minimal install, you might want to install openssh-clients and vim as well. Some packages may not be included in your base distribution and may need other repositories (EPEL, etc)</p>
-
-<h2>Kerberos Keytabs</h2>
-
-<p>Each host needs its own set of host/ and ldap/ principals as well as a shared one for the virtualized address. In the end, you need a keytab with the following principals:</p>
-
-<ul>
-<li>host/ldap1.example.com@EXAMPLE.COM</li>
-<li>ldap/ldap1.example.com@EXAMPLE.COM</li>
-<li>host/ldap.example.com@EXAMPLE.COM</li>
-<li>ldap/ldap.example.com@EXAMPLE.COM</li>
-</ul>
-
-
-<p>WARNING: Each time you write a -randkey&#8217;d principal to a keytab, it&#8217;s KVNO (Key Version Number) is increased, thus invalidating all previous written principals. You need to merge the shared principals into each hosts keytab. See my guide on Kerberos Utilities for information on doing this.</p>
-
-<p>Put this file at /etc/krb5.keytab and set an ACL on it such that the LDAP user can read it.</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>[root@ldap1 ~]# chmod 640 /etc/krb5.keytab 
-</span><span class='line'>[root@ldap1 ~]# setfacl -m u:ldap:r /etc/krb5.keytab 
-</span><span class='line'>[root@ldap1 ~]# </span></code></pre></td></tr></table></div></figure>
-
-
-<p>If you see something like &#8220;kerberos error 13&#8221; or &#8220;get_sec_context: 13&#8221; it means that someone cannot read the keytab, usually the LDAP server. Fix it.</p>
-
-<h2>NTP</h2>
-
-<p>Kerberos and the OpenLDAP synchronization require synchronized clocks. If you aren&#8217;t already set up for this, follow my guide for setting up NTP on a system before continuing.</p>
-
-<h2>SASL</h2>
-
-<p>You need saslauthd to be running on both LDAP servers. If you do not already have this set up, follow my guide for SASL Authentication before continuing.</p>
-
-<h2>Logging</h2>
-
-<p>We will be using Syslog and Logrotate to manage the logfiles for the LDAP daemon (slapd). By default it will spit out to local4. This is configurable depending on your system, but for me I am leaving it as the default. Add an entry to your <code>rsyslog</code> config file (usually <code>/etc/rsyslog.conf</code>) for <code>slapd</code></p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>local4.*                /var/log/slapd.log</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Now unless we tell <code>logrotate</code> to rotate this file, it will get infinitely large and cause you lots of headaches. I created a config file to automatically rotate this log according the the system defaults. This was done at <code>/etc/logrotate.d/slapd</code>:</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>/var/log/slapd.log {
-</span><span class='line'>    missingok
-</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Then restart <code>rsyslog</code>. Logrotate runs on a cron job and is not required to be restarted.</p>
-
-<h2>Data Directory</h2>
-
-<p>Since I am grabbing the data from my old LDAP server, I will not be setting up a new data directory. On the old server and on the new master, the data directory is <code>/var/lib/ldap/</code>. I simply scp&#8217;d all of the contents from the old server over to this directory. If you do this, I recommend stopping the old server for a moment to ensure that there are no changes occurring while you work. After scp-ing everything, make sure to chown everything to the LDAP user. I also recommend running <code>slapindex</code> to ensure that all data gets reindexed.</p>
-
-<p><code>Client Library Configuration</code>
-Now to make it convenient to test your new configuration, edit your <code>/etc/openldap/ldap.conf</code> to change the URI and add the certificate settings.</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>BASE            dc=example,dc=com
-</span><span class='line'>URI             ldaps://ldap.example.com
-</span><span class='line'>TLS_CACERT      /etc/pki/tls/example-ca.crt
-</span><span class='line'>TLS_REQCERT     allow</span></code></pre></td></tr></table></div></figure>
-
-
-<p>When configuring this file on the servers, TLS_REQCERT must be set to ALLOW since we are doing Syncrepl over LDAPS. Obviously since we are using a shared certificate for ldap.example.com, it will not match the hostname of the server and will fail. On all of your clients, they should certainly &#8220;demand&#8221; the certificate. But in this instance that prevents us from accomplishing Syncrepl over LDAPS.</p>
-
-<h2>Certificates for LDAPS</h2>
-
-<p>Since people want to be secure, OpenLDAP has the ability to do sessions inside of TLS tunnels. This works the same way HTTPS traffic does. To do this you need to have the ability to generate SSL certificates based on a given CA. This procedure varies from organization to organization. Regardless of your method, the hostname you chose is critical as this will be the name that is verified. In this setup, we are creating a host called &#8220;ldap.example.com&#8221; that all LDAP clients will be configured to use. As such the same SSL certificate for both hosts will be generated for &#8220;ldap.example.com&#8221; and placed on each server.</p>
-
-<p>I placed the public certificate at <code>/etc/pki/tls/certs/slapd.pem</code>, the secret key in <code>/etc/pki/tls/private/slapd.pem</code>, and my CA certificate at <code>/etc/pki/tls/example-ca.crt</code>. After obtaining my files, I verify them to make sure that they will actually work:</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>[root@ldap1 ~]# openssl verify -CAfile /etc/pki/tls/example-ca.crt /etc/pki/tls/certs/slapd.pem
-</span><span class='line'>/etc/pki/tls/certs/slapd.pem: OK
-</span><span class='line'>[root@ldap1 ~]# </span></code></pre></td></tr></table></div></figure>
-
-
-<p>You need to allow the LDAP account to read the private certificate:</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>[root@ldap1 ~]# setfacl -m u:ldap:r /etc/pki/tls/private/slapd.pem</span></code></pre></td></tr></table></div></figure>
-
-
-<h2>Server Configuration</h2>
-
-<p>If you are using a previous server configuration, just scp the entire <code>/etc/openldap</code> code over to the new servers. Make sure you blow away any files or directories that may have been added for you before you copy. If you are not, you might need to do a bit of setup. OpenLDAP 2.4 uses a new method of configuration called &#8220;cn=config&#8221;, which stores the configuration data in the LDAP database. However since this is not fully supported by most clients, I am still using the config file. For setting up a fresh install, see one of my other articles on this. (Still in progress at the time of this writing)</p>
-
-<p>The following directives will need to be placed in your slapd.conf for the SSL certificates:</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>TLSCertificateFile /etc/pki/tls/certs/slapd.pem
-</span><span class='line'>TLSCertificateKeyFile /etc/pki/tls/private/slapd.pem
-</span><span class='line'>TLSCACertificateFile /etc/pki/tls/example-ca.crt</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Depending on your system, you may need to configure the daemon to run on ldaps://. On Red-Hat based systems this is in <code>/etc/sysconfig/ldap</code>.</p>
-
-<p>You need to add two things to your configuration for Syncrepl to function. First to your <code>slapd.conf</code>:</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'># Syncrepl ServerID
-</span><span class='line'>serverID 001
-</span><span class='line'>
-</span><span class='line'># Syncrepl configuration for mirroring instant replication between another 
-</span><span class='line'># server. The binddn should be the host/ principal of this server 
-</span><span class='line'># stored in the Kerberos keytab
-</span><span class='line'>syncrepl rid=001
-</span><span class='line'>provider=ldaps://ldap2.example.com
-</span><span class='line'>type=refreshAndPersist
-</span><span class='line'>retry="5 5 300 +"
-</span><span class='line'>searchbase="dc=example,dc=com"
-</span><span class='line'>attrs="*,+"
-</span><span class='line'>bindmethod=sasl
-</span><span class='line'>binddn="cn=ldap1,ou=hosts,dc=example,dc=com"
-</span><span class='line'>mirrormode TRUE</span></code></pre></td></tr></table></div></figure>
-
-
-<p>The serverID value must uniquely identify the server. Make sure you change it when inserting the configuration onto the secondary server. Likewise change the Syncrepl RID as well for the same reason.</p>
-
-<p>Secondly you need need to allow the replication binddn full read access to all objects. This should go in your ACL file (which could be your slapd.conf, but shouldnt be).</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>access to *
-</span><span class='line'>        by dn.exact="cn=ldap1,ou=hosts,dc=example,dc=com" read
-</span><span class='line'>        by dn.exact="cn=ldap2,ou=hosts,dc=example,dc=com" read</span></code></pre></td></tr></table></div></figure>
-
-
-<p>WARNING: If you do not have an existing ACL setup, doing just these entries will prevent anything else from doing anything with your server. These directives are meant to be ADDED to an existing ACL.</p>
-
-<p>You should be all set and ready to start the server.</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>[root@ldap1 ~]# service slapd start
-</span><span class='line'>Starting slapd:                                            [  OK  ] 
-</span><span class='line'>[root@ldap1 ~]# </span></code></pre></td></tr></table></div></figure>
-
-
-<p>Make sure that when you do your SASL bind, the server reports your DN correctly. To verify this:</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>ldap1 ~ # su ldap -s /bin/bash
-</span><span class='line'>bash-4.1$ kinit -k -t /etc/krb5.keytab host/ldap1.example.com
-</span><span class='line'>bash-4.1$ ldapwhoami -Q
-</span><span class='line'>dn:cn=ldap1,ou=hosts,dc=example,dc=com
-</span><span class='line'>bash-4.1$</span></code></pre></td></tr></table></div></figure>
-
-
-<p>That DN is the one that should be in your ACL and have read access to everything.</p>
-
-<p>Since the LDAP user will always need this principal, I recommend adding a cronjob to keep the ticket alive. I wrote a script that will renew your ticket and fix an SELinux permissioning problem as well. You can get it <a href="http://archive.grantcohoe.com/projects/ldap/slaprenew">here</a>. Just throw it into your <code>/usr/local/sbin/</code> directory. There are better ways of doing this, but this one works just as well.</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>0 */2 * * * /usr/local/sbin/slaprenew</span></code></pre></td></tr></table></div></figure>
-
-
-<h2>Firewall</h2>
-
-<p>Dont forget to open up ports 389 and 636 for LDAP and LDAPSSL!</p>
-
-<h2>Searching</h2>
-
-<p>After configuring both the master and the secondary servers, we now need to get the data initially replicated across your secondaries. Assuming you did like me and copied the data directory from an old server, your master is the only one that has real data. Start the service on this machine. If all went according to plan, you should be able to search for an object to verify that it works.</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>[root@ldap1 ~]# kinit user
-</span><span class='line'>Password for user@EXAMPLE.COM:
-</span><span class='line'>[root@ldap1 ~]# ldapsearch -h localhost uid=user uidNumber -Q -LLL
-</span><span class='line'>dn: uid=user,ou=users,dc=example,dc=com
-</span><span class='line'>uidNumber: 10046
-</span><span class='line'>
-</span><span class='line'>[root@ldap1 ~]#</span></code></pre></td></tr></table></div></figure>
-
-
-<p>If you get errors, increase the debug level (-d 1) and work out any issues.</p>
-
-<h2>Replication</h2>
-
-<p>After doing a kinit as the LDAP user described above (host/ldap2.example.com), start the LDAP server on the secondary. If you tail the slapd log file, you should start seeing replication events occurring really fast. This is the server loading its data from the provider as specified in slapd.conf. Once it is done, try searching the server in a similar fashion as above.</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>[root@ldap2 ~]# tail /var/log/slapd.log
-</span><span class='line'>slapd[15759]: syncrepl_entry: rid=001 be_search (0)
-</span><span class='line'>slapd[15759]: syncrepl_entry: rid=001 uid=user,ou=Users,dc=example,dc=com
-</span><span class='line'>slapd[15759]: syncrepl_entry: rid=001 be_add uid=user,ou=Users,dc=example,dc=com (0)
-</span><span class='line'>slapd[15759]: syncrepl_entry: rid=001 LDAP_RES_SEARCH_ENTRY(LDAP_SYNC_ADD)
-</span><span class='line'>slapd[15759]: syncrepl_entry: rid=001 inserted UUID 84ba3544-5be8-102b-9a32-4dfcdb785320
-</span><span class='line'>slapd[15759]: syncrepl_entry: rid=001 be_search (0)
-</span><span class='line'>slapd[15759]: syncrepl_entry: rid=001 uid=user,ou=Users,dc=example,dc=com
-</span><span class='line'>slapd[15759]: syncrepl_entry: rid=001 be_add uid=user,ou=Users,dc=example,dc=com (0)
-</span><span class='line'>slapd[15759]: syncrepl_entry: rid=001 LDAP_RES_SEARCH_ENTRY(LDAP_SYNC_ADD)
-</span><span class='line'>slapd[15759]: syncrepl_entry: rid=001 inserted UUID 84c04164-5be8-102b-9a33-4dfcdb785320
-</span><span class='line'>slapd[15759]: syncrepl_entry: rid=001 be_search (0)</span></code></pre></td></tr></table></div></figure>
-
-
-<h2>Heartbeat</h2>
-
-<p>Heartbeat provides failover for configured resources between several Linux systems. In this case we are going to provide high-availability of an alias IP address (10.0.0.3) which we will distribute to clients as the LDAP server (ldap.example.com). Heartbeat configuration is very simple and only requires three files:</p>
-
-<p><code>/etc/ha.d/haresources</code> contains the resources that we will be failing over. It should be the same on both servers.</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>ldap1.example.com IPaddr::10.0.0.3/24/eth0:1/10.0.0.255</span></code></pre></td></tr></table></div></figure>
-
-
-<p>The reason the name of the host above is not &#8220;ldap.example.com&#8221; is because the entry must be a node listed in the configuration file (below).</p>
-
-<p><code>/etc/ha.d/authkeys</code> contains a shared secret used to secure the heartbeat messages. This is to ensure that someone doesnt just throw up a server and claim to be a part of your cluster.</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>auth 1
-</span><span class='line'>1 md5 mysupersecretpassword</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Make sure to chmod it to something not world-readable (600 is recommend).</p>
-
-<p>Finally, <code>/etc/ha.d/ha.cf</code> is the Heartbeat configuration file. It should contain entries for each server in your cluster, timers, and log files.</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>mcast           eth0 225.0.0.1 694 1 0
-</span><span class='line'>auto_failback   on
-</span><span class='line'>keepalive 1
-</span><span class='line'>deadtime 5
-</span><span class='line'>debugfile       /var/log/ha-debug.log
-</span><span class='line'>logfile         /var/log/ha.log
-</span><span class='line'>logfacility     local0
-</span><span class='line'>udp             eth0
-</span><span class='line'>node            ldap1.example.com
-</span><span class='line'>node            ldap2.example.com</span></code></pre></td></tr></table></div></figure>
-
-
-<p>After all this is set, start the heartbeat service. After a bit you should see another ethernet interface show up on your primary. To test failover, unplug one of the machines and see what happens!</p>
-
-<h2>DNS Hack</h2>
-
-<p>A side affect of having the LDAP server respond on the shared IP address is that it gets confused about its hostname. As such you need to edit your <code>/etc/hosts</code> file to point the ldap.example.com name to each of the actual host IP addresses. In this example, ldap1 is 10.0.0.1 and ldap2 is 10.0.0.2. You should modify your hosts file to include:</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>10.0.0.1 ldap.example.com ldap
-</span><span class='line'>10.0.0.2 ldap.example.com ldap</span></code></pre></td></tr></table></div></figure>
-
-
-<p>The first entry should be the address of the local system (10.0.0.2 should be the first in the case of ldap2).</p>
-
-<p>Your DNS server should be able to do forward and reverse lookups for <code>ldap.example.com</code> going to 10.0.0.3 (the highly available address).</p>
-
-<p>If you are having issues binding between the servers or binding from clients, it is usually due to DNS problems.</p>
-
-<h1>Testing</h1>
-
-<p>If all went according to plan, you should be able to see Sync messages in your slapd log file.</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>slapd[11059]: slapd starting
-</span><span class='line'>slapd[11059]: do_syncrep2: rid=002 LDAP_RES_INTERMEDIATE - REFRESH_DELETE</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Likewise if you log into a client machine (in my case, I made this the KDC) you should be able to search at only the ldap.example.com host. The others will return errors.</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>[root@kdc ~]# ldapsearch -Q -LLL uid=user displayName -h ldap.example.com
-</span><span class='line'>dn: uid=user,ou=users,dc=example,dc=com
-</span><span class='line'>displayName: Firstname Lastname (user)
-</span><span class='line'>
-</span><span class='line'>[root@kdc ~]# ldapsearch -Q -LLL uid=user displayName -h ldap1.example.com
-</span><span class='line'>ldap_sasl_interactive_bind_s: Invalid credentials (49)
-</span><span class='line'>        additional info: SASL(-13): authentication failure: GSSAPI Failure: gss_accept_sec_context
-</span><span class='line'>[root@kdc ~]# ldapsearch -Q -LLL uid=user displayName -h ldap2.example.com
-</span><span class='line'>ldap_sasl_interactive_bind_s: Invalid credentials (49)
-</span><span class='line'>        additional info: SASL(-13): authentication failure: GSSAPI Failure: gss_accept_sec_context
-</span><span class='line'>[root@kdc ~]# </span></code></pre></td></tr></table></div></figure>
-
-
-<p>The reason is that the client has a different view of what the server&#8217;s hostname is. This difference causes SASL to freak out and not allow you to bind.</p>
-
-<h1>Errors</h1>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>[root@kdc ~]# ldapsearch -h ldap.example.com uid=user
-</span><span class='line'>SASL/GSSAPI authentication started
-</span><span class='line'>ldap_sasl_interactive_bind_s: Invalid credentials (49)
-</span><span class='line'>        additional info: SASL(-13): authentication failure: GSSAPI Failure: gss_accept_sec_context
-</span><span class='line'>[root@kdc ~]#</span></code></pre></td></tr></table></div></figure>
-
-
-<p>On the server reveals the error of:</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>slapd[9888]: GSSAPI Error: Unspecified GSS failure.  Minor code may provide more information (Wrong principal in request)
-</span><span class='line'>slapd[9888]: text=SASL(-13): authentication failure: GSSAPI Failure: gss_accept_sec_context</span></code></pre></td></tr></table></div></figure>
-
-
-<p>This means your DNS is not hacked or functional. Fix it according to the instructions</p>
-
-<p>The LDAP log says:</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>slapd[1901]: do_syncrepl: rid=005 rc -2 retrying
-</span><span class='line'>slapd[1901]: slap_client_connect: URI=ldap://ldap2.example.com ldap_sasl_interactive_bind_s failed (-2)</span></code></pre></td></tr></table></div></figure>
-
-
-<p>and <code>/var/log/messages</code> contains:</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>GSSAPI Error: Unspecified GSS failure.  Minor code may provide more information (Credentials cache permissions incorrect)</span></code></pre></td></tr></table></div></figure>
-
-
-<p>You need to change the SELinux context of your KRB5CC file (default is <code>/tmp/krb5cc_$UIDOFLDAPUSER</code> on Scientific Linux) to something the slapd process can read. Since every time you re-initialize the ticket you risk defaulting the permissions, I recommend using my script in your cronjob from above. If someone finds a better way to do this, please let me know!</p>
-
-<p>If after enabling SSL on your client you receive (using -d 1):</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>TLS: can't connect: TLS error -5938:Encountered end of file.</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Check your certificate files on the SERVER. Odds are you have an incorrect path.</p>
-
-<h1>Summary</h1>
-
-<p>You now have two independent LDAP servers running OpenLDAP 2.4 and synchronizing data between them. They are intended to listen on a Heartbeat-ed service IP address that will always be available even if one of the servers dies. You can also do SASL binds to each server to avoid having passwords stored in your configuration files.</p>
-
-<p>If after reading this you feel there is something that can be improved or isnt clear, feel free to contact me! Also you can grab sample configuration files that I used at <a href="http://archive.grantcohoe.com/projects/ldap">http://archive.grantcohoe.com/projects/ldap</a>.</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/2/">&larr; Older</a>
@@ -2707,6 +2382,10 @@ Now to make it convenient to test your new configuration, edit your <code>/etc/o
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2013/08/05/cloudbell-cloud-based-doorbell-service/">Cloudbell: Cloud-based doorbell service</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2013/04/24/starrs-installation-guide/">STARRS Installation Guide</a>
       </li>
     
@@ -2720,10 +2399,6 @@ Now to make it convenient to test your new configuration, edit your <code>/etc/o
     
       <li class="post">
         <a href="/blog/2013/04/12/csh-wireless-network-deployment/">CSH Wireless Network Deployment</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/02/27/cross-platform-authentication-services/">Cross-Platform Authentication Services</a>
       </li>
     
   </ul>

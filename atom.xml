@@ -4,7 +4,7 @@
   <title><![CDATA[Grant Cohoe]]></title>
   <link href="http://cohoe.github.com/atom.xml" rel="self"/>
   <link href="http://cohoe.github.com/"/>
-  <updated>2013-07-25T15:39:16-04:00</updated>
+  <updated>2013-08-05T15:47:11-04:00</updated>
   <id>http://cohoe.github.com/</id>
   <author>
     <name><![CDATA[Grant Cohoe]]></name>
@@ -12,6 +12,137 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Cloudbell: Cloud-based doorbell service]]></title>
+    <link href="http://cohoe.github.com/blog/2013/08/05/cloudbell-cloud-based-doorbell-service/"/>
+    <updated>2013-08-05T14:40:00-04:00</updated>
+    <id>http://cohoe.github.com/blog/2013/08/05/cloudbell-cloud-based-doorbell-service</id>
+    <content type="html"><![CDATA[<p>I recently moved into a condo building with one of my college friends. The building has an intercom that allows residents to &#8220;buzz&#8221; visitors in. Usually this is done with a simple panel on the wall in the apartment. However this one is slightly more advanced. The administrator programs in a phone number to dial when a visitor rings the apartment. Whoever picks up then just has to press a button (9) and the intercom unlocks the door and ends the call. This is all well and good, if you only have one phone to pick up from. However this is the 21st century. We don&#8217;t have landlines or shared phones. We all have our own cell phones or other voice provider services. What if I want the intercom to ring multiple phones? &#8220;Nope. &#8220;Can&#8217;t do.&#8221; said the administrator. I don&#8217;t believe in &#8220;Nope. Can&#8217;t be done.&#8221; so I set to work researching solutions.</p>
+
+<h2>Google Voice</h2>
+
+<p>I love Google Voice. I&#8217;ve used it as my primary phone provider since 2008 (back when it was super-invite-beta). One of GV&#8217;s advertised features was ringing multiple phones at once. This would be perfect for what I wanted to do. Unfortunately, GV only lets you have a mobile phone associated with one account. So I would have to sacrifice my mobile phone away from my primary account and put it on the shared one. My roommate would have to do the same thing. This was not an ideal solution.</p>
+
+<h2>Twilio</h2>
+
+<p>This is a newer service that one of my friends had played with before. I looked into what it had to offer feature-wise and quickly realized that it would do not only what I wanted, but &#8220;would-be-nice&#8221; features as well! Twilio does cost money, but not a lot of it. It&#8217;s $1/mo for a phone number, $.01/min for incoming calls, and $.02/min for outgoing calls. Plenty reasonable for this project.</p>
+
+<h2>System Overview</h2>
+
+<h3>Core Functionality</h3>
+
+<p>Twilio opened up interesting new features that add to the coolness of this project.
+* Call routing to multiple pickup stations (users)
+* Menu-based access code entry to allow pre-authorized users to enter a code and automatically open the door.</p>
+
+<h3>Hosting</h3>
+
+<p>Twilio itself runs on their own cloud infrastructure. I use one of my Amazon S3 buckets to host the static XML files that drive the logic and flow of the project. However call menus require a dynamic web server (in this case PHP). Twilio operates some of these for free, known as Twimlets. They are simple little Twilio apps that can provide a wide variety of call functionality.</p>
+
+<h3>Components</h3>
+
+<p>There are three major components to the Cloudbell system:
+* Intercom - The unit in the entry of the building that can place outgoing calls to people, who can then hit a key and unlock the door.
+* Twilio Engine - The call management system that handles call flow from the Intercom to the Pickup Stations.
+* Pickup Stations - Peoples phones (mine and my roommmates) who answer calls and hit keys.</p>
+
+<h3>Call Flow</h3>
+
+<p>A visitor walks up to the intercom and enters the apartment number (111#). The intercom has been programmed with my Twilio phone number (222-333-4444). The intercom dials the phone number.</p>
+
+<p>Twilio is configured with a URL to GET when an incoming call is received. That URL is an XML file like this:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;Response&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;Gather</span> <span class="na">numDigits=</span><span class="s">&quot;4&quot;</span> <span class="na">action=</span><span class="s">&quot;http://twimlets.com/menu?Message=Enter%20access%20code%20or%20press%201%20to%20be%20connected.&amp;Options%5B1%5D=connect.xml&amp;Options%5B2222%5D=letthemin.xml&amp;&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>      <span class="nt">&lt;Say&gt;</span>Enter access code or press 1 to be connected.<span class="nt">&lt;/Say&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;/Gather&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;Redirect/&gt;</span>
+</span><span class='line'><span class="nt">&lt;/Response&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Generated at https://www.twilio.com/labs/twimlets/menu</p>
+
+<p>This code will prompt the user (<code>&lt;Say&gt;</code>) to enter 4 digits (<code>numDigits="4"</code>) and POST the values to a URL (<code>action="http://"</code>). Lets look at the decoded URL:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'>http://twimlets.com/menu
+</span><span class='line'>$Message=&quot;Enter access code or press 1 to be connected.&quot;
+</span><span class='line'>$Options[1]=connect.xml
+</span><span class='line'>$Options[2222]=letthemin.xml
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Here we can see that when the user presses 1 the application will call another bit of XML located at <a href="#">connect.xml</a>. Likewise when the user enters 2222 a similar bit of XML will be called (<a href="#">letthemin.xml). These are usually fully-qualified URLs.</p>
+
+<p>Lets look at what happens when they hit 1.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;Response&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;Say&gt;</span>Connecting<span class="nt">&lt;/Say&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;Dial</span> <span class="na">action=</span><span class="s">&quot;http://twimlets.com/simulring?Dial=true&amp;FailUrl=fail.xml&amp;&quot;</span> <span class="na">timeout=</span><span class="s">&quot;10&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>      <span class="nt">&lt;Number</span> <span class="na">url=</span><span class="s">&quot;http://twimlets.com/whisper?Message=Someone+is+at+the+door.+Press+any+key+to+answer+and+9+to+let+them+in&quot;</span><span class="nt">&gt;</span>111-111-1111<span class="nt">&lt;/Number&gt;</span>
+</span><span class='line'>      <span class="nt">&lt;Number</span> <span class="na">url=</span><span class="s">&quot;http://twimlets.com/whisper?Message=Someone+is+at+the+door.+Press+any+key+to+answer+and+9+to+let+them+in&quot;</span><span class="nt">&gt;</span>222-222-2222<span class="nt">&lt;/Number&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;/Dial&gt;</span>
+</span><span class='line'><span class="nt">&lt;/Response&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Here the system announces &#8220;Connecting&#8221; (<code>&lt;Say&gt;</code>) and dials two numbers (111-111-1111 and 222-222-2222). Whoever picks up first gets the call and a message is played: &#8220;Press any key to answer and 9 to let them in&#8221;. Simulring wants the receiver to accept the call before it is connected (hence the &#8220;press any key&#8221; part). 9 is the key that tells the intercom to unlock the door.</p>
+
+<p>The <code>&lt;Dial&gt;</code> action has also been configured with a failure URL (<code>FailUrl</code>), which is a bit of code to call when no one picks up. This occurs after 10 seconds (<code>timeout="10"</code>).</p>
+
+<p>Fail.xml is pretty simple:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;Response&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;Say&gt;</span>No one is available at this time. Please try again later.<span class="nt">&lt;/Say&gt;</span>
+</span><span class='line'><span class="nt">&lt;/Response&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>After this the call is terminated.</p>
+
+<p>Now lets go back and look at the code when then user entered the correct access code (2222). In this case a new file is called located at letthemin.xml.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;Response&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;Say&gt;</span>Access granted<span class="nt">&lt;/Say&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;Play&gt;</span>access.wav<span class="nt">&lt;/Play&gt;</span>
+</span><span class='line'><span class="nt">&lt;/Response&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This code says &#8220;Access granted&#8221; then plays an audio file that has been pre-generated. In this case it is the DTMF tone for 9. I generated my file from here: http://www.dialabc.com/sound/generate/</p>
+
+<p>By playing the tone, the intercom unlocks the door and terminates the call.</p>
+
+<h2>Conclusion</h2>
+
+<p>This system has worked pretty well thus far. I can give my friends the access code and they can let themselves into the building without myself or my roommate doing any work. Hosting it completely in the cloud also permits a certain degree of reliability in the system.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[STARRS Installation Guide]]></title>
