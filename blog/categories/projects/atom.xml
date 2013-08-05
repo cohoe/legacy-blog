@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Projects | Grant Cohoe]]></title>
   <link href="http://cohoe.github.com/blog/categories/projects/atom.xml" rel="self"/>
   <link href="http://cohoe.github.com/"/>
-  <updated>2013-08-05T15:47:11-04:00</updated>
+  <updated>2013-08-05T15:50:52-04:00</updated>
   <id>http://cohoe.github.com/</id>
   <author>
     <name><![CDATA[Grant Cohoe]]></name>
@@ -72,7 +72,7 @@ $Message="Enter access code or press 1 to be connected."
 $Options[1]=connect.xml
 $Options[2222]=letthemin.xml
 </code>
-Here we can see that when the user presses 1 the application will call another bit of XML located at <a href="#">connect.xml</a>. Likewise when the user enters 2222 a similar bit of XML will be called (<a href="#">letthemin.xml). These are usually fully-qualified URLs.</p>
+Here we can see that when the user presses 1 the application will call another bit of XML located at <a href="#">connect.xml</a>. Likewise when the user enters 2222 a similar bit of XML will be called at <a href="#">letthemin.xml</a>. These are usually fully-qualified URLs.</p>
 
 <p>Lets look at what happens when they hit 1.
 ```xml
