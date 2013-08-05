@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Projects | Grant Cohoe]]></title>
   <link href="http://cohoe.github.com/blog/categories/projects/atom.xml" rel="self"/>
   <link href="http://cohoe.github.com/"/>
-  <updated>2013-08-05T15:50:52-04:00</updated>
+  <updated>2013-08-05T15:55:27-04:00</updated>
   <id>http://cohoe.github.com/</id>
   <author>
     <name><![CDATA[Grant Cohoe]]></name>
@@ -72,7 +72,7 @@ $Message="Enter access code or press 1 to be connected."
 $Options[1]=connect.xml
 $Options[2222]=letthemin.xml
 </code>
-Here we can see that when the user presses 1 the application will call another bit of XML located at <a href="#">connect.xml</a>. Likewise when the user enters 2222 a similar bit of XML will be called at <a href="#">letthemin.xml</a>. These are usually fully-qualified URLs.</p>
+Here we can see that when the user presses 1 the application will call another bit of XML located at <code>connect.xml</code>. Likewise when the user enters 2222 a similar bit of XML will be called at <code>letthemin.xml</code>. These are usually fully-qualified URLs.</p>
 
 <p>Lets look at what happens when they hit 1.
 ```xml
@@ -91,7 +91,7 @@ Here the system announces "Connecting" (</code><Say>```) and dials two numbers (
 
 <p>The <code>&lt;Dial&gt;</code> action has also been configured with a failure URL (<code>FailUrl</code>), which is a bit of code to call when no one picks up. This occurs after 10 seconds (<code>timeout="10"</code>).</p>
 
-<p>Fail.xml is pretty simple:
+<p><code>fail.xml</code> is pretty simple:
 ```xml
 <Response></p>
 
@@ -102,7 +102,7 @@ Here the system announces "Connecting" (</code><Say>```) and dials two numbers (
 ```
 After this the call is terminated.</p>
 
-<p>Now lets go back and look at the code when then user entered the correct access code (2222). In this case a new file is called located at letthemin.xml.
+<p>Now lets go back and look at the code when then user entered the correct access code (2222). In this case a new file is called located at <code>letthemin.xml</code>.
 ```xml
 <Response></p>
 
@@ -111,8 +111,9 @@ After this the call is terminated.</p>
 </code></pre>
 
 <p></Response>
-```
-This code says "Access granted" then plays an audio file that has been pre-generated. In this case it is the DTMF tone for 9. I generated my file from here: http://www.dialabc.com/sound/generate/</p>
+```</p>
+
+<p>This code says "Access granted" then plays an audio file that has been pre-generated. In this case it is the DTMF tone for 9. I generated my file at <a href="http://www.dialabc.com/sound/generate/">DialABC</a>.</p>
 
 <p>By playing the tone, the intercom unlocks the door and terminates the call.</p>
 
