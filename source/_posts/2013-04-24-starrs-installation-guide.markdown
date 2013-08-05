@@ -379,4 +379,18 @@ service httpd restart
 # Testing
 At this point you should have a fully functioning STARRS installation. Navigate to your server in a web browser and you should be prompted for login credentials. As we established in the authentication database file, the username is root and the password is admin. If you get the STARRS main page, then success! Otherwise start looking through log files to figure out what is wrong.
 
-Detailed troubleshooting is out of the scope of this guide. System Administrator cleverness is a rare skill, but is the most useful thing when trying to figure out what happened. Shoot me an email if you really feel something is wrong. 
+Detailed troubleshooting is out of the scope of this guide. System Administrator cleverness is a rare skill, but is the most useful thing when trying to figure out what happened. Shoot me an email if you really feel something is wrong. I have included a few common errors here that I have run into when I don't follow my own instructions.
+
+## PHP DB Error
+If you see this render
+```
+pg_last_error() expects parameter 1 to be resource, boolean given
+```
+It probably means your DB credentials in ```application/config/database.php``` are not correct.
+
+## Blank Page
+If you see a blank page in the browser and something like this in the log file:
+```
+syntax error, unexpected end of file in /var/www/html/starrs-web/application/views/core/navbar.php
+```
+It probably means that PHP ```short_open_tag``` is not On in ```/etc/php.ini```.
