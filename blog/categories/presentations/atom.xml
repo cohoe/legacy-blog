@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Presentations | Grant Cohoe]]></title>
   <link href="http://cohoe.github.com/blog/categories/presentations/atom.xml" rel="self"/>
   <link href="http://cohoe.github.com/"/>
-  <updated>2013-11-02T15:33:00-04:00</updated>
+  <updated>2013-11-02T15:35:33-04:00</updated>
   <id>http://cohoe.github.com/</id>
   <author>
     <name><![CDATA[Grant Cohoe]]></name>
@@ -14,11 +14,11 @@
 
   
   <entry>
-    <title type="html"><![CDATA[Why we keep doing security wrong]]></title>
-    <link href="http://cohoe.github.com/blog/2013/11/02/why-we-keep-doing-security-wrong/"/>
+    <title type="html"><![CDATA[Why we keep doing security badly]]></title>
+    <link href="http://cohoe.github.com/blog/2013/11/02/why-we-keep-doing-security-badly/"/>
     <updated>2013-11-02T12:09:00-04:00</updated>
-    <id>http://cohoe.github.com/blog/2013/11/02/why-we-keep-doing-security-wrong</id>
-    <content type="html"><![CDATA[<p>Points on why infrastructure people focus on things that won't keep them secure in a high-stakes environment. Based on my experience at RSA and in the networking labs. Given at <a href="http://barcamproc.org">Barcamp Rochester Fall 2013</a>.</p>
+    <id>http://cohoe.github.com/blog/2013/11/02/why-we-keep-doing-security-badly</id>
+    <content type="html"><![CDATA[<p>Points on why infrastructure people focus on things that won't keep them secure in a high-stakes environment. Renamed from "wrong" to "badly" because as pointed out, it isn't technically wrong. Talk based on my experience at RSA and in the networking labs. Given at <a href="http://barcamproc.org">Barcamp Rochester Fall 2013</a>.</p>
 
 <p>Slides available in <a href="http://archive.grantcohoe.com/presentations/security.pptx">The Archive</a>.</p>
 ]]></content>
