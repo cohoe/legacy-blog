@@ -1,0 +1,118 @@
+---
+layout: post
+title: "Barcamp Tour 2013"
+date: 2013-11-10 19:33
+comments: true
+sharing: true
+categories: Events
+aliases: /events/barcamptour2013
+---
+
+Let me get something straight right off the bat: Barcamps have nothing to do with bars. These are technically-oriented community-organized unconferences where attendees share their ideas and projects with others.
+
+I had the privilege of attending three different Barcamp events over the span of three weekends this past fall. They were:
+* Barcamp Boston (BCBos)
+* Barcamp Rochester (BCRoc)
+* Barcamp Manchester (BCMan)
+
+# Barcamp Boston
+Date: Oct 26-27 2013 (2 day)
+Venue: MIT Stata Center, Cambridge MA
+Attendees: ~450
+
+This was my first Barcamp since graduation. Previously I had only attended a handful of BCRoc events in college. I was quite impressed at the vast number of attendees and the wide array of skillsets they brought with them. The hosts clearly had done this before because the event went incredibly smooth and was very organized. 
+
+## Talks Given
+* 802.11/WLAN Design Fundamentals (Basic overview of the 802.11 protocol standards and the "golden rule" of WLAN design)
+
+## Talks Heard
+* Trippy Math
+* Bitcoin Basics
+* Keeping Up With Technology (Discussion)
+* Sociology of OkCupid
+* Open WiFi
+* Linux Sysadmin AMA
+* Dating for Nerds
+* Lightning Round Talks/Demos
+* Big Data Intro
+* Home Repair for Geeks
+* Docker (Process Containers)
+* Analog/Digital Audio Synthesis
+* Future of Storytelling
+* Ray Tracing Concepts
+* Sex, Drugs, Rock-n-Roll and Technology
+
+## The Good
+* Longer-than-expected talks. All of my past Barcamp events had 20 minute talks. Here they were 40. This gave much more time for talking and a full-length Q&A session which was awesome.
+* Online schedule board: A Google Doc was kept up-to-date with the daily schedule which was great for tracking what talks were available and where to go next.
+* Talks Requested Board: People could post topics they wanted to hear about to see if someone could give a talk on it.
+* Talk Interest Board: If you had a talk but weren't sure if there was any interest in it, you could post it on a board and people would mark it if they would attend. A really great way to gauge interest in potential topics. 
+* Lots of writing space: Each room had plenty of space for presenters to add on-the-fly diagrams to their talks. I blame the academia of MIT for having them be chalkboards though. We aren't in the 19th century anymore.
+* Name Badges: These were really cool. Had QR codes that linked to each attendees information (interests, twitter, URL, etc)
+
+## The Not-so-Good
+* No organized lightning talks: These are quick 5-minute talks about anything imaginable given in quick succession. They are great because you get just a brief taste for a topic, then move on to the next. These are something that I assumed were a staple of Barcamps everywhere. Guess not :/
+* No travel time: Talks ended every 40 minutes, and the next talk would start immediately. You missed the last few minutes of one and/or were late to the other.
+
+I really enjoyed this event. The longer talks meant more content per session. And all of that was spread that across two days!
+
+# Barcamp Rochester
+Date: Nov 2 2013
+Venue: RIT GCCIS, Rochester NY
+Attendees: ~100
+
+After BCBos I emailed the hosts of BCRoc with ideas that I thought might be great to use. The Talk Request and Talk Interest boards were two examples that they implemented. I missed two of the morning sessions due to another event but there were still plenty of talks to be had. A benefit of a consistant venue, core hosts, and bi-anual events means the hosts can pull together an event relatively quickly. 
+
+## Talks Given
+* Security Design Considerations (Things to avoid when designing network infrastructure)
+* Linux Sysadmin AMA (Literally anything. I won't know a lot of it but I can point to in the right direction)
+* Babby's 2nd Networking Seminar for CSHers (Layer 4+ and DNS)
+
+## Talks Heard
+* Microsoft Cloud Overview
+* Why We Need to Disconnect More
+* Lessons Learned from ISTS(x)
+* 802.11ac WiFi
+* Sales Pitch for Vim
+
+## The Good
+* Later Start Time: Great for those who like sleep. Or a few extra hours the night before to build your talks.
+* Good Travel Time: 5 minutes between talks for biological functions, mingling, and getting to the next talk.
+* Sponsor Letters: These were a cool new thing for thanking the sponsors.
+
+## The Not-so-Good
+* No shirts: There was a valid excuse, but I'm still sad.
+* Lightning Talk Confusion: Rather than being after lunch, these were moved to later in the afternoon. What was not apparent was that these were scheduled for two blocks rather than one. Many people left to go to other talks (including me). Would have much rather stayed for the full Lightning Talks session.
+* No name badges: The stickers work, but you can't beat pre-printed lanyard-afixed name badges.
+
+All in all this was yet another successful BCRoc. There were a lot of new faces (both as hosts and attendees) and plenty of interesting talks to choose from.
+
+# Barcamp Manchester
+Date: Nov 9 2013
+Venue: Dyn Headquarters, Manchester NH
+Attendees: ~50
+
+While I was really looking forward to a weekend off, who can resist just one more event? This one was a bit more of a mystery to me since information was somewhat scarse. Arrived a bit late due to GPS errors and finding parking (I won't go into the speed bumps of death along the way)
+
+## Talks Given
+* Lightning Talks/Project Show-n-Tell (5 minutes to talk about anything or to show off your cool pet project)
+* Linux AMA for Beginners or Hackers (Lets talk about all things Linux)
+
+## Talks Heard
+* FPGA/Ardiuno/Raspberry Pi
+* Vagrant Plugin Ecosystem
+* Intro to Object Oriented Javascript
+
+## The Good
+* Unique Setting: Held at a startup corporate office was kinda cool.
+* Lunchtime "build-it" Competition: Who can build the furthest-traveling paper airplane? I really liked this. There were many interesting designs and lots of software engineering jokes.
+* Name Badges: I like these. Makes me feel like it's a real conference.
+
+## The Not-so-Good
+* Presentation Rooms: These were small team conference rooms and really did not accomodate more than 8 people. Not everyone could see the wall-mounted display and there was no writing surface for quick diagrams.
+* Scheduling: Talks were 40 minutes or an hour depending on the session time. There was also 20 minutes between talks, plenty of time to lose interest.
+* Lack of information: The website does not offer much information other than what a Barcamp is, the Sponsors, and the address of the venue. "Panels" is also not a very good label for the online talk system, which I didn't discover until after the event.
+* Entry: You had to call someone to let you in. But the guy who entered after us had to sit and wait for the next person and let them in. Not sure what was up with that.
+* No shirt: Sadface
+
+Overall I was not very impressed with this event. I was surprised that for being a somewhat science/technology center in New Hampshire that there weren't more attendees. This showed in that there were only ~20 talks total. The venue while unique did not feel very useful for a conference such as this.
