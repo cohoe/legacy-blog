@@ -4,8 +4,8 @@ title: "Fix Me Maybe"
 date: 2013-01-03 00:23
 comments: true
 sharing: true
-categories: Rants
-alias: /rants/fixmemaybe
+categories: Misc
+alias: /misc/fixmemaybe
 ---
 Fix Me Maybe (parody of Call Me Maybe)
 Words by Grant Cohoe (cohoe)
