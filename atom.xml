@@ -4,7 +4,7 @@
   <title><![CDATA[Grant Cohoe]]></title>
   <link href="http://cohoe.github.com/atom.xml" rel="self"/>
   <link href="http://cohoe.github.com/"/>
-  <updated>2013-11-02T15:37:08-04:00</updated>
+  <updated>2013-11-13T15:37:44-05:00</updated>
   <id>http://cohoe.github.com/</id>
   <author>
     <name><![CDATA[Grant Cohoe]]></name>
@@ -14,11 +14,189 @@
 
   
   <entry>
-    <title type="html"><![CDATA[Why we keep doing security badly]]></title>
-    <link href="http://cohoe.github.com/blog/2013/11/02/why-we-keep-doing-security-badly/"/>
+    <title type="html"><![CDATA[Barcamp Tour 2013]]></title>
+    <link href="http://cohoe.github.com/blog/2013/11/10/barcamp-tour-2013/"/>
+    <updated>2013-11-10T19:33:00-05:00</updated>
+    <id>http://cohoe.github.com/blog/2013/11/10/barcamp-tour-2013</id>
+    <content type="html"><![CDATA[<p>Let me get something straight right off the bat: Barcamps have nothing to do with bars. Barcamps are technically-oriented community-organized unconferences where attendees share their ideas and projects with each other.</p>
+
+<p>I had the privilege of attending three different Barcamp events over the span of three weekends this past fall. They were:</p>
+
+<ul>
+<li>Barcamp Boston (BCBos)</li>
+<li>Barcamp Rochester (BCRoc)</li>
+<li>Barcamp Manchester (BCMan)</li>
+</ul>
+
+
+<p>While each event shared the same common premise that is Barcamp, they were different in many ways. I found there were a lot of good things and some not-so-good. So without further adieu, here&#8217;s the rundown!</p>
+
+<h1>Barcamp Boston</h1>
+
+<p>Date: Oct 26-27 2013 (2 day)<br>
+Venue: MIT Stata Center, Cambridge MA<br>
+Attendees: ~450</p>
+
+<p>This was my first Barcamp since graduation. Previously I had only attended a handful of BCRoc events in college. I was quite impressed at the vast number of attendees and the wide array of skillsets they brought with them. The hosts clearly had done this before because the event went incredibly smooth and was very organized. Talk selection was incredibly diverse ranging from online dating to cool javascript libraries.</p>
+
+<h3>Talks Given</h3>
+
+<ul>
+<li>802.11/WLAN Design Fundamentals (Basic overview of the 802.11 protocol standards and the &#8220;golden rule&#8221; of WLAN design)</li>
+</ul>
+
+
+<h3>Talks Heard</h3>
+
+<ul>
+<li>Trippy Math</li>
+<li>Bitcoin Basics</li>
+<li>Keeping Up With Technology (Discussion)</li>
+<li>Sociology of OkCupid</li>
+<li>Open WiFi</li>
+<li>Linux Sysadmin AMA</li>
+<li>Dating for Nerds</li>
+<li>Lightning Round Talks/Demos</li>
+<li>Big Data Intro</li>
+<li>Home Repair for Geeks</li>
+<li>Docker (Process Containers)</li>
+<li>Analog/Digital Audio Synthesis</li>
+<li>Future of Storytelling</li>
+<li>Ray Tracing Concepts</li>
+<li>Sex, Drugs, Rock-n-Roll and Technology</li>
+</ul>
+
+
+<h3>The Good</h3>
+
+<ul>
+<li>Longer-than-expected talks. All of my past Barcamp events had 20 minute talks. Here they were 40. This gave much more time for talking and a full-length Q&amp;A session which was awesome.</li>
+<li>Online schedule board: A Google Doc was kept up-to-date with the daily schedule which was great for tracking what talks were available and where to go next.</li>
+<li>Talks Requested Board: People could post topics they wanted to hear about to see if someone could give a talk on it.</li>
+<li>Talk Interest Board: If you had a talk but weren&#8217;t sure if there was any interest in it, you could post it on a board and people would mark it if they would attend. A really great way to gauge interest in potential topics.</li>
+<li>Lots of writing space: Each room had plenty of space for presenters to add on-the-fly diagrams to their talks. I blame the academia of MIT for having them be chalkboards though. We aren&#8217;t in the 19th century anymore.</li>
+<li>Name Badges: These were really cool. Had QR codes that linked to each attendees information (interests, twitter, URL, etc)</li>
+</ul>
+
+
+<h3>The Not-so-Good</h3>
+
+<ul>
+<li>No organized lightning talks: These are quick 5-minute talks about anything imaginable given in quick succession. They are great because you get just a brief taste for a topic, then move on to the next. These are something that I assumed were a staple of Barcamps everywhere. Guess not :/</li>
+<li>No travel time: Talks ended every 40 minutes, and the next talk would start immediately. You missed the last few minutes of one and/or were late to the other.</li>
+</ul>
+
+
+<p>I really enjoyed this event. The longer talks meant more content per session. And all of that was spread that across two days!</p>
+
+<h1>Barcamp Rochester</h1>
+
+<p>Date: Nov 2 2013<br>
+Venue: RIT GCCIS, Rochester NY<br>
+Attendees: ~100</p>
+
+<p>After BCBos I emailed the hosts of BCRoc with ideas that I thought might be great to use. The Talk Request and Talk Interest boards were two examples that they implemented. I missed two of the morning sessions due to another event but there were still plenty of talks to be had. A benefit of a consistant venue, core hosts, and bi-anual events means the hosts can pull together an event relatively quickly.</p>
+
+<h3>Talks Given</h3>
+
+<ul>
+<li>Infrastructure Security Considerations (Things to avoid when designing networks)</li>
+<li>Linux Sysadmin AMA (Literally anything. I won&#8217;t know a lot of it but I can point you in the right direction)</li>
+<li>Babby&#8217;s 2nd Networking Seminar for CSHers (Layer 4+ and DNS)</li>
+</ul>
+
+
+<h3>Talks Heard</h3>
+
+<ul>
+<li>Microsoft Cloud Overview</li>
+<li>Why We Need to Disconnect More</li>
+<li>Lessons Learned from ISTS(x)</li>
+<li>802.11ac WiFi</li>
+<li>Sales Pitch for Vim</li>
+</ul>
+
+
+<h3>The Good</h3>
+
+<ul>
+<li>Later Start Time: Great for those who like sleep. Or a few extra hours the night before to build your talks.</li>
+<li>Good Travel Time: 5 minutes between talks for biological functions, mingling, and getting to the next talk.</li>
+<li>Sponsor Letters: These were a cool new thing for thanking the sponsors.</li>
+</ul>
+
+
+<h3>The Not-so-Good</h3>
+
+<ul>
+<li>No shirts: There was a legitimate excuse, but I&#8217;m still sad.</li>
+<li>Lightning Talk Confusion: Rather than being after lunch, these were moved to later in the afternoon. What was not apparent was that these were scheduled for two blocks rather than one. Many people left to go to other talks (including me). Would have much rather stayed for the full Lightning Talks session.</li>
+<li>No name badges: The stickers work, but you can&#8217;t beat pre-printed lanyard-afixed name badges.</li>
+</ul>
+
+
+<p>All in all this was yet another successful BCRoc. There were a lot of new faces (both as hosts and attendees) and plenty of interesting talks to choose from.</p>
+
+<h1>Barcamp Manchester</h1>
+
+<p>Date: Nov 9 2013<br>
+Venue: Dyn Headquarters, Manchester NH<br>
+Attendees: ~50</p>
+
+<p>While I was really looking forward to a weekend off, who can resist just one more event? This one was a bit more of a mystery to me since information was somewhat scarse. Arrived a bit late due to GPS errors and finding parking (I won&#8217;t go into the speed bumps of death along the way)</p>
+
+<h3>Talks Given</h3>
+
+<ul>
+<li>Lightning Talks/Project Show-n-Tell (5 minutes to talk about anything or to show off your cool pet project)</li>
+<li>Linux AMA for Beginners or Hackers (Lets talk about all things Linux)</li>
+</ul>
+
+
+<h3>Talks Heard</h3>
+
+<ul>
+<li>FPGA/Ardiuno/Raspberry Pi</li>
+<li>Vagrant Plugin Ecosystem</li>
+<li>Intro to Object Oriented Javascript</li>
+</ul>
+
+
+<h3>The Good</h3>
+
+<ul>
+<li>Unique Setting: Held at a startup corporate office was kinda cool.</li>
+<li>Lunchtime &#8220;build-it&#8221; Competition: Who can build the furthest-traveling paper airplane? I really liked this. There were many interesting designs and lots of software engineering jokes.</li>
+</ul>
+
+
+<h3>The Not-so-Good</h3>
+
+<ul>
+<li>Presentation Rooms: These were small team conference rooms and really did not accomodate more than 8 people. Not everyone could see the wall-mounted display and there was no writing surface for quick diagrams.</li>
+<li>Scheduling: Talks were 40 minutes or an hour depending on the session time. There was also 20 minutes between talks, plenty of time to lose interest.</li>
+<li>Lack of information: The website does not offer much information other than what a Barcamp is, the Sponsors, and the address of the venue. &#8220;Panels&#8221; is also not a very good label for the online talk system, which I didn&#8217;t discover until after the event.</li>
+<li>Entry: You had to call someone to let you in. But the guy who entered after us had to sit and wait for the next person and let them in. Not sure what was up with that.</li>
+<li>No shirt: Sadface</li>
+</ul>
+
+
+<p>Overall I was not very impressed with this event. Not sure if it is just Barcamp Burnout or what. I was surprised that for being a somewhat science/technology center in New Hampshire that there weren&#8217;t more attendees. This showed in that there were only ~20 talks total. The venue while unique did not feel very useful for a conference such as this. That being said I did walk away learning a few new things and meeting a few new people.</p>
+
+<h1>Closing</h1>
+
+<p>Thats it for Barcamps for a while. 3 events in 3 weekends in 3 different states giving 3 different talks with at least 3 CSHers at each event. Yikes. TEDxBeaconStreet is right around the corner, followed by holidays and hockey.</p>
+
+<p>As always, feedback and questions are always welcome. Shoot me an email or a tweet.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Infrastructure Security Considerations]]></title>
+    <link href="http://cohoe.github.com/blog/2013/11/02/infrastructure-security-considerations/"/>
     <updated>2013-11-02T12:09:00-04:00</updated>
-    <id>http://cohoe.github.com/blog/2013/11/02/why-we-keep-doing-security-badly</id>
-    <content type="html"><![CDATA[<p>Points on why infrastructure people focus on things that won&#8217;t keep them secure in a high-stakes environment. Renamed from &#8220;wrong&#8221; to &#8220;badly&#8221; because as pointed out, it isn&#8217;t technically wrong. Talk based on my experience at RSA and in the networking labs. Given at <a href="http://barcamproc.org">Barcamp Rochester Fall 2013</a>.</p>
+    <id>http://cohoe.github.com/blog/2013/11/02/infrastructure-security-considerations</id>
+    <content type="html"><![CDATA[<p>Points on a few things infrastructure people tend to do that won&#8217;t keep them secure in a high-stakes environment. Talk based on my experience at RSA and in the RIT networking labs. Title changed based on community feedback. Given at <a href="http://barcamproc.org">Barcamp Rochester Fall 2013</a>.</p>
 
 <p>Slides available in <a href="http://archive.grantcohoe.com/presentations/security.pptx">The Archive</a>.</p>
 ]]></content>

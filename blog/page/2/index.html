@@ -9,7 +9,7 @@
   <meta name="author" content="Grant Cohoe">
 
   
-  <meta name="description" content="If I am the requester or the requestee, it means that I have had a conversation with you (Not chat/texted. Actual person-to-person) on at least two &hellip;">
+  <meta name="description" content="Requirements I have a shiny new VM server sitting in my dorm room. I have access to two networks, one operated by my dorm organization and the other &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -84,6 +84,341 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <!-- Now we're back to normal posts. Note the links used under href in both headers.-->
+        <h1 class="entry-title"><a href="/blog/2013/01/03/dynamic-dual-home-linux-server/">Dynamic Dual-Home Linux Server</a></h1>
+      
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-01-03T01:15:00-05:00" pubdate data-updated="true">Jan 3<span>rd</span>, 2013</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h1>Requirements</h1>
+
+<p>I have a shiny new VM server sitting in my dorm room. I have access to two networks, one operated by my dorm organization and the other provided to me by RIT. Both get me to the internet, but do so through different paths/SLAs. I want my server to be accessible from both networks. I also want to be able to attach VM hosts to NAT&#8217;d networks behind each respective network. This gives me a total of four possible VM networks (primary-external, primary-internal, secondary-external, secondary-internal). I have a Hurricane Electric IPv6 tunnel endpoint configured on the server, and want IPv6 connectivity available on ALL networks regardless of being external or internal. And to complicate matters, my external IP addresses are given to me via DHCP so I cannot set anything statically. Make it so.</p>
+
+<h1>Dependencies</h1>
+
+<ul>
+<li>IPTables</li>
+<li>EBTables</li>
+<li>Kernel 2.6 or newer</li>
+<li>IPCalc
+You also need access to two networks.</li>
+</ul>
+
+
+<h1>Script Setup</h1>
+
+<p>First, like any good shell script, we should define our command paths:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>SERVICE=/sbin/service
+</span><span class='line'>IPTABLES=/sbin/iptables
+</span><span class='line'>IP6TABLES=/sbin/ip6tables
+</span><span class='line'>EBTABLES=/sbin/ebtables
+</span><span class='line'>IPCALC=/bin/ipcalc</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Next we&#8217;ll define the interface names that we are going to use. These should already be pre-configured and have their appropriate IP information.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>PRIMARY_EXTERNAL_INTERFACE="primary-net"
+</span><span class='line'>PRIMARY_INTERNAL_INTERFACE="primary-nat"
+</span><span class='line'>SECONDARY_EXTERNAL_INTERFACE="secondary-net"
+</span><span class='line'>SECONDARY_INTERNAL_INTERFACE="secondary-nat"
+</span><span class='line'>IPV6_TUNNEL_INTERFACE="he-ipv6"</span></code></pre></td></tr></table></div></figure>
+
+
+<h1>Subnet Information</h1>
+
+<p>Now we need to load in the relevant subnet layouts. In an ideal world this would be set statically. However due to the nature of the environment I am in, both of my networks serve me my address via DHCP and is subject to change. This is very dirty and not very efficient, but it works:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'># Here we will get the subnet information for the primary network
+</span><span class='line'>PRIMARY_EXTERNAL_NETWORK=`$IPCALC -n $(ip -4 addr show dev $PRIMARY_EXTERNAL_INTERFACE | grep "inet" | cut -d ' ' -f 6) | cut -d = -f 2`
+</span><span class='line'>PRIMARY_EXTERNAL_PREFIX=`$IPCALC -p $(ip -4 addr show dev $PRIMARY_EXTERNAL_INTERFACE | grep "inet" | cut -d ' ' -f 6) | cut -d = -f 2`
+</span><span class='line'>PRIMARY_EXTERNAL_NETWORK="$PRIMARY_EXTERNAL_NETWORK/$PRIMARY_EXTERNAL_PREFIX"
+</span><span class='line'># Then the NAT'd network behind the primary
+</span><span class='line'>PRIMARY_INTERNAL_NETWORK=`ip -4 addr show dev $PRIMARY_INTERNAL_INTERFACE | grep "inet" | cut -d ' ' -f 6 | sed "s/[0-9]\+\//0\//"`
+</span><span class='line'># Now the subnet information for the secondary network
+</span><span class='line'>SECONDARY_EXTERNAL_NETWORK=`$IPCALC -n $(ip -4 addr show dev $SECONDARY_EXTERNAL_INTERFACE | grep "inet" | cut -d ' ' -f 6) | cut -d = -f 2`
+</span><span class='line'>SECONDARY_EXTERNAL_PREFIX=`$IPCALC -p $(ip -4 addr show dev $SECONDARY_EXTERNAL_INTERFACE | grep "inet" | cut -d ' ' -f 6) | cut -d = -f 2`
+</span><span class='line'>SECONDARY_EXTERNAL_NETWORK="$SECONDARY_EXTERNAL_NETWORK/$SECONDARY_EXTERNAL_PREFIX"
+</span><span class='line'># And it's NAT'd network.
+</span><span class='line'>SECONDARY_INTERNAL_NETWORK=`ip -4 addr show dev $SECONDARY_INTERNAL_INTERFACE | grep "inet" | cut -d ' ' -f 6 | sed "s/[0-9]\+\//0\//"`
+</span><span class='line'>
+</span><span class='line'># This is where we load in the IP addresses of the interfaces
+</span><span class='line'>PRIMARY_EXTERNAL_IP=`ip -4 addr show dev $PRIMARY_EXTERNAL_INTERFACE | grep inet | cut -d ' ' -f 6 | sed "s/\/[0-9]\+$//"`
+</span><span class='line'>PRIMARY_INTERNAL_IP=`ip -4 addr show dev $PRIMARY_INTERNAL_INTERFACE | grep inet | cut -d ' ' -f 6 | sed "s/\/[0-9]\+$//"`
+</span><span class='line'>SECONDARY_EXTERNAL_IP=`ip -4 addr show dev $SECONDARY_EXTERNAL_INTERFACE | grep inet | cut -d ' ' -f 6 | sed "s/\/[0-9]\+$//"`
+</span><span class='line'>SECONDARY_INTERNAL_IP=`ip -4 addr show dev $SECONDARY_INTERNAL_INTERFACE | grep inet | cut -d ' ' -f 6 | sed "s/\/[0-9]\+$//"`
+</span><span class='line'>
+</span><span class='line'># We get the gateways by pinging once out of the appropriate interface to the multicast address of All Routers on the network. 
+</span><span class='line'>PRIMARY_GATEWAY_IP=`ping -I $PRIMARY_EXTERNAL_IP 224.0.0.2 -c 1 | grep "icmp_seq" | cut -d : -f 1 | awk '{print $4}'`
+</span><span class='line'>SECONDARY_GATEWAY_IP=`ping -I $SECONDARY_EXTERNAL_IP 224.0.0.2 -c 1 | grep "icmp_seq" | cut -d : -f 1 | awk '{print $4}'`</span></code></pre></td></tr></table></div></figure>
+
+
+<h1>System Configuration</h1>
+
+<p>In order to get most of these features working, we need to enable IP forwarding in the kernel.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>echo "Enabling IP forwarding..."
+</span><span class='line'>sysctl -w net.ipv4.ip_forward=1
+</span><span class='line'>sysctl -w net.ipv6.conf.all.forwarding=1</span></code></pre></td></tr></table></div></figure>
+
+
+<h1>Routes</h1>
+
+<p>The routes are the most critical part of making this whole system work. We use two cool features of the linux networking stack, Route Tables and Route Rules. Route Tables are similar to your VRF tables in Cisco-land. Basically you maintain several different routing tables on a single system in addition to the main one. In order to specify what table a packet should use, you configure Route Rules. A rule basically says &#8220;Packets that match this rule should use table A&#8221;. In this system I use rules to force a packet to use a route table based on its source address.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>
+</span><span class='line'># Kernel IP Routes
+</span><span class='line'>echo "Setting system default gateways"
+</span><span class='line'>ip route del default
+</span><span class='line'>ip route add default via $PRIMARY_GATEWAY_IP
+</span><span class='line'>ip -6 route add ::/0 dev $IPV6_TUNNEL_INTERFACE
+</span><span class='line'>
+</span><span class='line'>echo "Adding default routes for primary external network..."
+</span><span class='line'>ip route flush table $PRIMARY_EXTERNAL_INTERFACE-routes
+</span><span class='line'>ip route add $PRIMARY_EXTERNAL_NETWORK dev $PRIMARY_EXTERNAL_INTERFACE src $PRIMARY_EXTERNAL_IP table $PRIMARY_EXTERNAL_INTERFACE-routes
+</span><span class='line'>ip route add default via $PRIMARY_GATEWAY_IP table $PRIMARY_EXTERNAL_INTERFACE-routes
+</span><span class='line'>
+</span><span class='line'>echo "Adding default routes for secondary external network..."
+</span><span class='line'>ip route flush table $SECONDARY_EXTERNAL_INTERFACE-routes
+</span><span class='line'>ip route add $SECONDARY_EXTERNAL_NETWORK dev $SECONDARY_EXTERNAL_INTERFACE src $SECONDARY_EXTERNAL_IP table $SECONDARY_EXTERNAL_INTERFACE-routes
+</span><span class='line'>ip route add default via $SECONDARY_GATEWAY_IP table $SECONDARY_EXTERNAL_INTERFACE-routes
+</span><span class='line'>
+</span><span class='line'>echo "Creating routes for primary internal network..."
+</span><span class='line'>ip route flush table $PRIMARY_INTERNAL_INTERFACE-routes
+</span><span class='line'>ip route add $PRIMARY_INTERNAL_NETWORK dev $PRIMARY_INTERNAL_INTERFACE table $PRIMARY_INTERNAL_INTERFACE-routes
+</span><span class='line'>ip route add default via $PRIMARY_GATEWAY_IP table $PRIMARY_INTERNAL_INTERFACE-routes
+</span><span class='line'>
+</span><span class='line'>echo "Creating routes for secondary internal network..."
+</span><span class='line'>ip route flush table $SECONDARY_INTERNAL_INTERFACE-routes
+</span><span class='line'>ip route add $SECONDARY_INTERNAL_NETWORK dev $SECONDARY_INTERNAL_INTERFACE table $SECONDARY_INTERNAL_INTERFACE-routes
+</span><span class='line'>ip route add default via $SECONDARY_GATEWAY_IP table $SECONDARY_INTERNAL_INTERFACE-routes
+</span><span class='line'>
+</span><span class='line'>echo "Creating route rules for primary external network..."
+</span><span class='line'>ip rule del from $PRIMARY_EXTERNAL_IP
+</span><span class='line'>ip rule add from $PRIMARY_EXTERNAL_IP table $PRIMARY_EXTERNAL_INTERFACE-routes
+</span><span class='line'>
+</span><span class='line'>echo "Creating route rules for secondary external network..."
+</span><span class='line'>ip rule del from $SECONDARY_EXTERNAL_IP
+</span><span class='line'>ip rule add from $SECONDARY_EXTERNAL_IP table $SECONDARY_EXTERNAL_INTERFACE-routes
+</span><span class='line'>
+</span><span class='line'>echo "Creating route rules for primary internal network..."
+</span><span class='line'>ip rule del from $PRIMARY_INTERNAL_NETWORK
+</span><span class='line'>ip rule add from $PRIMARY_INTERNAL_NETWORK lookup $PRIMARY_INTERNAL_INTERFACE-routes
+</span><span class='line'>
+</span><span class='line'>echo "Creating route rules for secondary internal network..."
+</span><span class='line'>ip rule del from $SECONDARY_INTERNAL_NETWORK
+</span><span class='line'>ip rule add from $SECONDARY_INTERNAL_NETWORK lookup $SECONDARY_INTERNAL_INTERFACE-routes</span></code></pre></td></tr></table></div></figure>
+
+
+<h1>Firewall</h1>
+
+<p>My script also maintains the host firewall rules, so we&#8217;ll enable those:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>echo "Reseting firewall rules..."
+</span><span class='line'>$SERVICE iptables restart
+</span><span class='line'>$SERVICE ip6tables restart
+</span><span class='line'>
+</span><span class='line'>echo "Setting up IPv4 firewall rules..."
+</span><span class='line'>$IPTABLES -A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
+</span><span class='line'>$IPTABLES -A INPUT -p ipv6 -j ACCEPT
+</span><span class='line'>$IPTABLES -A INPUT -p icmp -j ACCEPT
+</span><span class='line'>$IPTABLES -A INPUT -i lo -j ACCEPT
+</span><span class='line'>$IPTABLES -A INPUT -s mason.csh.rit.edu -p tcp --dport 5666 -j ACCEPT
+</span><span class='line'>$IPTABLES -A INPUT -p tcp --dport 53 -j ACCEPT
+</span><span class='line'>$IPTABLES -A INPUT -p udp --dport 53 -j ACCEPT
+</span><span class='line'>$IPTABLES -A INPUT -p tcp -m tcp --dport 80 -j ACCEPT
+</span><span class='line'>$IPTABLES -A INPUT -p tcp -m tcp --dport 22 -j ACCEPT
+</span><span class='line'>$IPTABLES -A INPUT -j REJECT --reject-with icmp-host-prohibited
+</span><span class='line'>
+</span><span class='line'>echo "Setting up IPv6 firewall rules..."
+</span><span class='line'>$IP6TABLES -A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
+</span><span class='line'>$IP6TABLES -A INPUT -p ipv6-icmp -j ACCEPT
+</span><span class='line'>$IP6TABLES -A INPUT -i lo -j ACCEPT
+</span><span class='line'>$IP6TABLES -A INPUT -p tcp  --dport 53 -j ACCEPT
+</span><span class='line'>$IP6TABLES -A INPUT -p udp  --dport 53 -j ACCEPT
+</span><span class='line'>$IP6TABLES -A INPUT -p tcp -m tcp --dport 22 -j ACCEPT
+</span><span class='line'>$IP6TABLES -A INPUT -j REJECT --reject-with icmp6-adm-prohibited
+</span><span class='line'>
+</span><span class='line'>echo "Setting up firewall rules for primary internal network..."
+</span><span class='line'>$IPTABLES -A FORWARD -s $PRIMARY_INTERNAL_NETWORK -j ACCEPT
+</span><span class='line'>$IPTABLES -t nat -A POSTROUTING -s $PRIMARY_INTERNAL_NETWORK -j SNAT --to-source $PRIMARY_EXTERNAL_IP
+</span><span class='line'>
+</span><span class='line'>echo "Setting up firewall rules for secondary internal network..."
+</span><span class='line'>$IPTABLES -A FORWARD -s $SECONDARY_INTERNAL_NETWORK -j ACCEPT
+</span><span class='line'>$IPTABLES -t nat -A POSTROUTING -s $SECONDARY_INTERNAL_NETWORK -j SNAT --to-source $SECONDARY_EXTERNAL_IP
+</span><span class='line'>
+</span><span class='line'>echo "Setting up default firewall actions..."
+</span><span class='line'>$IPTABLES -A FORWARD -m state --state RELATED,ESTABLISHED -j ACCEPT
+</span><span class='line'>$IPTABLES -A FORWARD -j REJECT --reject-with icmp-port-unreachable</span></code></pre></td></tr></table></div></figure>
+
+
+<h1>Router Advertisements</h1>
+
+<p>One of the features of my networking setup is that all networks, no matter internal or external have IPv6 connectivity. This is achieved by sending Router Advertisements out all interfaces. This is all well and good for the VMs that I am hosting, but these advertisements travel out of the physical interfaces to other hosts on the network! This is not good in that I am allowing other users to use my IPv6 tunnel interface. This puzzled me for a long time until I discovered a handy little program called &#8220;ebtables&#8221;. Ebtables is basically iptables for layer 2. As such, I was able to filter all router advertisement broadcasts out of the physical interfaces.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>echo "Blocking IPv6 router advertisement to the world..."
+</span><span class='line'>$SERVICE radvd stop
+</span><span class='line'>$SERVICE ebtables restart
+</span><span class='line'>$EBTABLES -A OUTPUT -d 33:33:0:0:0:1 -o eth1 -j DROP
+</span><span class='line'>$EBTABLES -A OUTPUT -d 33:33:0:0:0:1 -o eth0 -j DROP
+</span><span class='line'>$SERVICE radvd start</span></code></pre></td></tr></table></div></figure>
+
+
+<h1>End Result</h1>
+
+<p>You now have a dual-homed server with two external networks, two internal networks, and IPv6 connectivity to all. Both external networks can receive their configuration via DHCP and will dynamically adjust their routing accordingly.</p>
+
+<p><img src="http://www.grantcohoe.com/images/blog/enterprise-diagram.png" width="662" height="457" alt="" title="" /></p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -2313,9 +2648,13 @@ Music &amp; original words by Carly Rae Jepsen</p>
     
       <li><a class='category' href='/blog/categories/guides/'>Guides</a></li>
     
-      <li><a class='category' href='/blog/categories/rants/'>Rants</a></li>
+      <li><a class='category' href='/blog/categories/misc/'>Misc</a></li>
+    
+      <li><a class='category' href='/blog/categories/musings/'>Musings</a></li>
     
       <li><a class='category' href='/blog/categories/presentations/'>Presentations</a></li>
+    
+      <li><a class='category' href='/blog/categories/events/'>Events</a></li>
     
   </ul>
 </section>
@@ -2324,7 +2663,11 @@ Music &amp; original words by Carly Rae Jepsen</p>
   <ul id="recent_posts">
     
       <li class="post">
-        <a href="/blog/2013/11/02/why-we-keep-doing-security-badly/">Why we keep doing security badly</a>
+        <a href="/blog/2013/11/10/barcamp-tour-2013/">Barcamp Tour 2013</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/11/02/infrastructure-security-considerations/">Infrastructure Security Considerations</a>
       </li>
     
       <li class="post">
@@ -2337,10 +2680,6 @@ Music &amp; original words by Carly Rae Jepsen</p>
     
       <li class="post">
         <a href="/blog/2013/04/19/backups-for-photo-majors/">Backups for Photo Majors</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/04/19/impact-of-disk-alignment-in-virtualized-environments/">Impact of Disk Alignment in Virtualized Environments</a>
       </li>
     
   </ul>
