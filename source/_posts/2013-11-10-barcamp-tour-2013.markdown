@@ -5,7 +5,7 @@ date: 2013-11-10 19:33
 comments: true
 sharing: true
 categories: Events
-aliases: /events/barcamptour2013
+alias: /events/barcamptour2013
 ---
 
 Let me get something straight right off the bat: Barcamps have nothing to do with bars. Barcamps are technically-oriented community-organized unconferences where attendees share their ideas and projects with each other.
