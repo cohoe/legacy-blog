@@ -57,12 +57,6 @@ We will be taking this apart line by line to understand exactly what is going on
 ### Filters
 If you want to use search filters in your ACLs, I suggest you read <a href="http://www.zytrax.com/books/ldap/apa/search.html">this</a>. Filters are a great way to dynamically allow access to a set of objects.
 
-## Control
-There are three optional keywords that you can use to define further ACL processing (aka control flow). They are ```stop``` (implied at the end of each rule), ```continue```, and ```break```.
-
-Stop means stop. Further ACL processing will not occur, so you don't get the chance to gain/lose permissions later on. Since this is the implied option you should never have to specify it unless you want to halt at a specific ```<who>```.
-If you want to stop processing at the end of your ACL but keep going through it's ```<who>``` clauses, you can use continue. This lets you grant other people privileges based on this ACL but not continue with parsing other ACLs.
-If you want to stop going through the ```<who>```s of your ACL but want to keep going through other ACLs, specify ```<break>```. This lets you stop processing on the current ACL and continue with others.
 
 ## Level
 None - No access (typical)
@@ -75,6 +69,13 @@ Write - Change the value or add an attribute (typical)
 Manage - Mess with structuralObjectClasses (really mess things up)
 
 http://www.openldap.org/its/index.cgi/Documentation?id=7795;page%3D1;statetype%3D1
+
+## Control
+There are three optional keywords that you can use to define further ACL processing (aka control flow). They are ```stop``` (implied at the end of each rule), ```continue```, and ```break```.
+
+Stop means stop. Further ACL processing will not occur, so you don't get the chance to gain/lose permissions later on. Since this is the implied option you should never have to specify it unless you want to halt at a specific ```<who>```.
+If you want to stop processing at the end of your ACL but keep going through it's ```<who>``` clauses, you can use continue. This lets you grant other people privileges based on this ACL but not continue with parsing other ACLs.
+If you want to stop going through the ```<who>```s of your ACL but want to keep going through other ACLs, specify ```<break>```. This lets you stop processing on the current ACL and continue with others.
 
 ## Implied Stuff
 At the end of every ACL there is an implied clause that restricts access:
@@ -95,3 +96,6 @@ changetype: modify
 add: olcAccess
 olcAccess: {10}to foobar by baz
 ```
+
+# Todo
+https://itservices.stanford.edu/service/directory/aclexamples
