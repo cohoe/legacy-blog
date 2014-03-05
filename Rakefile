@@ -111,6 +111,7 @@ task :new_post, :title do |t, args|
     post.puts "date: #{Time.now.strftime('%Y-%m-%d %H:%M')}"
     post.puts "comments: true"
     post.puts "sharing: true"
+	post.puts "alias: /#{(0...8).map { ('a'..'z').to_a[rand(26)] }.join}"
     post.puts "categories: "
     post.puts "---"
   end

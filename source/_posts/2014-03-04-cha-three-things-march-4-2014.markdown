@@ -4,6 +4,7 @@ title: "CHA Three Things - March 4 2014"
 date: 2014-03-04 17:21
 comments: true
 sharing: true
+alias: /noatcfjn
 categories: Hockey
 ---
 
@@ -32,11 +33,11 @@ net.
 
 ## Team Goal
 Syracuse had a nifty little move to open up scoring on 
-Saturday. All five skaters touched the puck, eventually
-connecting with Julie Knerr's stick which whipped it 
+Saturday. All five skaters touched the puck which eventually
+connecting with Julie Knerr's stick and whipped it 
 past the Lindenwood goaltender for the first goal of the
 game. This would be all the Orange would need as Jenesica 
-Drinkwater held on for the remaining 59:00 to get the 
+Drinkwater would hold on for the remaining 59:00 to get the 
 donut.
 
 ## Tweet of the Weekend:
