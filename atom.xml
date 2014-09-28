@@ -4,7 +4,7 @@
   <title><![CDATA[Grant Cohoe]]></title>
   <link href="http://cohoe.github.com/atom.xml" rel="self"/>
   <link href="http://cohoe.github.com/"/>
-  <updated>2014-03-13T15:41:17-04:00</updated>
+  <updated>2014-09-27T20:11:08-04:00</updated>
   <id>http://cohoe.github.com/</id>
   <author>
     <name><![CDATA[Grant Cohoe]]></name>
@@ -12,6 +12,92 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[CHA Picks - March 7-8 2014 (Championship Weekend)]]></title>
+    <link href="http://cohoe.github.com/blog/2014/03/04/cha-picks-march-7-8-2014-championship-weekend/"/>
+    <updated>2014-03-04T17:22:00-05:00</updated>
+    <id>http://cohoe.github.com/blog/2014/03/04/cha-picks-march-7-8-2014-championship-weekend</id>
+    <content type="html"><![CDATA[<h2>Semifinals</h2>
+
+<h3>No. 4 Syracuse vs. No. 1 Mercyhurst</h3>
+
+<p>Syracuse has been unable to solve Mercyhurst in their entire D-I history, getting at best one tie each season. After getting swept by RIT to end the regular season I don&#8217;t think anything is going to change.<br>
+<strong>Mercyhurst Wins 5-2</strong></p>
+
+<h3>No. 3 RIT vs. No. 2 Robert Morris</h3>
+
+<p>The Tigers will need to bring their A-game if they want to keep this to a one-goal contest. I&#8217;ve seen that level of play from them before, but after seeing a C-game on Friday and a B+-game Saturday I don&#8217;t think it&#8217;s going to happen.<br>
+<strong>Robert Morris Wins 3-1</strong> <em>(empty net)</em></p>
+
+<h2>Final</h2>
+
+<h3>No. 2 Robert Morris vs. No. 1 Mercyhurst</h3>
+
+<p>The Colonials have been the only team to seriously challenge the Lakers in conference, responsible for 2 of their 3 losses. If Robert Morris can hold the &#8216;Hurst offense at bay they should be able to pull off the win.<br>
+<strong>Robert Morris Wins 3-2</strong></p>
+
+<p>My personal odds of each team winning the title:</p>
+
+<ul>
+<li>Robert Morris: 40</li>
+<li>Mercyhurst: 35</li>
+<li>RIT: 15</li>
+<li>Syracuse: 10</li>
+</ul>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[CHA Three Things - March 4 2014]]></title>
+    <link href="http://cohoe.github.com/blog/2014/03/04/cha-three-things-march-4-2014/"/>
+    <updated>2014-03-04T17:21:00-05:00</updated>
+    <id>http://cohoe.github.com/blog/2014/03/04/cha-three-things-march-4-2014</id>
+    <content type="html"><![CDATA[<h2>Farewell, old friend</h2>
+
+<p>This weekend was a bittersweet moment for RIT. After sweeping
+Penn State in the first round of the CHA playoffs, the Tigers
+had to say farewell to Ritter Arena, their home since the
+programs inception in 1975. Next season the Tigers will take to
+the ice in the 4200-seat Gene Polisseni Center in September.
+After the handshake, the team circled up and took a knee at
+center ice for one final salute to Ritter. I&#8217;ll be honest. I
+shed a tear.</p>
+
+<h2>Penn State [repeat]</h2>
+
+<p>For the second straight season, Penn State finished with
+a single win under their belt (each time against Lindenwood).
+They also finished last in the CHA and had their seasons
+come to a close at the hands of RIT at Ritter Arena. Next
+season the Nittany Lions will return 7 of their 8 top goal
+scorers as sophomores/juniors. Freshman Laura Bowman is
+reponsible for 10 goals and 6 assists on 90 shots, good enough
+for 2nd best percentage. Sophomore Shannon Yoxheimer ended her
+season 2nd with 8 goals, 8 assists on 197 shots. Not an ideal
+percentage but no coach can fault her for putting the puck on
+net.</p>
+
+<h2>Team Goal</h2>
+
+<p>Syracuse had a nifty little move to open up scoring on
+Saturday. All five skaters touched the puck which eventually
+connecting with Julie Knerr&#8217;s stick and whipped it
+past the Lindenwood goaltender for the first goal of the
+game. This would be all the Orange would need as Jenesica
+Drinkwater would hold on for the remaining 59:00 to get the
+donut.</p>
+
+<h2>Tweet of the Weekend:</h2>
+
+<blockquote class="twitter-tweet" lang="en"><p>Awesome to see <a href="https://twitter.com/GrantCohoe">@GrantCohoe</a> in my AutismUp jersey tonight! Thank you for your donation to the cure! <a href="https://twitter.com/search?q=%23classact&amp;src=hash">#classact</a> <a href="https://twitter.com/search?q=%23pumped&amp;src=hash">#pumped</a> <a href="https://twitter.com/search?q=%23lovethenumber&amp;src=hash">#lovethenumber</a> #35</p>&mdash; Jetta Rackleff (@JettaRackleff) <a href="https://twitter.com/JettaRackleff/statuses/439603589884149760">March 1, 2014</a></blockquote>
+
+
+<script async src="http://cohoe.github.com//platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Barcamp Tour 2013]]></title>
@@ -4056,96 +4142,7 @@ Music &amp; original words by Carly Rae Jepsen</p>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>There you go, yet another useful service to have around for dealing with your network. Raw files used above are available in the <a href="http://archive.grantcohoe.com/projects/ssl">Archive</a>. Now back to Webauth with me&#8230;</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[System Technology Accounting and Resource Registration Solution (STARRS)]]></title>
-    <link href="http://cohoe.github.com/blog/2013/01/01/system-technology-accounting-and-resource-registration-solution-starrs/"/>
-    <updated>2013-01-01T20:10:00-05:00</updated>
-    <id>http://cohoe.github.com/blog/2013/01/01/system-technology-accounting-and-resource-registration-solution-starrs</id>
-    <content type="html"><![CDATA[<h1>Background</h1>
-
-<p>Like most of my projects, it all started with CSH. RIT allocates us two /24 public-facing networks to distribute out to our users. These resources need to have some degree of accounting in the event a user does something stupid (piracy, kiddie-pr0n, etc). RIT handles this with their own internal application, referred to as &#8220;start.rit.edu&#8221;. <em>Fun aside, Start.RIT was coded by an old CSHer, now RIT employee and CSH advisor. He still maintains portions of it today.</em> When the CSH network got to the point of needing our own internal application, a member (<a href="http://www.csh.rit.edu/~sunday/">Joe Sunday</a>) created &#8220;start.csh.rit.edu&#8221;. Similar to it&#8217;s RIT counterpart, start.csh allowed administrators to register machines and distribute resources on the network. Start.csh also allowed for users to manage firewall rules for their hosts at the border firewall systems. On the backend, it had a script that would automatically generate an ISC-DHCPD config file and load it into the server.</p>
-
-<p>Unfortunately over time, bits of Start began to break. The fact that users could not register their own machines was a major source of irritation for the RTPs (Root-Type-Persons, or Sysadmins). When the network topology was shifted to accomodate some reorganization within RIT, the firewall rule system broke completely. There was no way to clear out old hosts that havent been on the network in years. And after the house DHCP server was compromised (then obliterated by the RTPs for security), the automatic DHCP generation was completely gone. We needed something new.</p>
-
-<p>Starting in the Spring of 2011 I starting to architect a new application to encoumpase the previous functionality and add a lot of new features and enhancements that would benefit us for years to come. Going into the projects, I knew one thing: It had to be based in PostgreSQL. Pg has native datatypes for IP addresses, subnets, and MAC addresses. I know that this would be invaluable to have later on in the project. I also knew that I didnt want to write a daemon that ran on some server imposing application logic.</p>
-
-<h1>Development</h1>
-
-<p>At this point in my career, I didn&#8217;t have a whole lot of database architecting experience. I began to search for a schema creation application to help me architect what I knew was going to be a complex schema. I ran across a service called <a href="http://www.schemabank.com">SchemaBank</a>. (SB is now defunct) It was a schema design webapp that supported Postgres. It also introduced me to two things that would change the course of the application forever: Triggers and Functions. I realized that I could use Pg as the backend daemon to the entire application. For client interaction with the application, I started to develop a set of wrapper API functions that would help impose the application logic on the stored data. While most of this was taken care of in the relations between entities, there were some that could not be expressed as a relation. Fast forward two months, and I had a first revision of the database and the API to start writing an interface for.</p>
-
-<p>At this point I didn&#8217;t know any sort of web languages other than HTML and CSS either. So using a book I won at BarCampRoc on <a href="http://shop.oreilly.com/product/9780596157142.do">PHP, MySQL, and Javascript</a> (a very good book by the way), I started to learn PHP. Originally I was going to go with a purely non-OOP model for the webapp, however after consulting one of my web-dev friends (<a href="http://iota.csh.rit.edu/">Ben Russell</a>), he suggested that I go with an OOP model and to use some sort of framework to avoid having to write a ton of extra code. At this point I went with one that another one of my web-dev friends had used, <a href="http://ellislab.com/codeigniter">Codeigniter</a>. So I set to work and started writing classes. During this time, I knew that I needed a new a new dhcpd.conf generation function. One of my friends (<a href="http://blog.agargiulo.com/">Anthony Gargiulo</a>) expressed an interest in helping out with the project, so I tasked him with writing a generation function in Perl. Four months later, I had a working PHP web interface (and he had a working dhcpd.conf generator). At this point, I had everything except a name. I dont really remember a lot about how it came about, but I think I took the first cool-sounding word that came to my head. I was in a Quake 3 Arena mood that day and remembered an old console command (impulse). I took that word and backronymed it to the IP Management Program for Use in Local Server Environments.</p>
-
-<h1>Initial Implementation</h1>
-
-<p>When we returned to RIT in the Fall, I set to work deploying IMPULSE. After a few hickups here and there, everything was in place and in use. Users were fairly receptive to it, mainly that they could register their devices themselves. However after some time, a few problems emerged. The web interface became terribly slow with all of the data that people had entered. It wasnt very efficient at allowing users to complete basic tasks and had a few bugs. Clearly some changes needed to occur, but during the course of the year I didn&#8217;t want to touch it. I spent 6 months writing code on this project, and I really didnt want to work on it again.</p>
-
-<h1>Refresh</h1>
-
-<p>My latest co-op offerred me a chance to take to the code once again, this time with a new use case in mind. They wanted something that could manage network registrations for developers in a complex environment, but there were a few major additions that needed to happen. IMPULSE needed to go global. It needeed more specific access control. It needed better device integration. And most importantly, it also needed a new interface. Armed with all the knowlege I have gained over the last year, I set out to work. 2 months later I had a new web interface and a lot of new fixes and enhancements to the core. However the name IMPULSE no longer applied. So I cooked up a new one: STARRS (System Technology Accounting and Resource Registration Solution). And that&#8217;s presumably what you actually care about.</p>
-
-<h1>Features</h1>
-
-<p>STARRS starts off with Datacenters, which correspond to your physical locations. Each datacenter contains Subnets and VLANs. Each datacenter then contains one or more Availability Zones, which are logical partitions of resources within the datacenter. AZs contain ranges of your subnets.</p>
-
-<p>Within datacenters are Systems. A system is a computer, based on a hardware Platform (usually Custom though). A system can have Interfaces which attach to your network. On each interface can be Addresses that are assigned from your Availability Zones. You can get your addresses in a variety of ways (depending on family). DHCP and Static for IPv4, and Autoconf, DHCPv6, and Static for IPv6. (Oh yeah, STARRS does both IPv4 and IPv6). Your addresses are given to you with a set expiration date. If you dont renew before that date (You will get email notifications), it will be automatically deleted. On your addresses, you can create a variety of DNS Records that can be added into managed DNS Zones. Zone DDNS updates are done with Keys that are stored within STARRS. If your address is configured with DHCP, you can be a member of a DHCP Class. Classes, Ranges, and Subnets all have a variety of configuration options that can be set. You can also set options globally. For network systems, you can store SNMP Credentials that STARRS can use to look up Switchport and CAM Table data. Using this you can easily locate your system interfaces in your infrastructure. And of course, you can search for systems that you have configured.</p>
-
-<p>STARRS depends on your existing authentication infrastructure for its user data. It does not track credentials within itself, but relies on the client to provide the user and external sources for privileging. The STARRS web interface gets the username from the web server from configurable PHP variables. It takes the username and calls an API initializing function that sets up your privilege levels. STARRS can get privilege data from one of the following:</p>
-
-<ul>
-<li>Local Tables</li>
-<li>OpenLDAP</li>
-<li>Active Directory</li>
-</ul>
-
-
-<p>Users can be global ADMINs and have RW access to everything in the database. They can be USERs who can create/edit/remove their own stuff, but cannot see certain confidential configuration and cannot edit other peoples stuff. People who are Group Admins can edit other peoples stuff in their group. There is also a PROGRAM user-level that allows external applications Read-Only access to user resources. If you don&#8217;t exist in the privilege source, you will be unable to initialize and do anything in STARRS.</p>
-
-<p>STARRS also has the ability to automatically generate a configuration file for the ISC-DHCPD server based on the resources you configure. It supports key-based DDNS updates to zones, DHCP classes, global/range/subnet/class options, and more. A cronjob runs to periodically generate, download, and reload the server configuration file. Eventually this might change to something more real, but for now this is what works.</p>
-
-<p>Use cases have STARRS working with the following web authentication services:</p>
-
-<ul>
-<li><a href="http://webauth.stanford.edu/">Stanford Webauth</a></li>
-<li><a href="http://httpd.apache.org/docs/2.2/mod/mod_ldap.html">Basic Auth w/ mod_ldap</a></li>
-</ul>
-
-
-<h1>Deployment</h1>
-
-<p>All of the code is available on Github in two repositories:</p>
-
-<ul>
-<li><a href="https://github.com/cohoe/starrs">Core/Database</a></li>
-<li><a href="https://github.com/cohoe/starrs-web">Web</a></li>
-</ul>
-
-
-<p>There is an unofficial and unsupported command-line interface written by a friend of mine (<a href="http://ryansb.com/">Ryan Brown</a>) located <a href="https://github.com/ryansb/ish">Here</a>.</p>
-
-<p>STARRS is licensed under the MIT license.</p>
-
-<h1>Demo</h1>
-
-<p>You can access <a href="http://starrsdemo.grantcohoe.com">the demo by clicking here.</a> Username is &#8216;root&#8217; and password is &#8216;admin&#8217;. The database resets itself every 24 hours at midnight, so don&#8217;t expect long-term persistence of data.</p>
-
-<h1>Who Should Use This</h1>
-
-<p>If you are a service provider to a group of users who consume network resources that you control. You want some way of accounting for what resources are in use and where they are in your network. The use cases of it so far are:</p>
-
-<ul>
-<li>Computer Science House - Dorm of college students (about 350 systems)</li>
-<li>Work - Product developers in 4 sites across 3 countries (1000+ systems)</li>
-<li>Enterprise - My personal VM server (30 systems)</li>
-</ul>
-
-
-<h1>Future</h1>
-
-<p>There are a couple of enhancements on deck for the next release (whever that may be). See the respective Github project issues for details. However STARRS will soon be encompasing libvirt support. When you create a system, you can specify it to be a Virtual Machine living on a Host in one of your datacenters. None of this has been worked on, but the idea is for STARRS to be a complete network management solution. Maybe I&#8217;ll call it CloudSTARRS (like rockstars, but in the cloud haha).</p>
+<p>There you go, yet another useful service to have around for dealing with your network. Raw files used above are available in the <a href="http://archive.grantcohoe.com/projects/ssl">Archive</a>.</p>
 ]]></content>
   </entry>
   
