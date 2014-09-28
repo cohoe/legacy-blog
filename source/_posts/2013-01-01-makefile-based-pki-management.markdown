@@ -228,4 +228,4 @@ Data Base Updated
 [root@gmcsrvx1 example.com]#
 ```
 
-There you go, yet another useful service to have around for dealing with your network. Raw files used above are available in the <a href="http://archive.grantcohoe.com/projects/ssl">Archive</a>. Now back to Webauth with me...
+There you go, yet another useful service to have around for dealing with your network. Raw files used above are available in the <a href="http://archive.grantcohoe.com/projects/ssl">Archive</a>.

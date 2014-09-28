@@ -260,7 +260,7 @@ multitask :push do
     system "wget \"https://github.com/cohoe/resume/blob/master/resume.pdf?raw=true\" --output-document=\"resume.pdf\""
     system "wget \"https://github.com/cohoe/resume/blob/master/references.pdf?raw=true\" --output-document=\"references.pdf\""
         system "git add ."
-    system "git add -u"
+    system "git add -u ."
     puts "\n## Commiting: Site updated at #{Time.now.utc}"
     message = "Site updated at #{Time.now.utc}"
     system "git commit -m \"#{message}\""
